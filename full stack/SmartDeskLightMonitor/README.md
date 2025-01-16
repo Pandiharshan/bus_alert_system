@@ -67,3 +67,4 @@ Commit: docs: update README - 04/15/2025 10:12:00
 Commit: docs: add user guide - 04/15/2025 16:50:00
 Commit: feat: implement multiple profiles - 04/15/2025 15:45:00
 Commit: chore: upgrade Gradle version - 01/16/2025 14:01:00
+Commit: chore: prepare for release - 01/16/2025 15:40:00
