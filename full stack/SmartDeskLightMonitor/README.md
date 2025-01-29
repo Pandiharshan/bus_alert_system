@@ -259,3 +259,4 @@ Commit: fix: resolve sensor reading issues - 01/22/2025 14:36:00
 Commit: refactor: enhance error handling - 01/22/2025 13:31:00
 Commit: style: fix lint issues - 01/28/2025 11:18:00
 Commit: feat: implement calibration tools - 01/28/2025 14:39:00
+Commit: fix: fix notification permissions - 01/29/2025 12:22:00
