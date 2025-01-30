@@ -263,3 +263,4 @@ Commit: fix: fix notification permissions - 01/29/2025 12:22:00
 Commit: docs: improve code comments - 01/29/2025 14:36:00
 Commit: refactor: optimize memory usage - 01/30/2025 15:42:00
 Commit: feat: add threshold configuration - 01/30/2025 13:29:00
+Commit: fix: resolve crash on startup - 01/30/2025 17:57:00
