@@ -94,3 +94,4 @@ Commit: docs: add API documentation - 01/29/2025 13:27:00
 Commit: refactor: optimize memory usage - 01/29/2025 17:54:00
 Commit: refactor: improve build process - 01/30/2025 11:17:00
 Commit: fix: resolve crash on startup - 01/30/2025 09:03:00
+Commit: docs: improve code comments - 01/31/2025 12:22:00
