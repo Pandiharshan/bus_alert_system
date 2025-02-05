@@ -106,3 +106,4 @@ Commit: fix: fix notification permissions - 02/05/2025 10:06:00
 Commit: feat: implement data persistence - 02/05/2025 14:37:00
 Commit: refactor: optimize sensor polling - 02/05/2025 14:39:00
 Commit: test: add performance tests - 02/05/2025 16:47:00
+Commit: refactor: improve network layer - 02/05/2025 10:09:00
