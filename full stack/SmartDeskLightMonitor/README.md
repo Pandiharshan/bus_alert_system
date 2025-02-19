@@ -279,3 +279,4 @@ Commit: test: add performance tests - 02/18/2025 09:00:00
 Commit: feat: implement alert notifications - 02/18/2025 16:50:00
 Commit: feat: add Material 3 theme support - 02/19/2025 13:32:00
 Commit: feat: add data export functionality - 02/19/2025 16:48:00
+Commit: docs: add user guide - 02/19/2025 12:26:00
