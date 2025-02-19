@@ -124,3 +124,4 @@ Commit: fix: fix data corruption issues - 02/18/2025 13:32:00
 Commit: feat: add network client for external sensors - 02/18/2025 13:28:00
 Commit: test: implement E2E tests - 02/18/2025 14:35:00
 Commit: style: improve naming conventions - 02/19/2025 11:16:00
+Commit: feat: add multi-sensor support - 02/19/2025 15:45:00
