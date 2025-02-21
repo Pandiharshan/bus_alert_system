@@ -20,3 +20,4 @@ Commit: feat: Add preset configurations (Office, Bright, Dim) - 2025-02-12T15:30
 Commit: feat: Implement manual alert toggle functionality - 2025-02-14T12:00:00
 Commit: feat: Add lux history tracking and sparkline chart - 2025-02-17T09:00:00
 Commit: feat: Implement connection status indicator - 2025-02-19T14:20:00
+Commit: feat: Add network auto-connect functionality - 2025-02-21T11:45:00
