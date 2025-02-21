@@ -126,3 +126,4 @@ Commit: test: implement E2E tests - 02/18/2025 14:35:00
 Commit: style: improve naming conventions - 02/19/2025 11:16:00
 Commit: feat: add multi-sensor support - 02/19/2025 15:45:00
 Commit: feat: implement multiple profiles - 02/21/2025 15:42:00
+Commit: chore: prepare for release - 02/21/2025 16:49:00
