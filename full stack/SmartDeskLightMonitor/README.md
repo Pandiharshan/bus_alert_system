@@ -129,3 +129,4 @@ Commit: feat: implement multiple profiles - 02/21/2025 15:42:00
 Commit: chore: prepare for release - 02/21/2025 16:49:00
 Commit: feat: create backup/restore feature - 02/21/2025 14:39:00
 Commit: feat: create backup/restore feature - 02/24/2025 16:49:00
+Commit: feat: add threshold configuration - 02/24/2025 09:00:00
