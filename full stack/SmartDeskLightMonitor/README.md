@@ -295,3 +295,4 @@ Commit: feat: create dashboard UI with Compose - 03/03/2025 11:18:00
 Commit: refactor: improve network layer - 03/06/2025 09:00:00
 Commit: refactor: improve network layer - 03/06/2025 12:23:00
 Commit: feat: add accessibility features - 03/06/2025 13:27:00
+Commit: fix: fix notification permissions - 03/10/2025 14:33:00
