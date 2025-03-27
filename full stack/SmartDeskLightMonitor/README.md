@@ -162,3 +162,4 @@ Commit: feat: add animation transitions - 03/25/2025 11:19:00
 Commit: style: format code - 03/26/2025 13:31:00
 Commit: docs: improve troubleshooting guide - 03/26/2025 13:29:00
 Commit: fix: fix timezone handling - 03/27/2025 13:30:00
+Commit: docs: add API documentation - 03/27/2025 10:08:00
