@@ -36,3 +36,4 @@ Commit: feat: Add tooltip help text for controls - 2025-03-21T12:30:00
 Commit: feat: Implement swipe-to-refresh functionality - 2025-03-24T14:00:00
 Commit: feat: Add app icon and launcher assets - 2025-03-26T11:15:00
 Commit: feat: Create onboarding screens for first-time users - 2025-03-28T16:20:00
+Commit: feat: Add settings screen with preferences - 2025-03-31T10:00:00
