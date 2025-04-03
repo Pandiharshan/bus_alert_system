@@ -311,3 +311,4 @@ Commit: fix: resolve memory leaks - 03/28/2025 12:22:00
 Commit: docs: update changelog - 03/31/2025 14:38:00
 Commit: style: format code - 03/31/2025 11:19:00
 Commit: feat: implement calibration tools - 04/02/2025 11:13:00
+Commit: feat: add network client for external sensors - 04/03/2025 14:39:00
