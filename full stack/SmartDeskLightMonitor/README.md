@@ -315,3 +315,4 @@ Commit: feat: add network client for external sensors - 04/03/2025 14:39:00
 Commit: fix: resolve crash on startup - 04/03/2025 12:21:00
 Commit: fix: resolve performance bottlenecks - 04/03/2025 12:26:00
 Commit: chore: upgrade Gradle version - 04/04/2025 10:08:00
+Commit: test: add unit tests for ViewModel - 04/04/2025 10:12:00
