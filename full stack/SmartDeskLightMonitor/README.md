@@ -180,3 +180,4 @@ Commit: refactor: optimize Compose performance - 04/04/2025 13:31:00
 Commit: refactor: improve test coverage - 04/04/2025 11:16:00
 Commit: test: add performance tests - 04/04/2025 13:33:00
 Commit: refactor: improve build process - 04/07/2025 13:31:00
+Commit: chore: improve build scripts - 04/07/2025 14:33:00
