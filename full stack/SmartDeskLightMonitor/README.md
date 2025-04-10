@@ -330,3 +330,4 @@ Commit: feat: add multi-sensor support - 04/09/2025 16:51:00
 Commit: test: implement UI tests - 04/09/2025 15:45:00
 Commit: chore: improve build scripts - 04/09/2025 16:49:00
 Commit: fix: fix timezone handling - 04/10/2025 15:42:00
+Commit: chore: improve build scripts - 04/10/2025 14:36:00
