@@ -194,3 +194,4 @@ Commit: feat: add preset configurations - 04/10/2025 12:23:00
 Commit: chore: prepare for release - 04/11/2025 11:15:00
 Commit: refactor: improve build process - 04/11/2025 10:11:00
 Commit: feat: implement real-time lux monitoring - 04/14/2025 13:30:00
+Commit: docs: improve troubleshooting guide - 04/14/2025 09:04:00
