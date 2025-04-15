@@ -64,3 +64,4 @@ Commit: docs: Update API documentation and README - 2025-05-26T15:15:00
 Commit: docs: Add user guide and troubleshooting section - 2025-05-28T12:30:00
 Commit: feat: create dashboard UI with Compose - 04/15/2025 09:00:00
 Commit: docs: update README - 04/15/2025 10:12:00
+Commit: docs: add user guide - 04/15/2025 16:50:00
