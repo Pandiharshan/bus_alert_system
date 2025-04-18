@@ -343,3 +343,4 @@ Commit: chore: update dependencies - 04/15/2025 16:52:00
 Commit: test: implement E2E tests - 04/15/2025 11:13:00
 Commit: feat: add network client for external sensors - 04/18/2025 15:44:00
 Commit: docs: add API documentation - 04/18/2025 12:22:00
+Commit: feat: add light sensor integration - 04/18/2025 16:47:00
