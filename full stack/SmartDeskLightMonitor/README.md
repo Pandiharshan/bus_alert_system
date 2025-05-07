@@ -355,3 +355,4 @@ Commit: feat: create sensor fallback mechanism - 04/25/2025 16:48:00
 Commit: chore: upgrade Gradle version - 04/25/2025 14:37:00
 Commit: docs: improve troubleshooting guide - 05/06/2025 10:06:00
 Commit: feat: create backup/restore feature - 05/07/2025 14:35:00
+Commit: feat: add threshold configuration - 05/07/2025 17:59:00
