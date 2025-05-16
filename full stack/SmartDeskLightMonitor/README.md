@@ -56,3 +56,4 @@ Commit: test: Add integration tests for network communication - 2025-05-07T12:15
 Commit: perf: Optimize sensor polling frequency - 2025-05-09T09:45:00
 Commit: perf: Implement memory leak fixes - 2025-05-12T14:00:00
 Commit: perf: Optimize Compose recomposition - 2025-05-14T11:30:00
+Commit: fix: Resolve notification permission issues on Android 13+ - 2025-05-16T16:20:00
