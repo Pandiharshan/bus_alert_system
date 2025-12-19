@@ -1,9 +1,9 @@
 # SmartDesk Light Monitor
 
-[![CI/CD Pipeline](https://github.com/Pandiharshan/bus_alert_system/actions/workflows/android-ci.yml/badge.svg)](https://github.com/Pandiharshan/bus_alert_system/actions/workflows/android-ci.yml)
-[![Code Coverage](https://img.shields.io/codecov/c/github/Pandiharshan/bus_alert_system?logo=codecov)](https://codecov.io/gh/Pandiharshan/bus_alert_system)
-[![License](https://img.shields.io/github/license/Pandiharshan/bus_alert_system?color=blue)](LICENSE)
-[![GitHub release](https://img.shields.io/github/v/release/Pandiharshan/bus_alert_system?include_prereleases&logo=github)](https://github.com/Pandiharshan/bus_alert_system/releases)
+[![CI/CD Pipeline](https://github.com/Pandiharshan/Smart-Desk-Assistant/actions/workflows/android-ci.yml/badge.svg)](https://github.com/Pandiharshan/Smart-Desk-Assistant/actions/workflows/android-ci.yml)
+[![Code Coverage](https://img.shields.io/codecov/c/github/Pandiharshan/Smart-Desk-Assistant?logo=codecov)](https://codecov.io/gh/Pandiharshan/Smart-Desk-Assistant)
+[![License](https://img.shields.io/github/license/Pandiharshan/Smart-Desk-Assistant?color=blue)](LICENSE)
+[![GitHub release](https://img.shields.io/github/v/release/Pandiharshan/Smart-Desk-Assistant?include_prereleases&logo=github)](https://github.com/Pandiharshan/Smart-Desk-Assistant/releases)
 [![Android API](https://img.shields.io/badge/API-26%2B-brightgreen.svg?style=flat&logo=android)](https://android-arsenal.com/api?level=26)
 [![Kotlin Version](https://img.shields.io/badge/Kotlin-1.9.0-blue.svg?logo=kotlin)](https://kotlinlang.org/)
 [![Compose](https://img.shields.io/badge/Compose-1.5.4-4285F4?logo=jetpack-compose&logoColor=white)](https://developer.android.com/jetpack/compose)
@@ -31,7 +31,7 @@ A modern Android application for monitoring and controlling your SmartDesk light
 
 1. Clone the repository:
    ```bash
-   git clone https://github.com/Pandiharshan/bus_alert_system.git
+   git clone https://github.com/Pandiharshan/Smart-Desk-Assistant.git
    ```
 
 2. Open the project in Android Studio (Flamingo or later recommended)
@@ -76,23 +76,23 @@ SOFTWARE.
 
 ## 📊 Project Statistics
 
-![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Pandiharshan/bus_alert_system?color=blue&label=Commits%20per%20month)
-![GitHub last commit](https://img.shields.io/github/last-commit/Pandiharshan/bus_alert_system?color=blue)
-![GitHub contributors](https://img.shields.io/github/contributors/Pandiharshan/bus_alert_system?color=blue)
-![GitHub issues](https://img.shields.io/github/issues-raw/Pandiharshan/bus_alert_system?color=blue)
-![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/Pandiharshan/bus_alert_system?color=blue)
+![GitHub commit activity](https://img.shields.io/github/commit-activity/m/Pandiharshan/Smart-Desk-Assistant?color=blue&label=Commits%20per%20month)
+![GitHub last commit](https://img.shields.io/github/last-commit/Pandiharshan/Smart-Desk-Assistant?color=blue)
+![GitHub contributors](https://img.shields.io/github/contributors/Pandiharshan/Smart-Desk-Assistant?color=blue)
+![GitHub issues](https://img.shields.io/github/issues-raw/Pandiharshan/Smart-Desk-Assistant?color=blue)
+![GitHub pull requests](https://img.shields.io/github/issues-pr-raw/Pandiharshan/Smart-Desk-Assistant?color=blue)
 
 ## 🌟 Stargazers
 
-[![Stargazers repo roster for @Pandiharshan/bus_alert_system](https://reporoster.com/stars/Pandiharshan/bus_alert_system)](https://github.com/Pandiharshan/bus_alert_system/stargazers)
+[![Stargazers repo roster for @Pandiharshan/Smart-Desk-Assistant](https://reporoster.com/stars/Pandiharshan/Smart-Desk-Assistant)](https://github.com/Pandiharshan/Smart-Desk-Assistant/stargazers)
 
 ## 🤝 Contributors
 
-[![Contributors](https://contrib.rocks/image?repo=Pandiharshan/bus_alert_system)](https://github.com/Pandiharshan/bus_alert_system/graphs/contributors)
+[![Contributors](https://contrib.rocks/image?repo=Pandiharshan/Smart-Desk-Assistant)](https://github.com/Pandiharshan/Smart-Desk-Assistant/graphs/contributors)
 
 ## 📬 Contact
 
-For feature requests and support, please [open an issue](https://github.com/Pandiharshan/bus_alert_system/issues/new/choose).
+For feature requests and support, please [open an issue](https://github.com/Pandiharshan/Smart-Desk-Assistant/issues/new/choose).
 
 ---
 
