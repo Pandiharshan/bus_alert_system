@@ -9,28 +9,24 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.campusbussbuddy.domain.model.AuthState
 import com.campusbussbuddy.viewmodel.auth.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
-    onNavigateToStudent: () -> Unit,
-    onNavigateToDriver: () -> Unit,
+    onNavigateToRegister: () -> Unit,
     viewModel: AuthViewModel = hiltViewModel()
 ) {
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val currentUser by viewModel.currentUser.collectAsStateWithLifecycle()
+    val authState by viewModel.authState.collectAsStateWithLifecycle()
     
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     
-    // Navigate based on user role when signed in
-    LaunchedEffect(currentUser) {
-        currentUser?.let { user ->
-            when (user.role) {
-                com.campusbussbuddy.domain.model.UserRole.STUDENT -> onNavigateToStudent()
-                com.campusbussbuddy.domain.model.UserRole.DRIVER -> onNavigateToDriver()
-            }
+    // Clear error when user starts typing
+    LaunchedEffect(email, password) {
+        if (authState is AuthState.Error) {
+            viewModel.clearError()
         }
     }
     
@@ -52,7 +48,8 @@ fun LoginScreen(
             onValueChange = { email = it },
             label = { Text("Email") },
             modifier = Modifier.fillMaxWidth(),
-            singleLine = true
+            singleLine = true,
+            enabled = authState !is AuthState.Loading
         )
         
         Spacer(modifier = Modifier.height(16.dp))
@@ -63,7 +60,8 @@ fun LoginScreen(
             label = { Text("Password") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
-            visualTransformation = PasswordVisualTransformation()
+            visualTransformation = PasswordVisualTransformation(),
+            enabled = authState !is AuthState.Loading
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -71,22 +69,40 @@ fun LoginScreen(
         Button(
             onClick = { viewModel.signIn(email, password) },
             modifier = Modifier.fillMaxWidth(),
-            enabled = !uiState.isLoading && email.isNotBlank() && password.isNotBlank()
+            enabled = authState !is AuthState.Loading && email.isNotBlank() && password.isNotBlank()
         ) {
-            if (uiState.isLoading) {
-                CircularProgressIndicator(modifier = Modifier.size(16.dp))
+            if (authState is AuthState.Loading) {
+                CircularProgressIndicator(
+                    modifier = Modifier.size(16.dp),
+                    color = MaterialTheme.colorScheme.onPrimary
+                )
             } else {
                 Text("Sign In")
             }
         }
         
-        uiState.error?.let { error ->
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        TextButton(
+            onClick = onNavigateToRegister,
+            enabled = authState !is AuthState.Loading
+        ) {
+            Text("Don't have an account? Register")
+        }
+        
+        if (authState is AuthState.Error) {
             Spacer(modifier = Modifier.height(16.dp))
-            Text(
-                text = error,
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.errorContainer
+                )
+            ) {
+                Text(
+                    text = authState.message,
+                    modifier = Modifier.padding(16.dp),
+                    color = MaterialTheme.colorScheme.onErrorContainer
+                )
+            }
         }
     }
 }

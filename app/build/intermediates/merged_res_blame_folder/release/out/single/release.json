@@ -1,0 +1,10 @@
+[
+    {
+        "merged": "com.campusbussbuddy.app-merged_res-56:/xml_backup_rules.xml.flat",
+        "source": "com.campusbussbuddy.app-main-57:/xml/backup_rules.xml"
+    },
+    {
+        "merged": "com.campusbussbuddy.app-merged_res-56:/xml_data_extraction_rules.xml.flat",
+        "source": "com.campusbussbuddy.app-main-57:/xml/data_extraction_rules.xml"
+    }
+]

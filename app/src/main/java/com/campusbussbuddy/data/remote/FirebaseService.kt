@@ -12,8 +12,6 @@ class FirebaseService @Inject constructor() {
     val firestore: FirebaseFirestore by lazy { FirebaseFirestore.getInstance() }
     
     companion object {
-        const val BUSES_COLLECTION = "buses"
-        const val BOARDING_COLLECTION = "boarding"
         const val USERS_COLLECTION = "users"
     }
 }
