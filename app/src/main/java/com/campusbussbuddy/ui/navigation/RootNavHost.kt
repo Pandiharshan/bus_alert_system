@@ -19,9 +19,10 @@ fun RootNavHost() {
     
     // Handle role-based navigation
     LaunchedEffect(authState) {
-        when (authState) {
+        val currentState = authState
+        when (currentState) {
             is AuthState.Authenticated -> {
-                val destination = when (authState.user.role) {
+                val destination = when (currentState.user.role) {
                     UserRole.STUDENT -> Destinations.STUDENT
                     UserRole.DRIVER -> Destinations.DRIVER
                 }

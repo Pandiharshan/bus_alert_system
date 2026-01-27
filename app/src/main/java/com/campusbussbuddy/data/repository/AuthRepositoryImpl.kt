@@ -4,6 +4,7 @@ import com.campusbussbuddy.data.remote.FirebaseService
 import com.campusbussbuddy.domain.model.User
 import com.campusbussbuddy.domain.model.UserRole
 import com.campusbussbuddy.domain.repository.AuthRepository
+import com.google.firebase.auth.FirebaseAuth
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
@@ -99,7 +100,7 @@ class AuthRepositoryImpl @Inject constructor(
     }
 
     override fun getCurrentUser(): Flow<User?> = callbackFlow {
-        val listener = firebaseService.auth.addAuthStateListener { auth ->
+        val listener = FirebaseAuth.AuthStateListener { auth ->
             val firebaseUser = auth.currentUser
             if (firebaseUser != null) {
                 // Fetch user data from Firestore
@@ -139,6 +140,8 @@ class AuthRepositoryImpl @Inject constructor(
                 trySend(null)
             }
         }
+        
+        firebaseService.auth.addAuthStateListener(listener)
         
         awaitClose {
             firebaseService.auth.removeAuthStateListener(listener)

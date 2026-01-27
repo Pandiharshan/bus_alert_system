@@ -92,13 +92,14 @@ fun LoginScreen(
         
         if (authState is AuthState.Error) {
             Spacer(modifier = Modifier.height(16.dp))
+            val errorState = authState as AuthState.Error
             Card(
                 colors = CardDefaults.cardColors(
                     containerColor = MaterialTheme.colorScheme.errorContainer
                 )
             ) {
                 Text(
-                    text = authState.message,
+                    text = errorState.message,
                     modifier = Modifier.padding(16.dp),
                     color = MaterialTheme.colorScheme.onErrorContainer
                 )

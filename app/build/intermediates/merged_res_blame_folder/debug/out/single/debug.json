@@ -1,10 +1,10 @@
 [
     {
-        "merged": "com.campusbussbuddy.app-merged_res-60:/xml_data_extraction_rules.xml.flat",
-        "source": "com.campusbussbuddy.app-main-62:/xml/data_extraction_rules.xml"
+        "merged": "com.campusbussbuddy.app-merged_res-61:/xml_backup_rules.xml.flat",
+        "source": "com.campusbussbuddy.app-main-63:/xml/backup_rules.xml"
     },
     {
-        "merged": "com.campusbussbuddy.app-merged_res-60:/xml_backup_rules.xml.flat",
-        "source": "com.campusbussbuddy.app-main-62:/xml/backup_rules.xml"
+        "merged": "com.campusbussbuddy.app-merged_res-61:/xml_data_extraction_rules.xml.flat",
+        "source": "com.campusbussbuddy.app-main-63:/xml/data_extraction_rules.xml"
     }
 ]

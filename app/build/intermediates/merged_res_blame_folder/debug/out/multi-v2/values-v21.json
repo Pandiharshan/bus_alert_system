@@ -1,10 +1,10 @@
 {
     "logs": [
         {
-            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-58:/values-v21/values-v21.xml",
+            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-59:/values-v21/values-v21.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\3b6d2984f3c931ed5d8a096d210bd276\\transformed\\core-1.12.0\\res\\values-v21\\values-v21.xml",
+                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\c65c188359e860663525f32513dcd15c\\transformed\\core-1.12.0\\res\\values-v21\\values-v21.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,13",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4",
