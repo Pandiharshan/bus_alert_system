@@ -10,7 +10,9 @@ import androidx.lifecycle.ViewModel;
 import com.campusbussbuddy.MainActivity;
 import com.campusbussbuddy.data.remote.FirebaseService;
 import com.campusbussbuddy.data.repository.AuthRepositoryImpl;
+import com.campusbussbuddy.data.repository.FirebaseAuthRepository;
 import com.campusbussbuddy.di.AppModule;
+import com.campusbussbuddy.di.AppModule_ProvideFirebaseAuthRepositoryFactory;
 import com.campusbussbuddy.di.AppModule_ProvideFirebaseServiceFactory;
 import com.campusbussbuddy.viewmodel.auth.AuthViewModel;
 import com.campusbussbuddy.viewmodel.auth.AuthViewModel_HiltModules_KeyModule_ProvideFactory;
@@ -530,6 +532,8 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
 
     private Provider<FirebaseService> provideFirebaseServiceProvider;
 
+    private Provider<FirebaseAuthRepository> provideFirebaseAuthRepositoryProvider;
+
     private Provider<AuthRepositoryImpl> authRepositoryImplProvider;
 
     private SingletonCImpl() {
@@ -540,7 +544,8 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
 
     @SuppressWarnings("unchecked")
     private void initialize() {
-      this.provideFirebaseServiceProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseService>(singletonCImpl, 1));
+      this.provideFirebaseServiceProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseService>(singletonCImpl, 2));
+      this.provideFirebaseAuthRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseAuthRepository>(singletonCImpl, 1));
       this.authRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AuthRepositoryImpl>(singletonCImpl, 0));
     }
 
@@ -578,9 +583,12 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
       public T get() {
         switch (id) {
           case 0: // com.campusbussbuddy.data.repository.AuthRepositoryImpl 
-          return (T) new AuthRepositoryImpl(singletonCImpl.provideFirebaseServiceProvider.get());
+          return (T) new AuthRepositoryImpl(singletonCImpl.provideFirebaseAuthRepositoryProvider.get());
 
-          case 1: // com.campusbussbuddy.data.remote.FirebaseService 
+          case 1: // com.campusbussbuddy.data.repository.FirebaseAuthRepository 
+          return (T) AppModule_ProvideFirebaseAuthRepositoryFactory.provideFirebaseAuthRepository(singletonCImpl.provideFirebaseServiceProvider.get());
+
+          case 2: // com.campusbussbuddy.data.remote.FirebaseService 
           return (T) AppModule_ProvideFirebaseServiceFactory.provideFirebaseService();
 
           default: throw new AssertionError(id);

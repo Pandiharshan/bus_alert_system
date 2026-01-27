@@ -1,52 +1,29 @@
 package com.campusbussbuddy.data.repository
 
-import com.campusbussbuddy.data.remote.FirebaseService
 import com.campusbussbuddy.domain.model.User
 import com.campusbussbuddy.domain.model.UserRole
 import com.campusbussbuddy.domain.repository.AuthRepository
-import com.google.firebase.auth.FirebaseAuth
-import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.tasks.await
+import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 import javax.inject.Singleton
 
+// 🚀 DEV AUTH MODE - ZERO VALIDATION
+// Set to true: Instant login, no validation, role selector
+// Set to false: Uses real Firebase authentication
+const val USE_DEV_AUTH = true
+
 @Singleton
 class AuthRepositoryImpl @Inject constructor(
-    private val firebaseService: FirebaseService
+    private val firebaseAuthRepository: FirebaseAuthRepository
 ) : AuthRepository {
 
     override suspend fun signIn(email: String, password: String): Result<User> {
-        return try {
-            val authResult = firebaseService.auth.signInWithEmailAndPassword(email, password).await()
-            val firebaseUser = authResult.user ?: return Result.failure(Exception("Authentication failed"))
-            
-            // Fetch user data from Firestore
-            val userDoc = firebaseService.firestore
-                .collection(FirebaseService.USERS_COLLECTION)
-                .document(firebaseUser.uid)
-                .get()
-                .await()
-            
-            if (!userDoc.exists()) {
-                // Sign out if user document doesn't exist
-                firebaseService.auth.signOut()
-                return Result.failure(Exception("User profile not found"))
-            }
-            
-            val userData = userDoc.data!!
-            val user = User(
-                id = firebaseUser.uid,
-                email = userData["email"] as String,
-                name = userData["name"] as String,
-                collegeId = userData["collegeId"] as String,
-                role = UserRole.valueOf(userData["role"] as String)
-            )
-            
-            Result.success(user)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return if (USE_DEV_AUTH) {
+            devSignIn(email, password)
+        } else {
+            firebaseAuthRepository.signIn(email, password)
         }
     }
 
@@ -57,94 +34,85 @@ class AuthRepositoryImpl @Inject constructor(
         collegeId: String,
         role: String
     ): Result<User> {
-        return try {
-            val authResult = firebaseService.auth.createUserWithEmailAndPassword(email, password).await()
-            val firebaseUser = authResult.user ?: return Result.failure(Exception("Registration failed"))
-            
-            // Create user document in Firestore
-            val userData = mapOf(
-                "email" to email,
-                "name" to name,
-                "collegeId" to collegeId,
-                "role" to role,
-                "createdAt" to System.currentTimeMillis()
-            )
-            
-            firebaseService.firestore
-                .collection(FirebaseService.USERS_COLLECTION)
-                .document(firebaseUser.uid)
-                .set(userData)
-                .await()
-            
-            val user = User(
-                id = firebaseUser.uid,
-                email = email,
-                name = name,
-                collegeId = collegeId,
-                role = UserRole.valueOf(role)
-            )
-            
-            Result.success(user)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return if (USE_DEV_AUTH) {
+            devSignUp(email, password, name, collegeId, role)
+        } else {
+            firebaseAuthRepository.signUp(email, password, name, collegeId, role)
         }
     }
 
     override suspend fun signOut(): Result<Unit> {
-        return try {
-            firebaseService.auth.signOut()
-            Result.success(Unit)
-        } catch (e: Exception) {
-            Result.failure(e)
+        return if (USE_DEV_AUTH) {
+            devSignOut()
+        } else {
+            firebaseAuthRepository.signOut()
         }
     }
 
-    override fun getCurrentUser(): Flow<User?> = callbackFlow {
-        val listener = FirebaseAuth.AuthStateListener { auth ->
-            val firebaseUser = auth.currentUser
-            if (firebaseUser != null) {
-                // Fetch user data from Firestore
-                firebaseService.firestore
-                    .collection(FirebaseService.USERS_COLLECTION)
-                    .document(firebaseUser.uid)
-                    .get()
-                    .addOnSuccessListener { document ->
-                        if (document.exists()) {
-                            val userData = document.data!!
-                            try {
-                                val user = User(
-                                    id = firebaseUser.uid,
-                                    email = userData["email"] as String,
-                                    name = userData["name"] as String,
-                                    collegeId = userData["collegeId"] as String,
-                                    role = UserRole.valueOf(userData["role"] as String)
-                                )
-                                trySend(user)
-                            } catch (e: Exception) {
-                                // Invalid role or missing data - sign out
-                                firebaseService.auth.signOut()
-                                trySend(null)
-                            }
-                        } else {
-                            // User document doesn't exist - sign out
-                            firebaseService.auth.signOut()
-                            trySend(null)
-                        }
-                    }
-                    .addOnFailureListener {
-                        // Network error or other issue - sign out
-                        firebaseService.auth.signOut()
-                        trySend(null)
-                    }
-            } else {
-                trySend(null)
-            }
+    override fun getCurrentUser(): Flow<User?> {
+        return if (USE_DEV_AUTH) {
+            devGetCurrentUser()
+        } else {
+            firebaseAuthRepository.getCurrentUser()
+        }
+    }
+
+    // Dev implementations - NO VALIDATION
+    private suspend fun devSignIn(email: String, @Suppress("UNUSED_PARAMETER") password: String): Result<User> {
+        delay(200) // Quick dev login
+        
+        // For dev mode, we'll determine role from the email prefix
+        // But we need to make sure this works with the UI role selector
+        val role = when {
+            email.startsWith("driver") -> UserRole.DRIVER
+            email.startsWith("student") -> UserRole.STUDENT
+            else -> UserRole.STUDENT // Default to student
         }
         
-        firebaseService.auth.addAuthStateListener(listener)
+        val devUser = User(
+            id = "dev_user",
+            email = email.ifBlank { "dev@test.com" },
+            name = "Dev User",
+            collegeId = "DEV123",
+            role = role
+        )
         
-        awaitClose {
-            firebaseService.auth.removeAuthStateListener(listener)
+        return Result.success(devUser)
+    }
+
+    private suspend fun devSignUp(
+        email: String,
+        @Suppress("UNUSED_PARAMETER") password: String,
+        name: String,
+        collegeId: String,
+        role: String
+    ): Result<User> {
+        delay(200) // Quick dev signup
+        
+        val userRole = try {
+            UserRole.valueOf(role.uppercase())
+        } catch (e: IllegalArgumentException) {
+            UserRole.STUDENT
         }
+        
+        val devUser = User(
+            id = "dev_user_${System.currentTimeMillis()}",
+            email = email.ifBlank { "dev@test.com" },
+            name = name.ifBlank { "Dev User" },
+            collegeId = collegeId.ifBlank { "DEV123" },
+            role = userRole
+        )
+        
+        return Result.success(devUser)
+    }
+
+    private suspend fun devSignOut(): Result<Unit> {
+        delay(100) // Instant sign out
+        return Result.success(Unit)
+    }
+
+    private fun devGetCurrentUser(): Flow<User?> = flow {
+        // Always emit null for dev mode (no persistent session)
+        emit(null)
     }
 }

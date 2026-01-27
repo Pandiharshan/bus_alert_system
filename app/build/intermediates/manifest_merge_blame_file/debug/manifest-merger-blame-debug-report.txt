@@ -9,11 +9,11 @@
 9        android:targetSdkVersion="34" />
 10
 11    <uses-permission android:name="android.permission.INTERNET" />
-11-->[com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:5-67
-11-->[com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:22-64
+11-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:5-67
+11-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:22-64
 12    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-12-->[com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:5-79
-12-->[com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:22-76
+12-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:5-79
+12-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:22-76
 13
 14    <permission
 14-->[androidx.core:core:1.12.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\c65c188359e860663525f32513dcd15c\transformed\core-1.12.0\AndroidManifest.xml:22:5-24:47
@@ -27,43 +27,43 @@
 18-->[androidx.core:core:1.12.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\c65c188359e860663525f32513dcd15c\transformed\core-1.12.0\AndroidManifest.xml:26:22-94
 19
 20    <application
-20-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:5-25:19
+20-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-28:19
 21        android:name="com.campusbussbuddy.app.CampusBusBuddyApplication"
-21-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:9-54
+21-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:9:9-54
 22        android:allowBackup="false"
-22-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:7:9-36
+22-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:10:9-36
 23        android:appComponentFactory="androidx.core.app.CoreComponentFactory"
 23-->[androidx.core:core:1.12.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\c65c188359e860663525f32513dcd15c\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 24        android:dataExtractionRules="@xml/data_extraction_rules"
-24-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:9-65
+24-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:11:9-65
 25        android:debuggable="true"
 26        android:extractNativeLibs="false"
 27        android:fullBackupContent="@xml/backup_rules"
-27-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:9:9-54
+27-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:12:9-54
 28        android:label="@string/app_name"
-28-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:10:9-41
+28-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:13:9-41
 29        android:supportsRtl="true"
-29-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:11:9-35
+29-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:14:9-35
 30        android:testOnly="true"
 31        android:theme="@style/Theme.CampusBusBuddy" >
-31-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:12:9-52
+31-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-52
 32        <activity
-32-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-23:20
+32-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:9-26:20
 33            android:name="com.campusbussbuddy.MainActivity"
-33-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:16:13-41
+33-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:19:13-41
 34            android:exported="true"
-34-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:17:13-36
+34-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:13-36
 35            android:theme="@style/Theme.CampusBusBuddy" >
-35-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:13-56
+35-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:13-56
 36            <intent-filter>
-36-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:19:13-22:29
+36-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:22:13-25:29
 37                <action android:name="android.intent.action.MAIN" />
-37-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:17-69
-37-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:25-66
+37-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:17-69
+37-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:25-66
 38
 39                <category android:name="android.intent.category.LAUNCHER" />
-39-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:17-77
-39-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:27-74
+39-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:17-77
+39-->C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:27-74
 40            </intent-filter>
 41        </activity>
 42        <activity

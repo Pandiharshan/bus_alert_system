@@ -26,16 +26,33 @@ fun RootNavHost() {
                     UserRole.STUDENT -> Destinations.STUDENT
                     UserRole.DRIVER -> Destinations.DRIVER
                 }
+                
+                // Navigate to role-based destination
                 navController.navigate(destination) {
-                    popUpTo(Destinations.AUTH) { inclusive = true }
+                    // Clear the entire back stack and replace with new destination
+                    popUpTo(0) { inclusive = true }
+                    // Avoid multiple copies of the same destination
+                    launchSingleTop = true
                 }
             }
             is AuthState.Unauthenticated -> {
+                // Navigate back to auth
                 navController.navigate(Destinations.AUTH) {
+                    // Clear the entire back stack
                     popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
                 }
             }
-            else -> { /* Loading or Error - stay on current screen */ }
+            is AuthState.Error -> {
+                // Navigate back to auth on error
+                navController.navigate(Destinations.AUTH) {
+                    popUpTo(0) { inclusive = true }
+                    launchSingleTop = true
+                }
+            }
+            is AuthState.Loading -> {
+                // Stay on current screen during loading
+            }
         }
     }
     
@@ -43,8 +60,8 @@ fun RootNavHost() {
         navController = navController,
         startDestination = Destinations.AUTH
     ) {
-        authNavGraph(navController)
-        studentNavGraph(navController)
-        driverNavGraph(navController)
+        authNavGraph(navController, authViewModel)
+        studentNavGraph(navController, authViewModel)
+        driverNavGraph(navController, authViewModel)
     }
 }

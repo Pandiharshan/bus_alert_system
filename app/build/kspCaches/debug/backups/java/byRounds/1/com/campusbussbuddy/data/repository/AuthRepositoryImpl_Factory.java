@@ -1,6 +1,5 @@
 package com.campusbussbuddy.data.repository;
 
-import com.campusbussbuddy.data.remote.FirebaseService;
 import dagger.internal.DaggerGenerated;
 import dagger.internal.Factory;
 import dagger.internal.QualifierMetadata;
@@ -22,23 +21,24 @@ import javax.inject.Provider;
     "KotlinInternalInJava"
 })
 public final class AuthRepositoryImpl_Factory implements Factory<AuthRepositoryImpl> {
-  private final Provider<FirebaseService> firebaseServiceProvider;
+  private final Provider<FirebaseAuthRepository> firebaseAuthRepositoryProvider;
 
-  public AuthRepositoryImpl_Factory(Provider<FirebaseService> firebaseServiceProvider) {
-    this.firebaseServiceProvider = firebaseServiceProvider;
+  public AuthRepositoryImpl_Factory(
+      Provider<FirebaseAuthRepository> firebaseAuthRepositoryProvider) {
+    this.firebaseAuthRepositoryProvider = firebaseAuthRepositoryProvider;
   }
 
   @Override
   public AuthRepositoryImpl get() {
-    return newInstance(firebaseServiceProvider.get());
+    return newInstance(firebaseAuthRepositoryProvider.get());
   }
 
   public static AuthRepositoryImpl_Factory create(
-      Provider<FirebaseService> firebaseServiceProvider) {
-    return new AuthRepositoryImpl_Factory(firebaseServiceProvider);
+      Provider<FirebaseAuthRepository> firebaseAuthRepositoryProvider) {
+    return new AuthRepositoryImpl_Factory(firebaseAuthRepositoryProvider);
   }
 
-  public static AuthRepositoryImpl newInstance(FirebaseService firebaseService) {
-    return new AuthRepositoryImpl(firebaseService);
+  public static AuthRepositoryImpl newInstance(FirebaseAuthRepository firebaseAuthRepository) {
+    return new AuthRepositoryImpl(firebaseAuthRepository);
   }
 }

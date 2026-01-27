@@ -1,27 +1,31 @@
 package com.campusbussbuddy.ui.screens.auth
 
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.selection.selectable
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.campusbussbuddy.domain.model.AuthState
+import com.campusbussbuddy.domain.model.UserRole
 import com.campusbussbuddy.viewmodel.auth.AuthViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var selectedRole by remember { mutableStateOf(UserRole.STUDENT) }
     
     // Clear error when user starts typing
     LaunchedEffect(email, password) {
@@ -43,10 +47,27 @@ fun LoginScreen(
             modifier = Modifier.padding(bottom = 32.dp)
         )
         
+        // DEV MODE INDICATOR
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = "🚀 DEV MODE: Any email/password works!",
+                modifier = Modifier.padding(12.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
+        
         OutlinedTextField(
             value = email,
             onValueChange = { email = it },
-            label = { Text("Email") },
+            label = { Text("Email (any text works)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             enabled = authState !is AuthState.Loading
@@ -57,7 +78,7 @@ fun LoginScreen(
         OutlinedTextField(
             value = password,
             onValueChange = { password = it },
-            label = { Text("Password") },
+            label = { Text("Password (optional)") },
             modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             visualTransformation = PasswordVisualTransformation(),
@@ -66,10 +87,52 @@ fun LoginScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
+        // ROLE SELECTOR
+        Text(
+            text = "Select Role for Testing",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp)
+        )
+        
+        UserRole.values().forEach { role ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .selectable(
+                        selected = selectedRole == role,
+                        onClick = { selectedRole = role },
+                        role = Role.RadioButton
+                    )
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = selectedRole == role,
+                    onClick = { selectedRole = role },
+                    enabled = authState !is AuthState.Loading
+                )
+                Text(
+                    text = "${role.name.lowercase().replaceFirstChar { it.uppercase() }} Dashboard",
+                    modifier = Modifier.padding(start = 8.dp)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(24.dp))
+        
         Button(
-            onClick = { viewModel.signIn(email, password) },
+            onClick = { 
+                // Use role-based email for easy testing
+                val roleEmail = when (selectedRole) {
+                    UserRole.STUDENT -> "student@test.com"
+                    UserRole.DRIVER -> "driver@test.com"
+                }
+                viewModel.signIn(roleEmail, password) 
+            },
             modifier = Modifier.fillMaxWidth(),
-            enabled = authState !is AuthState.Loading && email.isNotBlank() && password.isNotBlank()
+            enabled = authState !is AuthState.Loading
         ) {
             if (authState is AuthState.Loading) {
                 CircularProgressIndicator(
@@ -77,7 +140,7 @@ fun LoginScreen(
                     color = MaterialTheme.colorScheme.onPrimary
                 )
             } else {
-                Text("Sign In")
+                Text("Login as ${selectedRole.name.lowercase().replaceFirstChar { it.uppercase() }}")
             }
         }
         

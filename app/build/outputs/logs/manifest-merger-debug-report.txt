@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-27:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-27:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-27:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-27:12
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
 MERGED from [androidx.compose.material3:material3:1.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\7446092ce63f7eaa185bf1f90ca7da64\transformed\material3-1.1.2\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.hilt:hilt-navigation-compose:1.1.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\1e91deab26bec618d9189673b68090f5\transformed\hilt-navigation-compose-1.1.0\AndroidManifest.xml:2:1-7:12
 MERGED from [androidx.hilt:hilt-navigation:1.1.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\e3478d5dc6e8e75a3a38619b82459604\transformed\hilt-navigation-1.1.0\AndroidManifest.xml:2:1-7:12
@@ -93,9 +93,31 @@ MERGED from [com.google.firebase:protolite-well-known-types:18.0.0] C:\Users\PAN
 		INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml
 	xmlns:android
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:11-69
+uses-permission#android.permission.INTERNET
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:5-67
+MERGED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:5-67
+MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:11:5-67
+MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:11:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:7:5-67
+MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:7:5-67
+	android:name
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:22-64
+uses-permission#android.permission.ACCESS_NETWORK_STATE
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:5-79
+MERGED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:5-79
+MERGED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:5-79
+MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:10:5-79
+MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:10:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:8:5-79
+MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:8:5-79
+MERGED from [io.grpc:grpc-android:1.52.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\94894301669ed72f4751fef26a8a84b8\transformed\grpc-android-1.52.1\AndroidManifest.xml:9:5-79
+MERGED from [io.grpc:grpc-android:1.52.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\94894301669ed72f4751fef26a8a84b8\transformed\grpc-android-1.52.1\AndroidManifest.xml:9:5-79
+	android:name
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:22-76
 application
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:5-25:19
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:5:5-25:19
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-28:19
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-28:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.5.4] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\4558f05987b0fa54d672d32c474e5bed\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-tooling-android:1.5.4] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\4558f05987b0fa54d672d32c474e5bed\transformed\ui-tooling-release\AndroidManifest.xml:22:5-26:19
 MERGED from [androidx.compose.ui:ui-test-manifest:1.5.4] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\73d3df3fe16ef5d09da9bd5502b8c07f\transformed\ui-test-manifest-1.5.4\AndroidManifest.xml:22:5-26:19
@@ -137,39 +159,39 @@ MERGED from [androidx.startup:startup-runtime:1.1.1] C:\Users\PANDI HARSHAN\.gra
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\c65c188359e860663525f32513dcd15c\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:11:9-35
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:14:9-35
 	android:label
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:10:9-41
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:13:9-41
 	android:fullBackupContent
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:9:9-54
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:12:9-54
 	tools:targetApi
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:13:9-29
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:16:9-29
 	android:allowBackup
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:7:9-36
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:10:9-36
 	android:theme
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:12:9-52
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-52
 	android:dataExtractionRules
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:9-65
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:11:9-65
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:9-54
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:9:9-54
 activity#com.campusbussbuddy.MainActivity
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-23:20
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:9-26:20
 	android:exported
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:17:13-36
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:13-36
 	android:theme
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:13-56
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:13-56
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:16:13-41
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:19:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:19:13-22:29
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:22:13-25:29
 action#android.intent.action.MAIN
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:17-69
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:17-69
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:25-66
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:17-77
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:17-77
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:27-74
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:27-74
 uses-sdk
 INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml
@@ -350,24 +372,6 @@ ADDED from [androidx.compose.ui:ui-test-manifest:1.5.4] C:\Users\PANDI HARSHAN\.
 		ADDED from [androidx.compose.ui:ui-test-manifest:1.5.4] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\73d3df3fe16ef5d09da9bd5502b8c07f\transformed\ui-test-manifest-1.5.4\AndroidManifest.xml:25:13-36
 	android:name
 		ADDED from [androidx.compose.ui:ui-test-manifest:1.5.4] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\73d3df3fe16ef5d09da9bd5502b8c07f\transformed\ui-test-manifest-1.5.4\AndroidManifest.xml:24:13-63
-uses-permission#android.permission.INTERNET
-ADDED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:5-67
-MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:11:5-67
-MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:11:5-67
-MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:7:5-67
-MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:7:5-67
-	android:name
-		ADDED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:25:22-64
-uses-permission#android.permission.ACCESS_NETWORK_STATE
-ADDED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:5-79
-MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:10:5-79
-MERGED from [com.google.firebase:firebase-firestore:24.10.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\80ad28bb9b7801889d0c79b91f8fa3d8\transformed\firebase-firestore-24.10.0\AndroidManifest.xml:10:5-79
-MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:8:5-79
-MERGED from [com.google.android.recaptcha:recaptcha:18.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\0735a8d04ff123e2f6208fa2965ae2a2\transformed\recaptcha-18.1.2\AndroidManifest.xml:8:5-79
-MERGED from [io.grpc:grpc-android:1.52.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\94894301669ed72f4751fef26a8a84b8\transformed\grpc-android-1.52.1\AndroidManifest.xml:9:5-79
-MERGED from [io.grpc:grpc-android:1.52.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\94894301669ed72f4751fef26a8a84b8\transformed\grpc-android-1.52.1\AndroidManifest.xml:9:5-79
-	android:name
-		ADDED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:26:22-76
 activity#com.google.firebase.auth.internal.GenericIdpActivity
 ADDED from [com.google.firebase:firebase-auth:22.3.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5cbff60235858986fd8c3077420c81ca\transformed\firebase-auth-22.3.0\AndroidManifest.xml:29:9-46:20
 	android:excludeFromRecents

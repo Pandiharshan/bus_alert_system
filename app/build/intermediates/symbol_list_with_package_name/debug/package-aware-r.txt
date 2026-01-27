@@ -331,7 +331,6 @@ string date_range_picker_start_headline
 string date_range_picker_title
 string default_error_message
 string default_popup_window_title
-string default_web_client_id
 string dialog
 string dropdown_menu
 string expanded

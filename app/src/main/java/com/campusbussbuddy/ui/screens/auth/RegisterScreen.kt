@@ -21,7 +21,7 @@ import com.campusbussbuddy.viewmodel.auth.AuthViewModel
 @Composable
 fun RegisterScreen(
     onNavigateToLogin: () -> Unit,
-    viewModel: AuthViewModel = hiltViewModel()
+    viewModel: AuthViewModel
 ) {
     val authState by viewModel.authState.collectAsStateWithLifecycle()
     
@@ -54,6 +54,23 @@ fun RegisterScreen(
             style = MaterialTheme.typography.headlineMedium,
             modifier = Modifier.padding(bottom = 32.dp)
         )
+        
+        // DEV MODE INDICATOR
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.primaryContainer
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+        ) {
+            Text(
+                text = "🚀 DEV MODE: All fields optional!",
+                modifier = Modifier.padding(12.dp),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        }
         
         OutlinedTextField(
             value = name,
@@ -159,18 +176,12 @@ fun RegisterScreen(
         
         Spacer(modifier = Modifier.height(24.dp))
         
-        val isFormValid = name.isNotBlank() && 
-                email.isNotBlank() && 
-                collegeId.isNotBlank() && 
-                password.isNotBlank() && 
-                password == confirmPassword
-        
         Button(
             onClick = { 
                 viewModel.signUp(email, password, name, collegeId, selectedRole.name)
             },
             modifier = Modifier.fillMaxWidth(),
-            enabled = authState !is AuthState.Loading && isFormValid
+            enabled = authState !is AuthState.Loading
         ) {
             if (authState is AuthState.Loading) {
                 CircularProgressIndicator(
