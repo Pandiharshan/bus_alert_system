@@ -1,220 +1,232 @@
 package com.campusbussbuddy.ui.screens.auth
 
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.campusbussbuddy.domain.model.AuthState
-import com.campusbussbuddy.domain.model.UserRole
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun RegisterScreen(
-    onNavigateToLogin: () -> Unit,
-    viewModel: AuthViewModel
+    onNavigateToLogin: () -> Unit
 ) {
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
-    
     var name by remember { mutableStateOf("") }
     var email by remember { mutableStateOf("") }
     var collegeId by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var confirmPassword by remember { mutableStateOf("") }
-    var selectedRole by remember { mutableStateOf(UserRole.STUDENT) }
     
     val scrollState = rememberScrollState()
     
-    // Clear error when user starts typing
-    LaunchedEffect(name, email, collegeId, password, confirmPassword) {
-        if (authState is AuthState.Error) {
-            viewModel.clearError()
-        }
-    }
+    // Animation for the gradient
+    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset"
+    )
     
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp)
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Create Account",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-        
-        // DEV MODE INDICATOR
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text(
-                text = "🚀 DEV MODE: All fields optional!",
-                modifier = Modifier.padding(12.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-        
-        OutlinedTextField(
-            value = name,
-            onValueChange = { name = it },
-            label = { Text("Full Name") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = collegeId,
-            onValueChange = { collegeId = it },
-            label = { Text("College ID") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = confirmPassword,
-            onValueChange = { confirmPassword = it },
-            label = { Text("Confirm Password") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            enabled = authState !is AuthState.Loading,
-            isError = confirmPassword.isNotEmpty() && password != confirmPassword
-        )
-        
-        if (confirmPassword.isNotEmpty() && password != confirmPassword) {
-            Text(
-                text = "Passwords do not match",
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(start = 16.dp, top = 4.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Role Selection
-        Text(
-            text = "Select Role",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-        
-        UserRole.values().forEach { role ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectable(
-                        selected = selectedRole == role,
-                        onClick = { selectedRole = role },
-                        role = Role.RadioButton
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF764ba2).copy(alpha = 0.8f + animatedOffset * 0.2f),
+                        Color(0xFF667eea).copy(alpha = 0.9f),
+                        Color(0xFF764ba2).copy(alpha = 0.7f + animatedOffset * 0.3f)
                     )
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = selectedRole == role,
-                    onClick = { selectedRole = role },
-                    enabled = authState !is AuthState.Loading
                 )
-                Text(
-                    text = role.name.lowercase().replaceFirstChar { it.uppercase() },
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Button(
-            onClick = { 
-                viewModel.signUp(email, password, name, collegeId, selectedRole.name)
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = authState !is AuthState.Loading
+            )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(24.dp)
+                .verticalScroll(scrollState),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
-            if (authState is AuthState.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Create Account")
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        TextButton(
-            onClick = onNavigateToLogin,
-            enabled = authState !is AuthState.Loading
-        ) {
-            Text("Already have an account? Sign In")
-        }
-        
-        if (authState is AuthState.Error) {
-            Spacer(modifier = Modifier.height(16.dp))
-            val errorState = authState as AuthState.Error
+            // App Title
+            Text(
+                text = "🚌 Join Campus Bus Buddy",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 28.sp
+                ),
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Create your account to get started",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 32.dp)
+            )
+            
+            // Register Card
             Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp)),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
             ) {
-                Text(
-                    text = errorState.message,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Create Account",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color(0xFF2D3748),
+                        modifier = Modifier.padding(bottom = 32.dp)
+                    )
+                    
+                    // Name Field
+                    OutlinedTextField(
+                        value = name,
+                        onValueChange = { name = it },
+                        label = { Text("Full Name") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF764ba2),
+                            focusedLabelColor = Color(0xFF764ba2)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Email Field
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF764ba2),
+                            focusedLabelColor = Color(0xFF764ba2)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // College ID Field
+                    OutlinedTextField(
+                        value = collegeId,
+                        onValueChange = { collegeId = it },
+                        label = { Text("College ID") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF764ba2),
+                            focusedLabelColor = Color(0xFF764ba2)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Password Field
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF764ba2),
+                            focusedLabelColor = Color(0xFF764ba2)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Confirm Password Field
+                    OutlinedTextField(
+                        value = confirmPassword,
+                        onValueChange = { confirmPassword = it },
+                        label = { Text("Confirm Password") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF764ba2),
+                            focusedLabelColor = Color(0xFF764ba2)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // Create Account Button
+                    Button(
+                        onClick = onNavigateToLogin,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF764ba2)
+                        )
+                    ) {
+                        Text(
+                            text = "✨ Create Account",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color.White
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Login Link
+                    TextButton(
+                        onClick = onNavigateToLogin
+                    ) {
+                        Text(
+                            text = "Already have an account? Sign In",
+                            color = Color(0xFF764ba2),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                }
             }
         }
     }

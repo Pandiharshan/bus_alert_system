@@ -6,11 +6,9 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.campusbussbuddy.ui.screens.auth.LoginScreen
 import com.campusbussbuddy.ui.screens.auth.RegisterScreen
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel
 
 fun NavGraphBuilder.authNavGraph(
-    navController: NavHostController,
-    authViewModel: AuthViewModel
+    navController: NavHostController
 ) {
     navigation(
         route = Destinations.AUTH,
@@ -21,7 +19,16 @@ fun NavGraphBuilder.authNavGraph(
                 onNavigateToRegister = {
                     navController.navigate("register")
                 },
-                viewModel = authViewModel
+                onNavigateToStudent = {
+                    navController.navigate(Destinations.STUDENT) {
+                        popUpTo(Destinations.AUTH) { inclusive = true }
+                    }
+                },
+                onNavigateToDriver = {
+                    navController.navigate(Destinations.DRIVER) {
+                        popUpTo(Destinations.AUTH) { inclusive = true }
+                    }
+                }
             )
         }
         
@@ -29,8 +36,7 @@ fun NavGraphBuilder.authNavGraph(
             RegisterScreen(
                 onNavigateToLogin = {
                     navController.popBackStack()
-                },
-                viewModel = authViewModel
+                }
             )
         }
     }

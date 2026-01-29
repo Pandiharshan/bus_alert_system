@@ -1,171 +1,196 @@
 package com.campusbussbuddy.ui.screens.auth
 
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.campusbussbuddy.domain.model.AuthState
-import com.campusbussbuddy.domain.model.UserRole
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel
+import androidx.compose.ui.unit.sp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun LoginScreen(
     onNavigateToRegister: () -> Unit,
-    viewModel: AuthViewModel
+    onNavigateToStudent: () -> Unit,
+    onNavigateToDriver: () -> Unit
 ) {
-    val authState by viewModel.authState.collectAsStateWithLifecycle()
-    
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
-    var selectedRole by remember { mutableStateOf(UserRole.STUDENT) }
     
-    // Clear error when user starts typing
-    LaunchedEffect(email, password) {
-        if (authState is AuthState.Error) {
-            viewModel.clearError()
-        }
-    }
+    // Animation for the gradient
+    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset"
+    )
     
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .padding(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
-    ) {
-        Text(
-            text = "Campus Bus Buddy",
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.padding(bottom = 32.dp)
-        )
-        
-        // DEV MODE INDICATOR
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp)
-        ) {
-            Text(
-                text = "🚀 DEV MODE: Any email/password works!",
-                modifier = Modifier.padding(12.dp),
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onPrimaryContainer
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF667eea).copy(alpha = 0.8f + animatedOffset * 0.2f),
+                        Color(0xFF764ba2).copy(alpha = 0.9f),
+                        Color(0xFF667eea).copy(alpha = 0.7f + animatedOffset * 0.3f)
+                    )
+                )
             )
-        }
-        
-        OutlinedTextField(
-            value = email,
-            onValueChange = { email = it },
-            label = { Text("Email (any text works)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        OutlinedTextField(
-            value = password,
-            onValueChange = { password = it },
-            label = { Text("Password (optional)") },
-            modifier = Modifier.fillMaxWidth(),
-            singleLine = true,
-            visualTransformation = PasswordVisualTransformation(),
-            enabled = authState !is AuthState.Loading
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // ROLE SELECTOR
-        Text(
-            text = "Select Role for Testing",
-            style = MaterialTheme.typography.titleMedium,
+    ) {
+        Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 8.dp)
-        )
-        
-        UserRole.values().forEach { role ->
-            Row(
+                .fillMaxSize()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            // App Title with Animation
+            Text(
+                text = "🚌 Campus Bus Buddy",
+                style = MaterialTheme.typography.headlineLarge.copy(
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 32.sp
+                ),
+                color = Color.White,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            
+            Text(
+                text = "Your journey starts here",
+                style = MaterialTheme.typography.bodyLarge,
+                color = Color.White.copy(alpha = 0.8f),
+                modifier = Modifier.padding(bottom = 48.dp)
+            )
+            
+            // Login Card
+            Card(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .selectable(
-                        selected = selectedRole == role,
-                        onClick = { selectedRole = role },
-                        role = Role.RadioButton
-                    )
-                    .padding(vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = selectedRole == role,
-                    onClick = { selectedRole = role },
-                    enabled = authState !is AuthState.Loading
-                )
-                Text(
-                    text = "${role.name.lowercase().replaceFirstChar { it.uppercase() }} Dashboard",
-                    modifier = Modifier.padding(start = 8.dp)
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        Button(
-            onClick = { 
-                // Use role-based email for easy testing
-                val roleEmail = when (selectedRole) {
-                    UserRole.STUDENT -> "student@test.com"
-                    UserRole.DRIVER -> "driver@test.com"
-                }
-                viewModel.signIn(roleEmail, password) 
-            },
-            modifier = Modifier.fillMaxWidth(),
-            enabled = authState !is AuthState.Loading
-        ) {
-            if (authState is AuthState.Loading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(16.dp),
-                    color = MaterialTheme.colorScheme.onPrimary
-                )
-            } else {
-                Text("Login as ${selectedRole.name.lowercase().replaceFirstChar { it.uppercase() }}")
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        TextButton(
-            onClick = onNavigateToRegister,
-            enabled = authState !is AuthState.Loading
-        ) {
-            Text("Don't have an account? Register")
-        }
-        
-        if (authState is AuthState.Error) {
-            Spacer(modifier = Modifier.height(16.dp))
-            val errorState = authState as AuthState.Error
-            Card(
+                    .clip(RoundedCornerShape(24.dp)),
                 colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.errorContainer
-                )
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
             ) {
-                Text(
-                    text = errorState.message,
-                    modifier = Modifier.padding(16.dp),
-                    color = MaterialTheme.colorScheme.onErrorContainer
-                )
+                Column(
+                    modifier = Modifier.padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Text(
+                        text = "Welcome Back",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
+                        color = Color(0xFF2D3748),
+                        modifier = Modifier.padding(bottom = 32.dp)
+                    )
+                    
+                    // Email Field
+                    OutlinedTextField(
+                        value = email,
+                        onValueChange = { email = it },
+                        label = { Text("Email") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF667eea),
+                            focusedLabelColor = Color(0xFF667eea)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(20.dp))
+                    
+                    // Password Field
+                    OutlinedTextField(
+                        value = password,
+                        onValueChange = { password = it },
+                        label = { Text("Password") },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clip(RoundedCornerShape(16.dp)),
+                        singleLine = true,
+                        visualTransformation = PasswordVisualTransformation(),
+                        colors = OutlinedTextFieldDefaults.colors(
+                            focusedBorderColor = Color(0xFF667eea),
+                            focusedLabelColor = Color(0xFF667eea)
+                        )
+                    )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // Student Login Button
+                    Button(
+                        onClick = onNavigateToStudent,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF667eea)
+                        )
+                    ) {
+                        Text(
+                            text = "🎓 Login as Student",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color.White
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Driver Login Button
+                    Button(
+                        onClick = onNavigateToDriver,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF764ba2)
+                        )
+                    ) {
+                        Text(
+                            text = "🚌 Login as Driver",
+                            style = MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = Color.White
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Register Link
+                    TextButton(
+                        onClick = onNavigateToRegister
+                    ) {
+                        Text(
+                            text = "Don't have an account? Register",
+                            color = Color(0xFF667eea),
+                            style = MaterialTheme.typography.bodyMedium.copy(
+                                fontWeight = FontWeight.Medium
+                            )
+                        )
+                    }
+                }
             }
         }
     }

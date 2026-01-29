@@ -5,18 +5,31 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
 import com.campusbussbuddy.ui.screens.student.StudentHomeScreen
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel
+import com.campusbussbuddy.ui.screens.student.BusMapScreen
+import com.campusbussbuddy.ui.screens.student.QrScannerScreen
+import com.campusbussbuddy.ui.screens.student.StudentProfileScreen
 
 fun NavGraphBuilder.studentNavGraph(
-    navController: NavHostController,
-    authViewModel: AuthViewModel
+    navController: NavHostController
 ) {
     navigation(
         route = Destinations.STUDENT,
-        startDestination = "student_home"
+        startDestination = Destinations.STUDENT_HOME
     ) {
-        composable("student_home") {
-            StudentHomeScreen(authViewModel = authViewModel)
+        composable(Destinations.STUDENT_HOME) {
+            StudentHomeScreen(navController = navController)
+        }
+        
+        composable(Destinations.BUS_MAP) {
+            BusMapScreen(navController = navController)
+        }
+        
+        composable(Destinations.QR_SCANNER) {
+            QrScannerScreen(navController = navController)
+        }
+        
+        composable(Destinations.STUDENT_PROFILE) {
+            StudentProfileScreen(navController = navController)
         }
     }
 }
