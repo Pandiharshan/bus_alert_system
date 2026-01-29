@@ -1,6 +1,5 @@
 package com.campusbussbuddy.ui.screens.student
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,12 +7,12 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocationOn
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.ExitToApp
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -26,115 +25,123 @@ import com.campusbussbuddy.ui.navigation.Destinations
 fun StudentHomeScreen(
     navController: NavHostController
 ) {
-    // Animation for the gradient
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(4000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
-    )
-    
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF4facfe).copy(alpha = 0.8f + animatedOffset * 0.2f),
-                        Color(0xFF00f2fe).copy(alpha = 0.9f),
-                        Color(0xFF4facfe).copy(alpha = 0.7f + animatedOffset * 0.3f)
-                    )
-                )
-            )
+            .background(Color(0xFFFAFAFA))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+                .padding(horizontal = 20.dp)
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            // Header
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 48.dp, bottom = 32.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "Good morning",
+                        fontSize = 16.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                    Text(
+                        text = "Alex",
+                        fontSize = 28.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        color = Color(0xFF111827)
+                    )
+                }
+                
+                IconButton(
+                    onClick = { navController.navigate(Destinations.AUTH) },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(10.dp))
+                        .background(Color.White)
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.ExitToApp,
+                        contentDescription = "Sign Out",
+                        tint = Color(0xFF6B7280),
+                        modifier = Modifier.size(20.dp)
+                    )
+                }
+            }
             
-            // Welcome Header
+            // Quick Actions
             Text(
-                text = "🎓 Student Dashboard",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp
-                ),
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 8.dp)
+                text = "Quick Actions",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF111827),
+                modifier = Modifier.padding(bottom = 16.dp)
             )
             
-            Text(
-                text = "Ready to catch your bus?",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.8f),
-                modifier = Modifier.padding(bottom = 40.dp)
-            )
-            
-            // Navigation Cards
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp)
             ) {
                 // Bus Map Card
                 Card(
                     onClick = { navController.navigate(Destinations.BUS_MAP) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(20.dp)),
+                        .height(80.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = Color.White
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(24.dp),
+                            .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(Color(0xFF4facfe), Color(0xFF00f2fe))
-                                    )
-                                ),
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.LocationOn,
                                 contentDescription = "Bus Map",
-                                modifier = Modifier.size(28.dp),
-                                tint = Color.White
+                                modifier = Modifier.size(20.dp),
+                                tint = Color(0xFF3B82F6)
                             )
                         }
                         
-                        Spacer(modifier = Modifier.width(20.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Text(
                                 text = "Bus Map",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = Color(0xFF2D3748)
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF111827)
                             )
                             Text(
                                 text = "Track buses in real-time",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF718096)
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280)
                             )
                         }
+                        
+                        Text(
+                            text = "→",
+                            fontSize = 18.sp,
+                            color = Color(0xFF9CA3AF)
+                        )
                     }
                 }
                 
@@ -143,54 +150,57 @@ fun StudentHomeScreen(
                     onClick = { navController.navigate(Destinations.QR_SCANNER) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(20.dp)),
+                        .height(80.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = Color.White
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(24.dp),
+                            .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(Color(0xFF667eea), Color(0xFF764ba2))
-                                    )
-                                ),
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFF10B981).copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Search,
                                 contentDescription = "QR Scanner",
-                                modifier = Modifier.size(28.dp),
-                                tint = Color.White
+                                modifier = Modifier.size(20.dp),
+                                tint = Color(0xFF10B981)
                             )
                         }
                         
-                        Spacer(modifier = Modifier.width(20.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Text(
                                 text = "QR Scanner",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = Color(0xFF2D3748)
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF111827)
                             )
                             Text(
                                 text = "Scan to board buses",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF718096)
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280)
                             )
                         }
+                        
+                        Text(
+                            text = "→",
+                            fontSize = 18.sp,
+                            color = Color(0xFF9CA3AF)
+                        )
                     }
                 }
                 
@@ -199,82 +209,96 @@ fun StudentHomeScreen(
                     onClick = { navController.navigate(Destinations.STUDENT_PROFILE) },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(100.dp)
-                        .clip(RoundedCornerShape(20.dp)),
+                        .height(80.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
+                        containerColor = Color.White
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Row(
                         modifier = Modifier
                             .fillMaxSize()
-                            .padding(24.dp),
+                            .padding(20.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Box(
                             modifier = Modifier
-                                .size(56.dp)
-                                .clip(RoundedCornerShape(16.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(Color(0xFFf093fb), Color(0xFFf5576c))
-                                    )
-                                ),
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(10.dp))
+                                .background(Color(0xFF8B5CF6).copy(alpha = 0.1f)),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Person,
                                 contentDescription = "Profile",
-                                modifier = Modifier.size(28.dp),
-                                tint = Color.White
+                                modifier = Modifier.size(20.dp),
+                                tint = Color(0xFF8B5CF6)
                             )
                         }
                         
-                        Spacer(modifier = Modifier.width(20.dp))
+                        Spacer(modifier = Modifier.width(16.dp))
                         
-                        Column {
+                        Column(
+                            modifier = Modifier.weight(1f)
+                        ) {
                             Text(
                                 text = "Profile",
-                                style = MaterialTheme.typography.titleLarge.copy(
-                                    fontWeight = FontWeight.Bold
-                                ),
-                                color = Color(0xFF2D3748)
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Medium,
+                                color = Color(0xFF111827)
                             )
                             Text(
                                 text = "Manage your account",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = Color(0xFF718096)
+                                fontSize = 14.sp,
+                                color = Color(0xFF6B7280)
                             )
                         }
+                        
+                        Text(
+                            text = "→",
+                            fontSize = 18.sp,
+                            color = Color(0xFF9CA3AF)
+                        )
                     }
                 }
             }
             
-            Spacer(modifier = Modifier.weight(1f))
+            Spacer(modifier = Modifier.height(32.dp))
             
-            // Back to Login Button
-            OutlinedButton(
-                onClick = { navController.navigate(Destinations.AUTH) },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .clip(RoundedCornerShape(16.dp)),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.White
+            // Recent Activity Section
+            Text(
+                text = "Recent Activity",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.SemiBold,
+                color = Color(0xFF111827),
+                modifier = Modifier.padding(bottom = 16.dp)
+            )
+            
+            Card(
+                modifier = Modifier.fillMaxWidth(),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White
                 ),
-                border = ButtonDefaults.outlinedButtonBorder.copy(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Color.White, Color.White.copy(alpha = 0.8f))
-                    )
-                )
+                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                shape = RoundedCornerShape(12.dp)
             ) {
-                Text(
-                    text = "← Back to Login",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = FontWeight.SemiBold
+                Column(
+                    modifier = Modifier.padding(20.dp)
+                ) {
+                    Text(
+                        text = "No recent trips",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF111827),
+                        modifier = Modifier.padding(bottom = 4.dp)
                     )
-                )
+                    Text(
+                        text = "Your bus boarding history will appear here",
+                        fontSize = 14.sp,
+                        color = Color(0xFF6B7280)
+                    )
+                }
             }
         }
     }

@@ -1,6 +1,5 @@
 package com.campusbussbuddy.ui.screens.auth
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -9,7 +8,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -26,172 +24,208 @@ fun LoginScreen(
     var email by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     
-    // Animation for the gradient
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(3000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
-    )
-    
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF667eea).copy(alpha = 0.8f + animatedOffset * 0.2f),
-                        Color(0xFF764ba2).copy(alpha = 0.9f),
-                        Color(0xFF667eea).copy(alpha = 0.7f + animatedOffset * 0.3f)
-                    )
-                )
-            )
+            .background(Color(0xFFFAFAFA))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(24.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+                .padding(horizontal = 20.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // App Title with Animation
-            Text(
-                text = "🚌 Campus Bus Buddy",
-                style = MaterialTheme.typography.headlineLarge.copy(
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 32.sp
-                ),
-                color = Color.White,
-                modifier = Modifier.padding(bottom = 8.dp)
-            )
+            Spacer(modifier = Modifier.height(80.dp))
             
-            Text(
-                text = "Your journey starts here",
-                style = MaterialTheme.typography.bodyLarge,
-                color = Color.White.copy(alpha = 0.8f),
+            // Logo/Brand Area
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
                 modifier = Modifier.padding(bottom = 48.dp)
-            )
-            
-            // Login Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .clip(RoundedCornerShape(24.dp)),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
             ) {
-                Column(
-                    modifier = Modifier.padding(32.dp),
-                    horizontalAlignment = Alignment.CenterHorizontally
+                Box(
+                    modifier = Modifier
+                        .size(64.dp)
+                        .clip(RoundedCornerShape(16.dp))
+                        .background(Color(0xFF2563EB)),
+                    contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = "Welcome Back",
-                        style = MaterialTheme.typography.headlineMedium.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color(0xFF2D3748),
-                        modifier = Modifier.padding(bottom = 32.dp)
+                        text = "🚌",
+                        fontSize = 28.sp
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Campus Bus Buddy",
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.SemiBold,
+                    color = Color(0xFF111827),
+                    letterSpacing = (-0.5).sp
+                )
+                
+                Text(
+                    text = "Smart campus transportation",
+                    fontSize = 16.sp,
+                    color = Color(0xFF6B7280),
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+            
+            // Login Form
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    text = "Sign in to your account",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF111827),
+                    modifier = Modifier.padding(bottom = 24.dp)
+                )
+                
+                // Email Field
+                Column(
+                    modifier = Modifier.padding(bottom = 16.dp)
+                ) {
+                    Text(
+                        text = "Email",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF374151),
+                        modifier = Modifier.padding(bottom = 6.dp)
                     )
                     
-                    // Email Field
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
-                        label = { Text("Email") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp)),
+                            .height(48.dp),
+                        placeholder = { 
+                            Text(
+                                "Enter your email",
+                                color = Color(0xFF9CA3AF),
+                                fontSize = 16.sp
+                            ) 
+                        },
                         singleLine = true,
+                        shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF667eea),
-                            focusedLabelColor = Color(0xFF667eea)
+                            unfocusedBorderColor = Color(0xFFD1D5DB),
+                            focusedBorderColor = Color(0xFF2563EB),
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White
                         )
                     )
+                }
+                
+                // Password Field
+                Column(
+                    modifier = Modifier.padding(bottom = 24.dp)
+                ) {
+                    Text(
+                        text = "Password",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = Color(0xFF374151),
+                        modifier = Modifier.padding(bottom = 6.dp)
+                    )
                     
-                    Spacer(modifier = Modifier.height(20.dp))
-                    
-                    // Password Field
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
-                        label = { Text("Password") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clip(RoundedCornerShape(16.dp)),
+                            .height(48.dp),
+                        placeholder = { 
+                            Text(
+                                "Enter your password",
+                                color = Color(0xFF9CA3AF),
+                                fontSize = 16.sp
+                            ) 
+                        },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
+                        shape = RoundedCornerShape(8.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF667eea),
-                            focusedLabelColor = Color(0xFF667eea)
+                            unfocusedBorderColor = Color(0xFFD1D5DB),
+                            focusedBorderColor = Color(0xFF2563EB),
+                            unfocusedContainerColor = Color.White,
+                            focusedContainerColor = Color.White
                         )
                     )
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
-                    
-                    // Student Login Button
+                }
+                
+                // Login Buttons
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
                     Button(
                         onClick = onNavigateToStudent,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(16.dp)),
+                            .height(48.dp),
                         colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF667eea)
-                        )
+                            containerColor = Color(0xFF2563EB)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "🎓 Login as Student",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
+                            text = "Continue as Student",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
                             color = Color.White
                         )
                     }
                     
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Driver Login Button
-                    Button(
+                    OutlinedButton(
                         onClick = onNavigateToDriver,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF764ba2)
-                        )
+                            .height(48.dp),
+                        colors = ButtonDefaults.outlinedButtonColors(
+                            contentColor = Color(0xFF374151)
+                        ),
+                        shape = RoundedCornerShape(8.dp)
                     ) {
                         Text(
-                            text = "🚌 Login as Driver",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.SemiBold
-                            ),
-                            color = Color.White
+                            text = "Continue as Driver",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium
                         )
                     }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    // Register Link
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                // Register Link
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    Text(
+                        text = "Don't have an account? ",
+                        fontSize = 14.sp,
+                        color = Color(0xFF6B7280)
+                    )
                     TextButton(
-                        onClick = onNavigateToRegister
+                        onClick = onNavigateToRegister,
+                        contentPadding = PaddingValues(0.dp)
                     ) {
                         Text(
-                            text = "Don't have an account? Register",
-                            color = Color(0xFF667eea),
-                            style = MaterialTheme.typography.bodyMedium.copy(
-                                fontWeight = FontWeight.Medium
-                            )
+                            text = "Sign up",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF2563EB)
                         )
                     }
                 }
             }
+            
+            Spacer(modifier = Modifier.weight(1f))
         }
     }
 }
