@@ -7,6 +7,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Build
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.*
@@ -190,7 +191,7 @@ fun TripManagementScreen(
                             )
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Close,
+                                imageVector = Icons.Default.ArrowBack,
                                 contentDescription = "Stop",
                                 modifier = Modifier.size(18.dp)
                             )

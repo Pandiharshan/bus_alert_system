@@ -12,12 +12,12 @@ fun NavGraphBuilder.authNavGraph(
 ) {
     navigation(
         route = Destinations.AUTH,
-        startDestination = "login"
+        startDestination = Destinations.LOGIN
     ) {
-        composable("login") {
+        composable(Destinations.LOGIN) {
             LoginScreen(
                 onNavigateToRegister = {
-                    navController.navigate("register")
+                    navController.navigate(Destinations.REGISTER)
                 },
                 onNavigateToStudent = {
                     navController.navigate(Destinations.STUDENT) {
@@ -32,7 +32,7 @@ fun NavGraphBuilder.authNavGraph(
             )
         }
         
-        composable("register") {
+        composable(Destinations.REGISTER) {
             RegisterScreen(
                 onNavigateToLogin = {
                     navController.popBackStack()

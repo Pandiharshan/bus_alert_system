@@ -4,18 +4,36 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.campusbussbuddy.ui.screens.driver.DriverHomeScreen
-import com.campusbussbuddy.ui.screens.driver.TripManagementScreen
-import com.campusbussbuddy.ui.screens.driver.QrGeneratorScreen
-import com.campusbussbuddy.ui.screens.driver.DriverProfileScreen
+import com.campusbussbuddy.ui.screens.driver.*
 
 fun NavGraphBuilder.driverNavGraph(
     navController: NavHostController
 ) {
     navigation(
         route = Destinations.DRIVER,
-        startDestination = Destinations.DRIVER_HOME
+        startDestination = Destinations.DRIVER_PORTAL
     ) {
+        composable(Destinations.DRIVER_PORTAL) {
+            DriverPortalScreen(navController = navController)
+        }
+        
+        composable(Destinations.BUS_LOGIN) {
+            BusLoginScreen(navController = navController)
+        }
+        
+        composable(Destinations.DRIVER_BUS_HOME) {
+            DriverBusHomeScreen(navController = navController)
+        }
+        
+        composable(Destinations.TRIP_SCREEN) {
+            TripScreen(navController = navController)
+        }
+        
+        composable(Destinations.BUS_PROFILE) {
+            BusProfileScreen(navController = navController)
+        }
+        
+        // Legacy screens (keeping for backward compatibility)
         composable(Destinations.DRIVER_HOME) {
             DriverHomeScreen(navController = navController)
         }
@@ -30,6 +48,17 @@ fun NavGraphBuilder.driverNavGraph(
         
         composable(Destinations.DRIVER_PROFILE) {
             DriverProfileScreen(navController = navController)
+        }
+        
+        // Placeholder screens for missing destinations
+        composable(Destinations.BUS_MEMBERS) {
+            // TODO: Create BusMembersScreen
+            DriverBusHomeScreen(navController = navController)
+        }
+        
+        composable(Destinations.ATTENDANCE) {
+            // TODO: Create AttendanceScreen  
+            DriverBusHomeScreen(navController = navController)
         }
     }
 }

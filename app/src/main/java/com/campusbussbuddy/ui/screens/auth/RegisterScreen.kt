@@ -1,5 +1,6 @@
 package com.campusbussbuddy.ui.screens.auth
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
@@ -12,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.PasswordVisualTransformation
@@ -31,15 +33,35 @@ fun RegisterScreen(
     
     val scrollState = rememberScrollState()
     
+    // Animation for the gradient
+    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
+    val animatedOffset by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(5000, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        ),
+        label = "offset"
+    )
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAFAFA))
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFF4facfe).copy(alpha = 0.8f + animatedOffset * 0.2f),
+                        Color(0xFF00f2fe).copy(alpha = 0.9f),
+                        Color(0xFF4facfe).copy(alpha = 0.7f + animatedOffset * 0.3f)
+                    )
+                )
+            )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .padding(horizontal = 24.dp)
                 .verticalScroll(scrollState)
         ) {
             // Top Bar
@@ -51,265 +73,214 @@ fun RegisterScreen(
             ) {
                 IconButton(
                     onClick = onNavigateToLogin,
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(RoundedCornerShape(12.dp))
+                        .background(Color.White.copy(alpha = 0.2f))
                 ) {
                     Icon(
                         imageVector = Icons.Default.ArrowBack,
                         contentDescription = "Back",
-                        tint = Color(0xFF374151)
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 
-                Spacer(modifier = Modifier.width(12.dp))
+                Spacer(modifier = Modifier.width(16.dp))
                 
                 Text(
                     text = "Create Account",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF111827)
+                    fontSize = 28.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
             
-            // Form
-            Column(
-                modifier = Modifier.fillMaxWidth()
+            // Form Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(24.dp)),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
             ) {
-                Text(
-                    text = "Join Campus Bus Buddy to get started with smart campus transportation.",
-                    fontSize = 16.sp,
-                    color = Color(0xFF6B7280),
-                    lineHeight = 24.sp,
-                    modifier = Modifier.padding(bottom = 32.dp)
-                )
-                
-                // Name Field
                 Column(
-                    modifier = Modifier.padding(bottom = 20.dp)
+                    modifier = Modifier.padding(32.dp)
                 ) {
                     Text(
-                        text = "Full Name",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 6.dp)
+                        text = "Join the Journey! 🚀",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF2D3748),
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     
+                    Text(
+                        text = "Create your account to get started with smart campus transportation.",
+                        fontSize = 16.sp,
+                        color = Color(0xFF718096),
+                        lineHeight = 24.sp,
+                        modifier = Modifier.padding(bottom = 32.dp)
+                    )
+                    
+                    // Name Field
                     OutlinedTextField(
                         value = name,
                         onValueChange = { name = it },
+                        label = { Text("Full Name") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
+                            .padding(bottom = 20.dp),
                         placeholder = { 
-                            Text(
-                                "Enter your full name",
-                                color = Color(0xFF9CA3AF),
-                                fontSize = 16.sp
-                            ) 
+                            Text("Enter your full name") 
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF2563EB),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                            focusedBorderColor = Color(0xFF4facfe),
+                            focusedLabelColor = Color(0xFF4facfe)
                         )
                     )
-                }
-                
-                // Email Field
-                Column(
-                    modifier = Modifier.padding(bottom = 20.dp)
-                ) {
-                    Text(
-                        text = "Email Address",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
                     
+                    // Email Field
                     OutlinedTextField(
                         value = email,
                         onValueChange = { email = it },
+                        label = { Text("Email Address") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
+                            .padding(bottom = 20.dp),
                         placeholder = { 
-                            Text(
-                                "Enter your email address",
-                                color = Color(0xFF9CA3AF),
-                                fontSize = 16.sp
-                            ) 
+                            Text("Enter your email address") 
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF2563EB),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                            focusedBorderColor = Color(0xFF4facfe),
+                            focusedLabelColor = Color(0xFF4facfe)
                         )
                     )
-                }
-                
-                // College ID Field
-                Column(
-                    modifier = Modifier.padding(bottom = 20.dp)
-                ) {
-                    Text(
-                        text = "Student/Employee ID",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
                     
+                    // College ID Field
                     OutlinedTextField(
                         value = collegeId,
                         onValueChange = { collegeId = it },
+                        label = { Text("Student/Employee ID") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
+                            .padding(bottom = 20.dp),
                         placeholder = { 
-                            Text(
-                                "Enter your ID number",
-                                color = Color(0xFF9CA3AF),
-                                fontSize = 16.sp
-                            ) 
+                            Text("Enter your ID number") 
                         },
                         singleLine = true,
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF2563EB),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                            focusedBorderColor = Color(0xFF4facfe),
+                            focusedLabelColor = Color(0xFF4facfe)
                         )
                     )
-                }
-                
-                // Password Field
-                Column(
-                    modifier = Modifier.padding(bottom = 20.dp)
-                ) {
-                    Text(
-                        text = "Password",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
                     
+                    // Password Field
                     OutlinedTextField(
                         value = password,
                         onValueChange = { password = it },
+                        label = { Text("Password") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
+                            .padding(bottom = 20.dp),
                         placeholder = { 
-                            Text(
-                                "Create a password",
-                                color = Color(0xFF9CA3AF),
-                                fontSize = 16.sp
-                            ) 
+                            Text("Create a password") 
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF2563EB),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                            focusedBorderColor = Color(0xFF4facfe),
+                            focusedLabelColor = Color(0xFF4facfe)
                         )
                     )
-                }
-                
-                // Confirm Password Field
-                Column(
-                    modifier = Modifier.padding(bottom = 32.dp)
-                ) {
-                    Text(
-                        text = "Confirm Password",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color(0xFF374151),
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
                     
+                    // Confirm Password Field
                     OutlinedTextField(
                         value = confirmPassword,
                         onValueChange = { confirmPassword = it },
+                        label = { Text("Confirm Password") },
                         modifier = Modifier
                             .fillMaxWidth()
-                            .height(48.dp),
+                            .padding(bottom = 32.dp),
                         placeholder = { 
-                            Text(
-                                "Confirm your password",
-                                color = Color(0xFF9CA3AF),
-                                fontSize = 16.sp
-                            ) 
+                            Text("Confirm your password") 
                         },
                         singleLine = true,
                         visualTransformation = PasswordVisualTransformation(),
-                        shape = RoundedCornerShape(8.dp),
+                        shape = RoundedCornerShape(16.dp),
                         colors = OutlinedTextFieldDefaults.colors(
-                            unfocusedBorderColor = Color(0xFFD1D5DB),
-                            focusedBorderColor = Color(0xFF2563EB),
-                            unfocusedContainerColor = Color.White,
-                            focusedContainerColor = Color.White
+                            focusedBorderColor = Color(0xFF4facfe),
+                            focusedLabelColor = Color(0xFF4facfe)
                         )
                     )
+                    
+                    // Create Account Button
+                    Button(
+                        onClick = onNavigateToLogin,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .clip(RoundedCornerShape(16.dp)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color.Transparent
+                        ),
+                        contentPadding = PaddingValues(0.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(
+                                    brush = Brush.horizontalGradient(
+                                        colors = listOf(Color(0xFF4facfe), Color(0xFF00f2fe))
+                                    )
+                                ),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text(
+                                text = "Create Account ✨",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = Color.White
+                            )
+                        }
+                    }
                 }
-                
-                // Create Account Button
-                Button(
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Login Link
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                Text(
+                    text = "Already have an account? ",
+                    fontSize = 16.sp,
+                    color = Color.White.copy(alpha = 0.8f)
+                )
+                TextButton(
                     onClick = onNavigateToLogin,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(48.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF2563EB)
-                    ),
-                    shape = RoundedCornerShape(8.dp)
+                    contentPadding = PaddingValues(0.dp)
                 ) {
                     Text(
-                        text = "Create Account",
+                        text = "Sign in",
                         fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
+                        fontWeight = FontWeight.Bold,
                         color = Color.White
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Login Link
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    Text(
-                        text = "Already have an account? ",
-                        fontSize = 14.sp,
-                        color = Color(0xFF6B7280)
-                    )
-                    TextButton(
-                        onClick = onNavigateToLogin,
-                        contentPadding = PaddingValues(0.dp)
-                    ) {
-                        Text(
-                            text = "Sign in",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF2563EB)
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(32.dp))
             }
+            
+            Spacer(modifier = Modifier.height(32.dp))
         }
     }
 }

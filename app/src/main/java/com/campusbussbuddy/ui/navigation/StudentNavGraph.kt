@@ -4,10 +4,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.navigation
-import com.campusbussbuddy.ui.screens.student.StudentHomeScreen
-import com.campusbussbuddy.ui.screens.student.BusMapScreen
-import com.campusbussbuddy.ui.screens.student.QrScannerScreen
-import com.campusbussbuddy.ui.screens.student.StudentProfileScreen
+import com.campusbussbuddy.ui.screens.student.*
 
 fun NavGraphBuilder.studentNavGraph(
     navController: NavHostController
@@ -26,6 +23,10 @@ fun NavGraphBuilder.studentNavGraph(
         
         composable(Destinations.QR_SCANNER) {
             QrScannerScreen(navController = navController)
+        }
+        
+        composable(Destinations.ABSENT_CALENDAR) {
+            AbsentCalendarScreen(navController = navController)
         }
         
         composable(Destinations.STUDENT_PROFILE) {
