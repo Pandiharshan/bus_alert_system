@@ -22,6 +22,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.campusbussbuddy.ui.navigation.Destinations
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -332,14 +334,25 @@ fun DriverProfileScreen(
                 Column(
                     modifier = Modifier.padding(24.dp)
                 ) {
-                    Text(
-                        text = "📊 Performance Metrics",
-                        style = MaterialTheme.typography.titleLarge.copy(
-                            fontWeight = FontWeight.Bold
-                        ),
-                        color = Color(0xFF2D3748),
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
                         modifier = Modifier.padding(bottom = 16.dp)
-                    )
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_speed),
+                            contentDescription = "Performance Metrics",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color(0xFF2D3748)
+                        )
+                        Text(
+                            text = "Performance Metrics",
+                            style = MaterialTheme.typography.titleLarge.copy(
+                                fontWeight = FontWeight.Bold
+                            ),
+                            color = Color(0xFF2D3748)
+                        )
+                    }
                     
                     val metrics = listOf(
                         "Total trips: 45",

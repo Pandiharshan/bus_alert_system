@@ -1,202 +1,346 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.campusbussbuddy.ui.screens.driver
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
+import com.campusbussbuddy.ui.navigation.Destinations
+import com.campusbussbuddy.ui.theme.AppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BusLoginScreen(
     navController: NavHostController
 ) {
-    val primary = Color(0xFF0DF26C)
-    val backgroundDark = Color(0xFF102217)
+    val primary = AppColors.Primary
+    val backgroundDark = AppColors.BackgroundDark
+    val cardBackground = AppColors.CardBackground
+    val borderColor = AppColors.Border
     
-    var busId by remember { mutableStateOf("") }
+    var busNumber by remember { mutableStateOf("") }
     var busPassword by remember { mutableStateOf("") }
     
-    Box(
+    // Animations
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseAnimation by infiniteTransition.animateFloat(
+        initialValue = 0.75f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "pulse"
+    )
+
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundDark)
+            .background(AppColors.BackgroundDark)
     ) {
-        LazyColumn(
+        // Top Navigation Bar
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            item {
-                Spacer(modifier = Modifier.height(40.dp))
-            }
-            
-            item {
-                // Header
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text = "Bus Login",
-                        color = Color.White,
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center
-                    )
-                    
-                    Text(
-                        text = "Enter your bus credentials to continue",
-                        color = Color(0xFF9CBAA8),
-                        fontSize = 16.sp,
-                        textAlign = TextAlign.Center,
-                        modifier = Modifier.padding(top = 8.dp)
-                    )
-                }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-            
-            item {
-                // Bus ID Field
-                Column {
-                    Text(
-                        text = "BUS ID",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 1.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    
-                    OutlinedTextField(
-                        value = busId,
-                        onValueChange = { busId = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { 
-                            Text(
-                                "Enter Bus ID (e.g., BUS-102)",
-                                color = Color(0xFF9CBAA8)
-                            ) 
-                        },
-                        trailingIcon = {
-                            Text("🚌", fontSize = 20.sp)
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primary.copy(alpha = 0.5f),
-                            unfocusedBorderColor = Color(0xFF3B5445),
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                }
-            }
-            
-            item {
-                // Bus Password Field
-                Column {
-                    Text(
-                        text = "BUS PASSWORD",
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        letterSpacing = 1.sp,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    
-                    OutlinedTextField(
-                        value = busPassword,
-                        onValueChange = { busPassword = it },
-                        modifier = Modifier.fillMaxWidth(),
-                        placeholder = { 
-                            Text(
-                                "••••••••",
-                                color = Color(0xFF9CBAA8)
-                            ) 
-                        },
-                        visualTransformation = PasswordVisualTransformation(),
-                        trailingIcon = {
-                            Icon(
-                                Icons.Default.Lock,
-                                contentDescription = null,
-                                tint = Color(0xFF9CBAA8)
-                            )
-                        },
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = primary.copy(alpha = 0.5f),
-                            unfocusedBorderColor = Color(0xFF3B5445),
-                            focusedTextColor = Color.White,
-                            unfocusedTextColor = Color.White
-                        ),
-                        shape = RoundedCornerShape(8.dp)
-                    )
-                }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(20.dp))
-            }
-            
-            item {
-                // Login Button
-                Button(
-                    onClick = { 
-                        // Navigate to driver bus home
-                        navController.navigate("driver_bus_home")
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = primary,
-                        contentColor = backgroundDark
-                    ),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            Icons.Default.ArrowForward,
-                            contentDescription = null,
-                            tint = backgroundDark
-                        )
-                        Text(
-                            text = "Login to Bus",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
-                }
-            }
-            
-            item {
-                // Help Text
-                Text(
-                    text = "Need help? Contact your fleet manager",
-                    color = Color(0xFF9CBAA8),
-                    fontSize = 14.sp,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth()
+            IconButton(
+                onClick = { navController.popBackStack() },
+                modifier = Modifier.size(48.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_back_vector),
+                    contentDescription = "Back",
+                    modifier = Modifier.size(24.dp),
+                    tint = AppColors.OnBackground
                 )
             }
+            
+            Text(
+                text = "Bus Login",
+                color = AppColors.OnBackground,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.weight(1f),
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.width(48.dp))
+        }
+        
+        // Header Illustration Area
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(200.dp)
+                .padding(horizontal = 16.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(
+                    Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFF102217).copy(alpha = 0.4f),
+                            Color(0xFF102217).copy(alpha = 0.9f)
+                        )
+                    )
+                )
+                .border(1.dp, Color.White.copy(alpha = 0.05f), RoundedCornerShape(8.dp))
+        )
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        // Welcome Content
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "Start Tracking",
+                color = AppColors.OnBackground,
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                textAlign = TextAlign.Center
+            )
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = "Enter vehicle credentials to sync this device with the fleet management system.",
+                color = AppColors.OnSurfaceVariant,
+                fontSize = 16.sp,
+                textAlign = TextAlign.Center,
+                lineHeight = 24.sp,
+                modifier = Modifier.padding(horizontal = 16.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(32.dp))
+        
+        // Login Form Fields
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Bus Number Field
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "BUS NUMBER",
+                    color = AppColors.OnBackground,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 1.sp
+                )
+                
+                OutlinedTextField(
+                    value = busNumber,
+                    onValueChange = { busNumber = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "e.g., B-204",
+                            color = AppColors.OnSurfaceVariant
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                            contentDescription = "Bus",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color(0xFF9CBAA8)
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primary,
+                        unfocusedBorderColor = borderColor,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = primary,
+                        focusedContainerColor = cardBackground,
+                        unfocusedContainerColor = cardBackground
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    singleLine = true
+                )
+            }
+            
+            // Bus Password Field
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "BUS PASSWORD",
+                    color = Color.White,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    letterSpacing = 1.sp
+                )
+                
+                OutlinedTextField(
+                    value = busPassword,
+                    onValueChange = { busPassword = it },
+                    modifier = Modifier.fillMaxWidth(),
+                    placeholder = {
+                        Text(
+                            text = "••••••••",
+                            color = Color(0xFF9CBAA8)
+                        )
+                    },
+                    trailingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_settings),
+                            contentDescription = "Lock",
+                            modifier = Modifier.size(20.dp),
+                            tint = Color(0xFF9CBAA8)
+                        )
+                    },
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = primary,
+                        unfocusedBorderColor = borderColor,
+                        focusedTextColor = Color.White,
+                        unfocusedTextColor = Color.White,
+                        cursorColor = primary,
+                        focusedContainerColor = cardBackground,
+                        unfocusedContainerColor = cardBackground
+                    ),
+                    shape = RoundedCornerShape(8.dp),
+                    visualTransformation = PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    singleLine = true
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(40.dp))
+        
+        // Login Button
+        Button(
+            onClick = { navController.navigate(Destinations.DRIVER_BUS_HOME) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .padding(horizontal = 24.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = primary,
+                contentColor = backgroundDark
+            ),
+            shape = RoundedCornerShape(12.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 8.dp,
+                pressedElevation = 4.dp
+            )
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = "Login to Bus",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Login",
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        // Secondary Actions
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            TextButton(onClick = { }) {
+                Text(
+                    text = "Forgot Bus Credentials?",
+                    color = Color(0xFF9CBAA8),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            
+            // GPS Status Indicator
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                modifier = Modifier
+                    .background(cardBackground, RoundedCornerShape(20.dp))
+                    .border(1.dp, borderColor, RoundedCornerShape(20.dp))
+                    .padding(horizontal = 16.dp, vertical = 8.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(8.dp)
+                        .background(primary, androidx.compose.foundation.shape.CircleShape)
+                        .then(
+                            if (pulseAnimation > 0.9f) Modifier.background(
+                                primary.copy(alpha = 0.5f),
+                                androidx.compose.foundation.shape.CircleShape
+                            ) else Modifier
+                        )
+                )
+                Text(
+                    text = "GPS Ready • System Version 2.4.0",
+                    color = Color(0xFF9CBAA8),
+                    fontSize = 12.sp
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Support Footer
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = "SmartBus Fleet Management System © 2024",
+                color = Color(0xFF5C7A68),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
+            Text(
+                text = "Need technical support? Contact Fleet Hub",
+                color = Color(0xFF5C7A68),
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center,
+                modifier = Modifier.padding(top = 4.dp)
+            )
         }
     }
 }

@@ -21,12 +21,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TripManagementScreen(
     navController: NavHostController
 ) {
+    val primary = Color(0xFF0DF26C)
+    val backgroundDark = Color(0xFF102217)
+    
     var isTripActive by remember { mutableStateOf(false) }
     
     // Animation for the gradient
@@ -84,14 +89,25 @@ fun TripManagementScreen(
                 
                 Spacer(modifier = Modifier.width(16.dp))
                 
-                Text(
-                    text = "🚌 Trip Management",
-                    style = MaterialTheme.typography.headlineMedium.copy(
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 28.sp
-                    ),
-                    color = Color.White
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_directions_bus),
+                        contentDescription = "Bus",
+                        modifier = Modifier.size(24.dp),
+                        tint = primary
+                    )
+                    Text(
+                        text = "Trip Management",
+                        style = MaterialTheme.typography.headlineMedium.copy(
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 28.sp
+                        ),
+                        color = Color.White
+                    )
+                }
             }
             
             // Trip Status Card
@@ -226,14 +242,25 @@ fun TripManagementScreen(
                     Column(
                         modifier = Modifier.padding(20.dp)
                     ) {
-                        Text(
-                            text = "📍 Current Location",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = Color(0xFF2D3748),
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(bottom = 8.dp)
-                        )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_pin_drop),
+                                contentDescription = "Location",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color(0xFF2D3748)
+                            )
+                            Text(
+                                text = "Current Location",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color(0xFF2D3748)
+                            )
+                        }
                         Text(
                             text = if (isTripActive) "Broadcasting location..." else "Location sharing stopped",
                             style = MaterialTheme.typography.bodyMedium,
@@ -254,14 +281,25 @@ fun TripManagementScreen(
                     Column(
                         modifier = Modifier.padding(20.dp)
                     ) {
-                        Text(
-                            text = "📊 Trip Statistics",
-                            style = MaterialTheme.typography.titleMedium.copy(
-                                fontWeight = FontWeight.Bold
-                            ),
-                            color = Color(0xFF2D3748),
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp),
                             modifier = Modifier.padding(bottom = 12.dp)
-                        )
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_speed),
+                                contentDescription = "Trip Statistics",
+                                modifier = Modifier.size(20.dp),
+                                tint = Color(0xFF2D3748)
+                            )
+                            Text(
+                                text = "Trip Statistics",
+                                style = MaterialTheme.typography.titleMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
+                                color = Color(0xFF2D3748)
+                            )
+                        }
                         Text("Duration: ${if (isTripActive) "00:15:30" else "Not started"}", 
                              style = MaterialTheme.typography.bodySmall, 
                              color = Color(0xFF718096),

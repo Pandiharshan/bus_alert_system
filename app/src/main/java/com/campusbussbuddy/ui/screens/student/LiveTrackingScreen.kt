@@ -24,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -128,7 +131,12 @@ fun LiveTrackingScreen(
                         .clip(RoundedCornerShape(12.dp)),
                     contentAlignment = Alignment.Center
                 ) {
-                    Text("🚌", fontSize = 24.sp, color = backgroundDark)
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_directions_bus),
+                        contentDescription = "Bus",
+                        modifier = Modifier.size(24.dp),
+                        tint = backgroundDark
+                    )
                 }
             }
             

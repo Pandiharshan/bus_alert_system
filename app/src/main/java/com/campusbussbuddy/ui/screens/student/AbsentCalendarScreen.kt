@@ -24,6 +24,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
@@ -252,13 +255,14 @@ fun AbsentCalendarScreen(
                                 )
                         ) {
                             // Placeholder for abstract pattern
-                            Text(
-                                "📶",
-                                fontSize = 20.sp,
-                                color = primary.copy(alpha = 0.3f),
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_speed),
+                                contentDescription = "Signal",
                                 modifier = Modifier
                                     .fillMaxSize()
                                     .padding(16.dp)
+                                    .size(20.dp),
+                                tint = primary.copy(alpha = 0.3f)
                             )
                         }
                     }

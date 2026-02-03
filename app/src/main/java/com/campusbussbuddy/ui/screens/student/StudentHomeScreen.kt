@@ -2,6 +2,7 @@
 
 package com.campusbussbuddy.ui.screens.student
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -9,227 +10,325 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.campusbussbuddy.ui.navigation.Destinations
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun StudentHomeScreen(
-    navController: NavHostController
-) {
+fun StudentHomeScreen(navController: NavHostController) {
     val primary = Color(0xFF0DF26C)
     val backgroundDark = Color(0xFF102217)
     val cardBackground = Color(0xFF1B2720)
+    val borderColor = Color(0xFF3B5445)
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(backgroundDark)
-    ) {
-        LazyColumn(
+    // Animations
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseAnimation by infiniteTransition.animateFloat(
+        initialValue = 0.75f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "pulse"
+    )
+    
+    val fabScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(3000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "fab"
+    )
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Column(
             modifier = Modifier
                 .fillMaxSize()
+                .background(backgroundDark)
                 .padding(bottom = 100.dp)
         ) {
-            item {
-                // Top App Bar
-                Row(
+            // Top App Bar
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(backgroundDark)
+                    .padding(16.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Profile Picture
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                        .padding(top = 32.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                        .size(40.dp)
+                        .clip(CircleShape)
+                        .background(Color.Gray)
+                        .border(2.dp, primary.copy(alpha = 0.3f), CircleShape)
+                )
+                
+                // Greeting and ID
+                Column(
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(start = 12.dp)
                 ) {
-                    Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .border(2.dp, primary.copy(alpha = 0.3f), CircleShape)
-                            .background(Color.Gray)
-                    ) {
-                        Icon(
-                            Icons.Default.Person,
-                            contentDescription = "Profile",
-                            tint = Color.White,
-                            modifier = Modifier
-                                .fillMaxSize()
-                                .padding(8.dp)
-                        )
-                    }
-                    
-                    Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .padding(start = 12.dp)
-                    ) {
-                        Text(
-                            text = "Good Morning, Alex",
-                            color = Color.White,
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                        Text(
-                            text = "Student ID: #8829",
-                            color = Color(0xFF9CBAA8),
-                            fontSize = 12.sp
-                        )
-                    }
-                    
-                    IconButton(
-                        onClick = { },
-                        modifier = Modifier
-                            .size(40.dp)
-                            .background(cardBackground, CircleShape)
-                    ) {
-                        Icon(
-                            Icons.Default.Notifications,
-                            contentDescription = "Notifications",
-                            tint = Color.White
-                        )
-                    }
+                    Text(
+                        text = "Good Morning, Alex",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Student ID: #8829",
+                        color = Color(0xFF9CBAA8),
+                        fontSize = 12.sp
+                    )
+                }
+                
+                // Notification Button
+                IconButton(
+                    onClick = { },
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(cardBackground, CircleShape)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_notifications),
+                        contentDescription = "Notifications",
+                        modifier = Modifier.size(20.dp),
+                        tint = Color.White
+                    )
                 }
             }
             
-            item {
-                // Live Status Card
-                Card(
+            // Live Status Card
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
+                colors = CardDefaults.cardColors(containerColor = cardBackground),
+                shape = RoundedCornerShape(12.dp),
+                border = androidx.compose.foundation.BorderStroke(1.dp, primary.copy(alpha = 0.1f))
+            ) {
+                Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),
-                    colors = CardDefaults.cardColors(containerColor = cardBackground),
-                    shape = RoundedCornerShape(12.dp)
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                    Column(
+                        modifier = Modifier.weight(3f),
+                        verticalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        Column(
-                            modifier = Modifier.weight(3f)
+                        // Live Status Indicator
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(8.dp)
                         ) {
-                            Row(
-                                verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            // Animated Pulse Dot
+                            Box(
+                                modifier = Modifier.size(8.dp),
+                                contentAlignment = Alignment.Center
                             ) {
                                 Box(
                                     modifier = Modifier
                                         .size(8.dp)
+                                        .scale(pulseAnimation)
+                                        .background(primary.copy(alpha = 0.75f), CircleShape)
+                                )
+                                Box(
+                                    modifier = Modifier
+                                        .size(4.dp)
                                         .background(primary, CircleShape)
                                 )
-                                Text(
-                                    text = "LIVE STATUS",
-                                    color = primary,
-                                    fontSize = 12.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    letterSpacing = 1.sp
-                                )
                             }
-                            
                             Text(
-                                text = "Next Bus: 10 mins away",
-                                color = Color.White,
-                                fontSize = 20.sp,
+                                text = "LIVE STATUS",
+                                color = primary,
+                                fontSize = 12.sp,
                                 fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(top = 4.dp)
-                            )
-                            
-                            Text(
-                                text = "Bus 42B - South High School Route",
-                                color = Color(0xFF9CBAA8),
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(top = 4.dp)
+                                letterSpacing = 1.sp
                             )
                         }
                         
-                        Box(
-                            modifier = Modifier
-                                .size(80.dp)
-                                .clip(RoundedCornerShape(8.dp))
-                                .background(Color.Gray.copy(alpha = 0.3f))
-                        ) {
-                            // Bus illustration placeholder
-                            Text(
-                                "🚌",
-                                fontSize = 32.sp,
-                                color = primary,
-                                modifier = Modifier.padding(16.dp)
-                            )
-                        }
+                        Text(
+                            text = "Next Bus: 10 mins away",
+                            color = Color.White,
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                        
+                        Text(
+                            text = "Bus 42B - South High School Route",
+                            color = Color(0xFF9CBAA8),
+                            fontSize = 14.sp
+                        )
+                    }
+                    
+                    // Bus Illustration
+                    Box(
+                        modifier = Modifier
+                            .size(80.dp)
+                            .clip(RoundedCornerShape(8.dp))
+                            .background(Color.Gray.copy(alpha = 0.3f)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                            contentDescription = "Bus",
+                            modifier = Modifier.size(40.dp),
+                            tint = primary
+                        )
                     }
                 }
             }
             
-            item {
-                // Quick Access Grid
-                Column(
-                    modifier = Modifier.padding(16.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
+            // Quick Access Grid
+            LazyColumn(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(16.dp),
+                verticalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                item {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.spacedBy(12.dp)
                     ) {
-                        QuickAccessCard(
-                            title = "My Profile",
-                            subtitle = "Alex Johnson",
-                            icon = Icons.Default.Person,
-                            onClick = { navController.navigate(Destinations.STUDENT_PROFILE) },
-                            modifier = Modifier.weight(1f)
-                        )
+                        // My Profile Card
+                        Card(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { navController.navigate(Destinations.STUDENT_PROFILE) },
+                            colors = CardDefaults.cardColors(containerColor = cardBackground),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_person),
+                                        contentDescription = "Profile",
+                                        modifier = Modifier.size(24.dp),
+                                        tint = primary
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        text = "My Profile",
+                                        color = Color.White,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Alex Johnson",
+                                        color = Color(0xFF9CBAA8),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
                         
-                        QuickAccessCard(
-                            title = "Absent Calendar",
-                            subtitle = "Manage leave",
-                            icon = Icons.Default.DateRange,
-                            onClick = { navController.navigate(Destinations.ABSENT_CALENDAR) },
-                            modifier = Modifier.weight(1f)
-                        )
+                        // Absent Calendar Card
+                        Card(
+                            modifier = Modifier
+                                .weight(1f)
+                                .clickable { navController.navigate(Destinations.ABSENT_CALENDAR) },
+                            colors = CardDefaults.cardColors(containerColor = cardBackground),
+                            shape = RoundedCornerShape(12.dp),
+                            border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+                        ) {
+                            Column(
+                                modifier = Modifier.padding(16.dp),
+                                verticalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_calendar_month),
+                                        contentDescription = "Calendar",
+                                        modifier = Modifier.size(24.dp),
+                                        tint = primary
+                                    )
+                                }
+                                Column {
+                                    Text(
+                                        text = "Absent Calendar",
+                                        color = Color.White,
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Bold
+                                    )
+                                    Text(
+                                        text = "Manage leave",
+                                        color = Color(0xFF9CBAA8),
+                                        fontSize = 12.sp
+                                    )
+                                }
+                            }
+                        }
                     }
-                    
-                    // Live Map Card
+                }
+                
+                item {
+                    // Live Map Card (Full Width)
                     Card(
-                        onClick = { navController.navigate(Destinations.LIVE_TRACKING) },
-                        modifier = Modifier.fillMaxWidth(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { navController.navigate(Destinations.LIVE_TRACKING) },
                         colors = CardDefaults.cardColors(containerColor = cardBackground),
-                        shape = RoundedCornerShape(12.dp)
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp),
-                            verticalAlignment = Alignment.CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                            horizontalArrangement = Arrangement.spacedBy(16.dp),
+                            verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(48.dp)
-                                    .background(primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                                    .background(primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
-                                    Icons.Default.Add,
-                                    contentDescription = null,
-                                    tint = primary,
-                                    modifier = Modifier.size(30.dp)
+                                    painter = painterResource(id = R.drawable.ic_map),
+                                    contentDescription = "Map",
+                                    modifier = Modifier.size(32.dp),
+                                    tint = primary
                                 )
                             }
                             
                             Column(
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
+                                verticalArrangement = Arrangement.spacedBy(4.dp)
                             ) {
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -242,13 +341,9 @@ fun StudentHomeScreen(
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Bold
                                     )
-                                    
                                     Box(
                                         modifier = Modifier
-                                            .background(
-                                                primary.copy(alpha = 0.2f),
-                                                RoundedCornerShape(20.dp)
-                                            )
+                                            .background(primary.copy(alpha = 0.2f), RoundedCornerShape(12.dp))
                                             .padding(horizontal = 8.dp, vertical = 2.dp)
                                     ) {
                                         Text(
@@ -259,12 +354,10 @@ fun StudentHomeScreen(
                                         )
                                     }
                                 }
-                                
                                 Text(
                                     text = "Track current bus location in real-time",
                                     color = Color(0xFF9CBAA8),
-                                    fontSize = 12.sp,
-                                    modifier = Modifier.padding(top = 4.dp)
+                                    fontSize = 12.sp
                                 )
                             }
                             
@@ -273,296 +366,252 @@ fun StudentHomeScreen(
                                     .size(64.dp)
                                     .clip(RoundedCornerShape(8.dp))
                                     .background(Color.Gray.copy(alpha = 0.3f))
+                                    .border(1.dp, Color.White.copy(alpha = 0.1f), RoundedCornerShape(8.dp))
+                            )
+                        }
+                    }
+                }
+                
+                item {
+                    // Attendance Summary Section
+                    Text(
+                        text = "Attendance Summary",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                    
+                    Card(
+                        modifier = Modifier.fillMaxWidth(),
+                        colors = CardDefaults.cardColors(containerColor = Color(0xFF111814)),
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(1.dp, borderColor)
+                    ) {
+                        Column {
+                            // Attendance Item 1
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
                             ) {
-                                // Map preview placeholder
-                                Icon(
-                                    Icons.Default.LocationOn,
-                                    contentDescription = "Map",
-                                    tint = primary,
-                                    modifier = Modifier
-                                        .fillMaxSize()
-                                        .padding(16.dp)
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(Color(0xFFFBBF24).copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_pending),
+                                            contentDescription = "Pending",
+                                            modifier = Modifier.size(20.dp),
+                                            tint = Color(0xFFFBBF24)
+                                        )
+                                    }
+                                    Column {
+                                        Text(
+                                            text = "Attendance Marked",
+                                            color = Color.White,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            text = "Status: Pending scan",
+                                            color = Color(0xFF9CBAA8),
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = "Today",
+                                    color = Color(0xFF9CBAA8),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                            
+                            Divider(color = borderColor, thickness = 1.dp)
+                            
+                            // Attendance Item 2
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Row(
+                                    horizontalArrangement = Arrangement.spacedBy(16.dp),
+                                    verticalAlignment = Alignment.CenterVertically
+                                ) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(40.dp)
+                                            .background(primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_check_circle),
+                                            contentDescription = "Complete",
+                                            modifier = Modifier.size(20.dp),
+                                            tint = primary
+                                        )
+                                    }
+                                    Column {
+                                        Text(
+                                            text = "Morning Trip",
+                                            color = Color.White,
+                                            fontSize = 14.sp,
+                                            fontWeight = FontWeight.SemiBold
+                                        )
+                                        Text(
+                                            text = "Yesterday • Arrived 8:15 AM",
+                                            color = Color(0xFF9CBAA8),
+                                            fontSize = 12.sp
+                                        )
+                                    }
+                                }
+                                Text(
+                                    text = "May 24",
+                                    color = Color(0xFF9CBAA8),
+                                    fontSize = 12.sp,
+                                    fontWeight = FontWeight.Medium
                                 )
                             }
                         }
                     }
                 }
             }
-            
-            item {
-                // Attendance Section
-                Text(
-                    text = "Attendance Summary",
-                    color = Color.White,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-                )
-            }
-            
-            item {
-                // Attendance List
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp),
-                    colors = CardDefaults.cardColors(containerColor = Color(0xFF111814)),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Column {
-                        // Attendance Item 1
-                        AttendanceItem(
-                            title = "Attendance Marked",
-                            subtitle = "Status: Pending scan",
-                            date = "Today",
-                            icon = Icons.Default.Add,
-                            iconColor = Color(0xFFFFA726),
-                            showDivider = true
-                        )
-                        
-                        // Attendance Item 2
-                        AttendanceItem(
-                            title = "Morning Trip",
-                            subtitle = "Yesterday • Arrived 8:15 AM",
-                            date = "May 24",
-                            icon = Icons.Default.CheckCircle,
-                            iconColor = primary,
-                            showDivider = false
-                        )
-                    }
-                }
-            }
         }
         
         // Floating QR Scan Button
-        FloatingActionButton(
-            onClick = { navController.navigate(Destinations.QR_SCANNER) },
+        Box(
             modifier = Modifier
                 .align(Alignment.BottomCenter)
-                .padding(bottom = 100.dp),
-            containerColor = primary,
-            contentColor = Color.Black,
-            shape = RoundedCornerShape(30.dp)
+                .padding(bottom = 100.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+            FloatingActionButton(
+                onClick = { /* Handle QR scan */ },
+                modifier = Modifier.scale(fabScale),
+                containerColor = primary,
+                contentColor = Color.Black,
+                shape = RoundedCornerShape(28.dp)
             ) {
-                Text("📱", fontSize = 20.sp)
-                Text(
-                    "Scan QR",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold
-                )
+                Row(
+                    horizontalArrangement = Arrangement.spacedBy(12.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(horizontal = 24.dp, vertical = 16.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_qr_code_scanner),
+                        contentDescription = "Scan QR",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Black
+                    )
+                    Text(
+                        text = "Scan QR",
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black
+                    )
+                }
             }
         }
         
         // Bottom Navigation Bar
-        BottomNavigationBar(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            selectedTab = 0,
-            onTabSelected = { }
-        )
-    }
-}
-
-@Composable
-private fun QuickAccessCard(
-    title: String,
-    subtitle: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val primary = Color(0xFF0DF26C)
-    val cardBackground = Color(0xFF1B2720)
-    
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        colors = CardDefaults.cardColors(containerColor = cardBackground),
-        shape = RoundedCornerShape(12.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(16.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(primary.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    icon,
-                    contentDescription = null,
-                    tint = primary
-                )
-            }
-            
-            Column(
-                verticalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                Text(
-                    text = title,
-                    color = Color.White,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = subtitle,
-                    color = Color(0xFF9CBAA8),
-                    fontSize = 12.sp
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun AttendanceItem(
-    title: String,
-    subtitle: String,
-    date: String,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    iconColor: Color,
-    showDivider: Boolean
-) {
-    Column {
-        Row(
+        Box(
             modifier = Modifier
+                .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(16.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+                .background(Color(0xFF111814).copy(alpha = 0.95f))
+                .padding(horizontal = 24.dp, vertical = 12.dp)
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(iconColor.copy(alpha = 0.1f), RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
+                // Home (Active)
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     Icon(
-                        icon,
-                        contentDescription = null,
-                        tint = iconColor
+                        painter = painterResource(id = R.drawable.ic_home),
+                        contentDescription = "Home",
+                        modifier = Modifier.size(24.dp),
+                        tint = primary
+                    )
+                    Text(
+                        text = "Home",
+                        color = primary,
+                        fontSize = 10.sp,
+                        fontWeight = FontWeight.Bold
                     )
                 }
                 
-                Column {
-                    Text(
-                        text = title,
-                        color = Color.White,
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.SemiBold
+                // Track
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_map),
+                        contentDescription = "Track",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Gray
                     )
                     Text(
-                        text = subtitle,
-                        color = Color(0xFF9CBAA8),
-                        fontSize = 12.sp,
-                        modifier = Modifier.padding(top = 4.dp)
+                        text = "Track",
+                        color = Color.Gray,
+                        fontSize = 10.sp
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(64.dp)) // Space for FAB
+                
+                // History
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_history),
+                        contentDescription = "History",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Gray
+                    )
+                    Text(
+                        text = "History",
+                        color = Color.Gray,
+                        fontSize = 10.sp
+                    )
+                }
+                
+                // Settings
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_settings),
+                        contentDescription = "Settings",
+                        modifier = Modifier.size(24.dp),
+                        tint = Color.Gray
+                    )
+                    Text(
+                        text = "Settings",
+                        color = Color.Gray,
+                        fontSize = 10.sp
                     )
                 }
             }
-            
-            Text(
-                text = date,
-                color = Color.Gray,
-                fontSize = 12.sp,
-                fontWeight = FontWeight.Medium
-            )
         }
-        
-        if (showDivider) {
-            Divider(
-                color = Color(0xFF3B5445),
-                thickness = 1.dp,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavigationBar(
-    modifier: Modifier = Modifier,
-    selectedTab: Int,
-    onTabSelected: (Int) -> Unit
-) {
-    val primary = Color(0xFF0DF26C)
-    
-    Card(
-        modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFF111814)
-        ),
-        shape = RoundedCornerShape(0.dp)
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp, vertical = 12.dp),
-            horizontalArrangement = Arrangement.SpaceAround
-        ) {
-            BottomNavItem(
-                icon = Icons.Default.Home,
-                label = "Home",
-                selected = selectedTab == 0,
-                onClick = { onTabSelected(0) }
-            )
-            BottomNavItem(
-                icon = Icons.Default.Add,
-                label = "Track",
-                selected = selectedTab == 1,
-                onClick = { onTabSelected(1) }
-            )
-            Spacer(modifier = Modifier.width(64.dp)) // Space for FAB
-            BottomNavItem(
-                icon = Icons.Default.Add,
-                label = "History",
-                selected = selectedTab == 2,
-                onClick = { onTabSelected(2) }
-            )
-            BottomNavItem(
-                icon = Icons.Default.Add,
-                label = "Settings",
-                selected = selectedTab == 3,
-                onClick = { onTabSelected(3) }
-            )
-        }
-    }
-}
-
-@Composable
-private fun BottomNavItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    label: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    val primary = Color(0xFF0DF26C)
-    
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(4.dp),
-        modifier = Modifier.clickable { onClick() }
-    ) {
-        Icon(
-            icon,
-            contentDescription = label,
-            tint = if (selected) primary else Color.Gray,
-            modifier = Modifier.size(24.dp)
-        )
-        Text(
-            label,
-            color = if (selected) primary else Color.Gray,
-            fontSize = 10.sp,
-            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
-        )
     }
 }

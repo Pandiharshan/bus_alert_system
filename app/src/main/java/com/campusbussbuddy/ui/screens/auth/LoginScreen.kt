@@ -1,21 +1,29 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.campusbussbuddy.ui.screens.auth
 
+import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
+import com.campusbussbuddy.ui.theme.AppColors
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -24,256 +32,235 @@ fun LoginScreen(
     onNavigateToStudent: () -> Unit,
     onNavigateToDriver: () -> Unit
 ) {
-    val primary = Color(0xFF0DF26C)
-    val backgroundDark = Color(0xFF102217)
+    // Animations
+    val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+    val pulseScale by infiniteTransition.animateFloat(
+        initialValue = 1f,
+        targetValue = 1.05f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = FastOutSlowInEasing),
+            repeatMode = RepeatMode.Reverse
+        ), label = "pulse"
+    )
     
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(backgroundDark)
-            .padding(16.dp),
+            .background(AppColors.BackgroundDark)
+            .padding(24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Top Navigation Bar
+        Spacer(modifier = Modifier.height(60.dp))
+        
+        // Header with Help Icon
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 32.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Spacer(modifier = Modifier.width(40.dp))
+            Spacer(modifier = Modifier.width(24.dp))
             
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(32.dp)
-                        .background(primary, RoundedCornerShape(8.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        "🚌",
-                        fontSize = 20.sp,
-                        color = backgroundDark
-                    )
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                    contentDescription = "SmartBus",
+                    modifier = Modifier.size(24.dp),
+                    tint = AppColors.Primary
+                )
                 Text(
                     text = "SmartBus",
-                    color = Color.White,
+                    color = AppColors.OnBackground,
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold
                 )
             }
             
-            IconButton(onClick = { }) {
-                Text(
-                    "❓",
-                    fontSize = 18.sp,
-                    color = Color.White.copy(alpha = 0.7f)
+            IconButton(
+                onClick = { /* Help action */ },
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_notifications),
+                    contentDescription = "Help",
+                    modifier = Modifier.size(20.dp),
+                    tint = AppColors.OnSurfaceVariant
                 )
             }
         }
         
-        Spacer(modifier = Modifier.height(64.dp))
+        Spacer(modifier = Modifier.height(80.dp))
         
-        // Illustration Section
+        // Bus Icon Illustration
         Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .aspectRatio(16f / 9f)
-                .clip(RoundedCornerShape(12.dp))
+                .size(200.dp)
                 .background(
-                    Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFF1A2E23),
-                            Color(0xFF102217)
-                        )
-                    )
+                    AppColors.Surface,
+                    RoundedCornerShape(16.dp)
+                )
+                .border(
+                    1.dp,
+                    AppColors.Outline,
+                    RoundedCornerShape(16.dp)
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
+            Icon(
+                painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                contentDescription = "Bus",
+                modifier = Modifier
+                    .size(80.dp)
+                    .scale(pulseScale),
+                tint = AppColors.Primary
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(40.dp))
+        
+        // Title and Subtitle
+        Text(
+            text = "Track Your Journey",
+            color = AppColors.OnBackground,
+            fontSize = 28.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center
+        )
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        Text(
+            text = "Seamless bus attendance and real-time\ntracking for a safer commute.",
+            color = AppColors.OnSurfaceVariant,
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            lineHeight = 24.sp
+        )
+        
+        Spacer(modifier = Modifier.height(60.dp))
+        
+        // Student Login Button
+        Button(
+            onClick = onNavigateToStudent,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = AppColors.Primary,
+                contentColor = AppColors.OnPrimary
+            ),
+            shape = RoundedCornerShape(12.dp),
+            elevation = ButtonDefaults.buttonElevation(
+                defaultElevation = 4.dp,
+                pressedElevation = 2.dp
+            )
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    "🚌",
-                    fontSize = 60.sp,
-                    color = primary
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_person),
+                    contentDescription = "Student",
+                    modifier = Modifier.size(20.dp)
                 )
-                
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    repeat(3) { index ->
-                        Box(
-                            modifier = Modifier
-                                .height(4.dp)
-                                .width(if (index == 1) 96.dp else if (index == 0) 48.dp else 32.dp)
-                                .background(
-                                    primary.copy(alpha = if (index == 1) 0.4f else 0.2f),
-                                    RoundedCornerShape(2.dp)
-                                )
-                        )
-                    }
-                }
+                Text(
+                    text = "Student Login",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Arrow",
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
         
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
-        // Headline & Body Text
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
+        // Driver Login Button
+        OutlinedButton(
+            onClick = onNavigateToDriver,
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp),
+            colors = ButtonDefaults.outlinedButtonColors(
+                contentColor = AppColors.OnBackground
+            ),
+            border = ButtonDefaults.outlinedButtonBorder.copy(
+                brush = Brush.horizontalGradient(
+                    colors = listOf(AppColors.Outline, AppColors.Outline)
+                )
+            ),
+            shape = RoundedCornerShape(12.dp)
         ) {
-            Text(
-                text = "Track Your Journey",
-                color = Color.White,
-                fontSize = 30.sp,
-                fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            Text(
-                text = "Seamless bus attendance and real-time tracking for a safer commute.",
-                color = Color.White.copy(alpha = 0.6f),
-                fontSize = 16.sp,
-                textAlign = TextAlign.Center,
-                lineHeight = 24.sp
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(40.dp))
-        
-        // Selection Buttons
-        Column(
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            Button(
-                onClick = onNavigateToStudent,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primary,
-                    contentColor = backgroundDark
-                ),
-                shape = RoundedCornerShape(12.dp)
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(Icons.Default.Person, contentDescription = null)
-                    Text(
-                        "Student Login",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
-                }
-            }
-            
-            OutlinedButton(
-                onClick = onNavigateToDriver,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp),
-                colors = ButtonDefaults.outlinedButtonColors(
-                    contentColor = Color.White
-                ),
-                border = ButtonDefaults.outlinedButtonBorder.copy(
-                    brush = Brush.linearGradient(
-                        colors = listOf(Color.White.copy(alpha = 0.1f), Color.White.copy(alpha = 0.1f))
-                    )
-                ),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    Icon(Icons.Default.Person, contentDescription = null)
-                    Text(
-                        "Driver Login",
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Bold
-                    )
-                    Spacer(modifier = Modifier.weight(1f))
-                    Icon(Icons.Default.KeyboardArrowRight, contentDescription = null)
-                }
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_settings),
+                    contentDescription = "Driver",
+                    modifier = Modifier.size(20.dp)
+                )
+                Text(
+                    text = "Driver Login",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.SemiBold
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                    contentDescription = "Arrow",
+                    modifier = Modifier.size(16.dp)
+                )
             }
         }
         
         Spacer(modifier = Modifier.weight(1f))
         
-        // Secondary Info
+        // Register Link
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
+            verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(1.dp)
-                        .background(Color.White.copy(alpha = 0.2f))
-                )
-                Text(
-                    "New to the platform?",
-                    color = Color.White.copy(alpha = 0.4f),
-                    fontSize = 14.sp
-                )
-                Box(
-                    modifier = Modifier
-                        .width(32.dp)
-                        .height(1.dp)
-                        .background(Color.White.copy(alpha = 0.2f))
-                )
-            }
+            Text(
+                text = "New to the platform?",
+                color = AppColors.OnSurfaceVariant,
+                fontSize = 14.sp
+            )
             
-            TextButton(onClick = onNavigateToRegister) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically,
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    Text(
-                        "Register Your Institution",
-                        color = primary,
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        "🔗",
-                        fontSize = 16.sp,
-                        color = primary
-                    )
-                }
+            TextButton(
+                onClick = onNavigateToRegister
+            ) {
+                Text(
+                    text = "Register Your Institution",
+                    color = AppColors.Primary,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_share),
+                    contentDescription = "External",
+                    modifier = Modifier
+                        .size(16.dp)
+                        .padding(start = 4.dp),
+                    tint = AppColors.Primary
+                )
             }
         }
         
-        Spacer(modifier = Modifier.height(40.dp))
+        Spacer(modifier = Modifier.height(16.dp))
         
         // Footer
         Text(
-            "POWERED BY SMARTBUS ANALYTICS V2.4",
-            color = Color.White.copy(alpha = 0.3f),
-            fontSize = 10.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 2.sp
+            text = "POWERED BY SMARTBUS ANALYTICS V2.4",
+            color = AppColors.TextTertiary,
+            fontSize = 11.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 1.sp
         )
-        
-        Spacer(modifier = Modifier.height(40.dp))
     }
 }

@@ -23,8 +23,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavHostController
+import androidx.compose.ui.res.painterResource
+import com.campusbussbuddy.R
 import com.campusbussbuddy.ui.navigation.Destinations
+import androidx.navigation.NavHostController
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -372,7 +374,12 @@ fun StudentProfileScreen(
                                         .background(Color.White.copy(alpha = 0.1f), CircleShape)
                                         .border(1.dp, Color.White.copy(alpha = 0.1f), CircleShape)
                                 ) {
-                                    Text("💬", fontSize = 20.sp, color = Color.White)
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_chat),
+                                        contentDescription = "Chat",
+                                        modifier = Modifier.size(20.dp),
+                                        tint = Color.White
+                                    )
                                 }
                             }
                         }
