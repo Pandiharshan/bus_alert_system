@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bus Login Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df26c",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col">
+<!-- Top Navigation Bar -->
+<div class="relative flex h-auto w-full flex-col bg-background-light dark:bg-background-dark">
+<div class="flex items-center p-4 pb-2 justify-between">
+<div class="text-white flex size-12 shrink-0 items-center cursor-pointer" data-icon="arrow_back">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">arrow_back</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12 font-display">Bus Login</h2>
+</div>
+</div>
+<!-- Header Illustration Area -->
+<div class="relative flex h-auto w-full flex-col bg-background-light dark:bg-background-dark">
+<div class="@container">
+<div class="@[480px]:px-4 @[480px]:py-3">
+<div class="w-full bg-center bg-no-repeat bg-cover flex flex-col justify-end overflow-hidden bg-background-light dark:bg-[#1b2720] @[480px]:rounded-lg min-h-[200px] border-b border-slate-200 dark:border-none" data-alt="Abstract green digital network lines representing connectivity" style='background-image: linear-gradient(rgba(16, 34, 23, 0.4), rgba(16, 34, 23, 0.9)), url("https://lh3.googleusercontent.com/aida-public/AB6AXuCSQyaVwnu-554u_3f-bASOEgk6CE8_MiW7QZCZByH5iPC3H4IrZod7AGDwykeEAMWkTUc8fPWNyL05Lb6w4BuVFPUS4YBjbdle81Yn7UPjmWxiW4RXT4AwWFBp03etCFjGtmhJDMBu-KovchliSCsxt9A3e-qGKAGpfAD_FWd6xrKcAXZk7lCHZqz2CilJTnJ5RnEYQwQusPvahSzG9fMsZ0j7bzXGBT2FTHX9RUH0KX-GpXNX4q4R2E01iVdUrKddKoF_n5PZds8");'>
+</div>
+</div>
+</div>
+</div>
+<!-- Welcome Content -->
+<div class="relative flex flex-col bg-background-light dark:bg-background-dark">
+<h2 class="text-slate-900 dark:text-white tracking-light text-[28px] font-bold leading-tight px-6 text-center pb-2 pt-8 font-display">Start Tracking</h2>
+<p class="text-slate-600 dark:text-[#9cbaa8] text-base font-normal leading-normal pb-6 pt-1 px-8 text-center font-display">Enter vehicle credentials to sync this device with the fleet management system.</p>
+</div>
+<!-- Login Form Fields -->
+<div class="flex flex-col gap-2 px-6">
+<!-- Bus Number Field -->
+<div class="flex flex-wrap items-end gap-4 py-2">
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-slate-700 dark:text-white text-sm font-medium leading-normal pb-2 font-display uppercase tracking-wider">Bus Number</p>
+<div class="flex w-full flex-1 items-stretch rounded-lg shadow-sm">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] h-14 placeholder:text-slate-400 dark:placeholder:text-[#9cbaa8] p-[15px] rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal font-display" placeholder="e.g., B-204" value=""/>
+<div class="text-slate-400 dark:text-[#9cbaa8] flex border border-slate-300 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] items-center justify-center pr-[15px] rounded-r-lg border-l-0">
+<span class="material-symbols-outlined">directions_bus</span>
+</div>
+</div>
+</label>
+</div>
+<!-- Bus Password Field -->
+<div class="flex flex-wrap items-end gap-4 py-2">
+<label class="flex flex-col min-w-40 flex-1">
+<p class="text-slate-700 dark:text-white text-sm font-medium leading-normal pb-2 font-display uppercase tracking-wider">Bus Password</p>
+<div class="flex w-full flex-1 items-stretch rounded-lg shadow-sm">
+<input class="form-input flex w-full min-w-0 flex-1 resize-none overflow-hidden rounded-lg text-slate-900 dark:text-white focus:outline-0 focus:ring-2 focus:ring-primary/50 border border-slate-300 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] h-14 placeholder:text-slate-400 dark:placeholder:text-[#9cbaa8] p-[15px] rounded-r-none border-r-0 pr-2 text-base font-normal leading-normal font-display" placeholder="••••••••" type="password" value=""/>
+<div class="text-slate-400 dark:text-[#9cbaa8] flex border border-slate-300 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] items-center justify-center pr-[15px] rounded-r-lg border-l-0">
+<span class="material-symbols-outlined">lock</span>
+</div>
+</div>
+</label>
+</div>
+</div>
+<!-- Login Button -->
+<div class="px-6 pt-10 pb-4">
+<button class="w-full h-14 bg-primary text-background-dark font-bold text-lg rounded-xl flex items-center justify-center gap-2 hover:opacity-90 active:scale-[0.98] transition-all font-display">
+<span>Login to Bus</span>
+<span class="material-symbols-outlined">login</span>
+</button>
+</div>
+<!-- Secondary Actions -->
+<div class="flex flex-col items-center gap-4 py-4 px-6 mb-8">
+<button class="text-slate-600 dark:text-[#9cbaa8] text-sm font-medium hover:underline font-display">Forgot Bus Credentials?</button>
+<div class="flex items-center gap-2 mt-4 py-2 px-4 rounded-full bg-slate-100 dark:bg-[#1b2720] border border-slate-200 dark:border-[#3b5445]">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<span class="text-xs text-slate-500 dark:text-[#9cbaa8] font-display">GPS Ready • System Version 2.4.0</span>
+</div>
+</div>
+<!-- Support Footer -->
+<div class="mt-auto pb-8 text-center px-6">
+<p class="text-slate-400 dark:text-[#5c7a68] text-xs font-display">
+            SmartBus Fleet Management System © 2024<br/>
+            Need technical support? <span class="text-primary font-medium">Contact Fleet Hub</span>
+</p>
+</div>
+</body></html>

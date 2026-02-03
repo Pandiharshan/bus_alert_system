@@ -1,27 +1,26 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.campusbussbuddy.ui.screens.student
 
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ArrowBack
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Edit
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -32,154 +31,222 @@ import com.campusbussbuddy.ui.navigation.Destinations
 fun StudentProfileScreen(
     navController: NavHostController
 ) {
-    // Animation for the gradient
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(7000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
-    )
+    val primary = Color(0xFF0DF26C)
+    val backgroundDark = Color(0xFF102217)
+    val cardBackground = Color(0xFF1A2E21)
     
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFfa709a).copy(alpha = 0.8f + animatedOffset * 0.2f),
-                        Color(0xFFfee140).copy(alpha = 0.9f),
-                        Color(0xFFfa709a).copy(alpha = 0.7f + animatedOffset * 0.3f)
-                    )
-                )
-            )
+            .background(backgroundDark)
     ) {
         LazyColumn(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(bottom = 80.dp)
         ) {
             item {
-                // Top Bar
+                // TopAppBar
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp, vertical = 16.dp)
-                        .statusBarsPadding(),
+                        .padding(16.dp)
+                        .padding(top = 32.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(
-                        onClick = { navController.popBackStack() },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White.copy(alpha = 0.2f))
-                    ) {
+                    IconButton(onClick = { navController.popBackStack() }) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            Icons.Default.ArrowBack,
                             contentDescription = "Back",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            tint = Color.White
                         )
                     }
                     
-                    Spacer(modifier = Modifier.width(16.dp))
-                    
                     Text(
-                        text = "Profile 👤",
-                        fontSize = 24.sp,
+                        text = "Student Profile",
+                        color = Color.White,
+                        fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.White
+                        modifier = Modifier.weight(1f),
+                        textAlign = TextAlign.Center
                     )
                     
-                    Spacer(modifier = Modifier.weight(1f))
-                    
-                    IconButton(
-                        onClick = { /* TODO: Edit profile */ },
-                        modifier = Modifier
-                            .size(48.dp)
-                            .clip(RoundedCornerShape(12.dp))
-                            .background(Color.White.copy(alpha = 0.2f))
-                    ) {
+                    IconButton(onClick = { }) {
                         Icon(
-                            imageVector = Icons.Default.Edit,
-                            contentDescription = "Edit",
-                            tint = Color.White,
-                            modifier = Modifier.size(24.dp)
+                            Icons.Default.Add,
+                            contentDescription = "Settings",
+                            tint = Color.White
                         )
                     }
                 }
             }
             
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            
-            item {
-                // Profile Header Card
-                Card(
+                // ProfileHeader
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .clip(RoundedCornerShape(24.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 16.dp)
+                        .padding(16.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Column(
-                        modifier = Modifier.padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
-                    ) {
-                        // Profile Avatar
+                    Box {
                         Box(
                             modifier = Modifier
-                                .size(100.dp)
-                                .clip(RoundedCornerShape(25.dp))
-                                .background(
-                                    brush = Brush.linearGradient(
-                                        colors = listOf(Color(0xFFfa709a), Color(0xFFfee140))
-                                    )
-                                ),
+                                .size(128.dp)
+                                .clip(CircleShape)
+                                .border(4.dp, primary.copy(alpha = 0.2f), CircleShape)
+                                .background(Color.Gray)
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = "Profile",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(24.dp)
+                            )
+                        }
+                        
+                        // Verified badge
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.BottomEnd)
+                                .size(24.dp)
+                                .background(primary, CircleShape)
+                                .border(4.dp, backgroundDark, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Profile",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color.White
+                                Icons.Default.Check,
+                                contentDescription = "Verified",
+                                tint = backgroundDark,
+                                modifier = Modifier.size(12.dp)
                             )
                         }
+                    }
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    Text(
+                        text = "Alex Smith",
+                        color = Color.White,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Text(
+                        text = "Grade 10 - Student ID: #55291",
+                        color = primary,
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                    
+                    Text(
+                        text = "Green Line Route • Sector 42",
+                        color = Color(0xFF9CBAA8),
+                        fontSize = 14.sp,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+            }
+            
+            item {
+                // Assigned Bus Section
+                Text(
+                    text = "Assigned Bus",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                )
+            }
+            
+            item {
+                // Bus Card
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = cardBackground),
+                    shape = RoundedCornerShape(12.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(48.dp)
+                                .background(primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Text("", fontSize = 20.sp)
+                        }
                         
-                        Spacer(modifier = Modifier.height(20.dp))
-                        
-                        Text(
-                            text = "Alex Johnson 🎓",
-                            fontSize = 26.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748)
-                        )
-                        
-                        Text(
-                            text = "alex.johnson@university.edu",
-                            fontSize = 16.sp,
-                            color = Color(0xFF718096),
-                            modifier = Modifier.padding(top = 8.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        Surface(
-                            color = Color(0xFF10B981).copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(20.dp)
+                        Column(
+                            modifier = Modifier.weight(1f)
                         ) {
                             Text(
-                                text = "🆔 Student ID: STU123456",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF10B981),
-                                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                                text = "BUS-102",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(6.dp),
+                                modifier = Modifier.padding(top = 4.dp)
+                            ) {
+                                // Animated pulsing dot
+                                val infiniteTransition = rememberInfiniteTransition(label = "pulse")
+                                val scale by infiniteTransition.animateFloat(
+                                    initialValue = 1f,
+                                    targetValue = 1.3f,
+                                    animationSpec = infiniteRepeatable(
+                                        animation = tween(1000),
+                                        repeatMode = RepeatMode.Reverse
+                                    ),
+                                    label = "pulse"
+                                )
+                                
+                                Box(
+                                    modifier = Modifier
+                                        .size(8.dp)
+                                        .scale(scale)
+                                        .background(primary, CircleShape)
+                                )
+                                Text(
+                                    text = "In Transit - 5 mins away",
+                                    color = Color(0xFF9CBAA8),
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                            }
+                        }
+                        
+                        Button(
+                            onClick = { navController.navigate(Destinations.LIVE_TRACKING) },
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primary.copy(alpha = 0.2f),
+                                contentColor = primary
+                            ),
+                            shape = RoundedCornerShape(20.dp),
+                            contentPadding = PaddingValues(horizontal = 12.dp, vertical = 4.dp)
+                        ) {
+                            Text(
+                                "TRACK",
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Bold,
+                                letterSpacing = 1.sp
                             )
                         }
                     }
@@ -187,187 +254,146 @@ fun StudentProfileScreen(
             }
             
             item {
-                Spacer(modifier = Modifier.height(24.dp))
+                // Driver Details Section
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp, vertical = 16.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Driver Details",
+                        color = Color.White,
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    TextButton(onClick = { }) {
+                        Text(
+                            text = "History",
+                            color = primary,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
             }
             
             item {
-                // Bus Info Card
+                // Driver Card
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .clip(RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+                        .padding(horizontal = 16.dp),
+                    colors = CardDefaults.cardColors(containerColor = cardBackground),
+                    shape = RoundedCornerShape(12.dp)
                 ) {
                     Column(
-                        modifier = Modifier.padding(24.dp)
+                        modifier = Modifier.padding(16.dp)
                     ) {
-                        Text(
-                            text = "Bus Information 🚌",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748),
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
-                        
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
+                            horizontalArrangement = Arrangement.spacedBy(16.dp)
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .size(48.dp)
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(
-                                        brush = Brush.linearGradient(
-                                            colors = listOf(Color(0xFF4facfe), Color(0xFF00f2fe))
-                                        )
-                                    ),
-                                contentAlignment = Alignment.Center
+                                    .size(56.dp)
+                                    .clip(RoundedCornerShape(8.dp))
+                                    .background(Color.Gray)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Build,
-                                    contentDescription = "Bus",
-                                    modifier = Modifier.size(24.dp),
-                                    tint = Color.White
+                                    Icons.Default.Person,
+                                    contentDescription = "Driver",
+                                    tint = Color.White,
+                                    modifier = Modifier
+                                        .fillMaxSize()
+                                        .padding(12.dp)
                                 )
                             }
-                            
-                            Spacer(modifier = Modifier.width(16.dp))
                             
                             Column(
                                 modifier = Modifier.weight(1f)
                             ) {
                                 Text(
-                                    text = "Bus #247",
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    color = Color(0xFF2D3748)
+                                    text = "John Doe",
+                                    color = Color.White,
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Bold
                                 )
-                                Text(
-                                    text = "Driver: Mike Johnson",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF718096)
-                                )
-                                Text(
-                                    text = "Route: Campus Loop",
-                                    fontSize = 14.sp,
-                                    color = Color(0xFF718096)
-                                )
+                                
+                                Row(
+                                    verticalAlignment = Alignment.CenterVertically,
+                                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                                    modifier = Modifier.padding(top = 4.dp)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Add,
+                                        contentDescription = null,
+                                        tint = Color(0xFFFFA726),
+                                        modifier = Modifier.size(14.dp)
+                                    )
+                                    Text(
+                                        text = "4.8",
+                                        color = Color(0xFF9CBAA8),
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium
+                                    )
+                                    Text(
+                                        text = "(124 trips)",
+                                        color = Color.Gray,
+                                        fontSize = 14.sp
+                                    )
+                                }
+                            }
+                            
+                            Row(
+                                horizontalArrangement = Arrangement.spacedBy(8.dp)
+                            ) {
+                                IconButton(
+                                    onClick = { },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(primary, CircleShape)
+                                ) {
+                                    Icon(
+                                        Icons.Default.Call,
+                                        contentDescription = "Call",
+                                        tint = backgroundDark,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                                
+                                IconButton(
+                                    onClick = { },
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .background(Color.White.copy(alpha = 0.1f), CircleShape)
+                                        .border(1.dp, Color.White.copy(alpha = 0.1f), CircleShape)
+                                ) {
+                                    Text("💬", fontSize = 20.sp, color = Color.White)
+                                }
                             }
                         }
-                    }
-                }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Menu Options Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .clip(RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp)
-                    ) {
-                        Text(
-                            text = "Account Settings ⚙️",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748),
-                            modifier = Modifier.padding(bottom = 16.dp)
-                        )
                         
-                        Column(
-                            verticalArrangement = Arrangement.spacedBy(12.dp)
-                        ) {
-                            ProfileMenuItem(
-                                icon = Icons.Default.List,
-                                title = "Boarding History",
-                                subtitle = "View your recent trips",
-                                gradient = listOf(Color(0xFF667eea), Color(0xFF764ba2)),
-                                onClick = { /* TODO: Navigate to history */ }
-                            )
-                            
-                            ProfileMenuItem(
-                                icon = Icons.Default.Notifications,
-                                title = "Notifications",
-                                subtitle = "Manage bus alerts",
-                                gradient = listOf(Color(0xFF4facfe), Color(0xFF00f2fe)),
-                                onClick = { /* TODO: Navigate to notifications */ }
-                            )
-                            
-                            ProfileMenuItem(
-                                icon = Icons.Default.Settings,
-                                title = "Settings",
-                                subtitle = "App preferences",
-                                gradient = listOf(Color(0xFF43e97b), Color(0xFF38f9d7)),
-                                onClick = { /* TODO: Navigate to settings */ }
-                            )
-                        }
-                    }
-                }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Stats Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 24.dp)
-                        .clip(RoundedCornerShape(20.dp)),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-                ) {
-                    Column(
-                        modifier = Modifier.padding(24.dp)
-                    ) {
-                        Text(
-                            text = "This Month 📊",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF2D3748),
-                            modifier = Modifier.padding(bottom = 20.dp)
-                        )
-                        
+                        // Driver details grid
                         Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceEvenly
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 12.dp),
+                            horizontalArrangement = Arrangement.spacedBy(12.dp)
                         ) {
-                            StatItem(
-                                value = "12",
-                                label = "Trips",
-                                color = Color(0xFF667eea)
+                            DriverDetailCard(
+                                label = "LICENSE",
+                                value = "TX-99210-A",
+                                modifier = Modifier.weight(1f)
                             )
                             
-                            StatItem(
-                                value = "4.8",
-                                label = "Rating",
-                                color = Color(0xFF10B981)
-                            )
-                            
-                            StatItem(
-                                value = "95%",
-                                label = "On Time",
-                                color = Color(0xFFfa709a)
+                            DriverDetailCard(
+                                label = "EXPERIENCE",
+                                value = "12 Years",
+                                modifier = Modifier.weight(1f)
                             )
                         }
                     }
@@ -375,138 +401,227 @@ fun StudentProfileScreen(
             }
             
             item {
-                Spacer(modifier = Modifier.height(32.dp))
+                // Account Section
+                Text(
+                    text = "Account",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
+                )
             }
             
             item {
-                // Sign Out Button
-                Padding(horizontal = 24.dp) {
-                    OutlinedButton(
-                        onClick = { navController.navigate(Destinations.AUTH) },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp)
-                            .clip(RoundedCornerShape(16.dp)),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color.White
-                        )
-                    ) {
-                        Text(
-                            text = "← Sign Out",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold
-                        )
-                    }
+                // Account Settings
+                Column(
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    AccountSettingItem(
+                        title = "Notifications",
+                        hasToggle = true,
+                        isToggled = true,
+                        onClick = { }
+                    )
+                    
+                    AccountSettingItem(
+                        title = "Emergency Contacts",
+                        hasToggle = false,
+                        onClick = { }
+                    )
+                    
+                    AccountSettingItem(
+                        title = "Sign Out",
+                        hasToggle = false,
+                        isDestructive = true,
+                        onClick = { }
+                    )
                 }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(32.dp))
             }
         }
+        
+        // Bottom Navigation
+        BottomNavigationBar(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            selectedTab = 2, // Profile tab selected
+            onTabSelected = { }
+        )
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun ProfileMenuItem(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    subtitle: String,
-    gradient: List<Color>,
-    onClick: () -> Unit
+private fun DriverDetailCard(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier
 ) {
     Card(
-        onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        modifier = modifier,
+        colors = CardDefaults.cardColors(containerColor = Color.Black.copy(alpha = 0.2f)),
+        shape = RoundedCornerShape(8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+        Column(
+            modifier = Modifier.padding(8.dp)
         ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(brush = Brush.linearGradient(gradient)),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.White
-                )
-            }
-            
-            Spacer(modifier = Modifier.width(16.dp))
-            
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2D3748)
-                )
-                Text(
-                    text = subtitle,
-                    fontSize = 14.sp,
-                    color = Color(0xFF718096)
-                )
-            }
-            
-            Icon(
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = "Navigate",
-                tint = Color(0xFF718096)
+            Text(
+                text = label,
+                color = Color(0xFF9CBAA8),
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 1.sp
+            )
+            Text(
+                text = value,
+                color = Color.White,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold,
+                modifier = Modifier.padding(top = 2.dp)
             )
         }
     }
 }
 
 @Composable
-private fun StatItem(
-    value: String,
-    label: String,
-    color: Color
+private fun AccountSettingItem(
+    title: String,
+    hasToggle: Boolean,
+    isToggled: Boolean = false,
+    isDestructive: Boolean = false,
+    onClick: () -> Unit
 ) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
+    val cardBackground = Color(0xFF1A2E21)
+    
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = cardBackground),
+        shape = RoundedCornerShape(12.dp)
     ) {
-        Text(
-            text = value,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = color
-        )
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            color = Color(0xFF718096),
-            modifier = Modifier.padding(top = 4.dp)
-        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Icon(
+                    when (title) {
+                        "Notifications" -> Icons.Default.Notifications
+                        "Emergency Contacts" -> Icons.Default.Add
+                        "Sign Out" -> Icons.Default.ExitToApp
+                        else -> Icons.Default.Add
+                    },
+                    contentDescription = null,
+                    tint = if (isDestructive) Color.Red else Color(0xFF9CBAA8)
+                )
+                
+                Text(
+                    text = title,
+                    color = if (isDestructive) Color.Red else Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+            
+            if (hasToggle) {
+                Switch(
+                    checked = isToggled,
+                    onCheckedChange = { },
+                    colors = SwitchDefaults.colors(
+                        checkedThumbColor = Color.White,
+                        checkedTrackColor = Color(0xFF0DF26C),
+                        uncheckedThumbColor = Color.Gray,
+                        uncheckedTrackColor = Color(0xFF374151)
+                    )
+                )
+            } else if (!isDestructive) {
+                Icon(
+                    Icons.Default.KeyboardArrowRight,
+                    contentDescription = null,
+                    tint = Color.Gray
+                )
+            }
+        }
     }
 }
 
 @Composable
-private fun Padding(
-    horizontal: androidx.compose.ui.unit.Dp = 0.dp,
-    vertical: androidx.compose.ui.unit.Dp = 0.dp,
-    content: @Composable () -> Unit
+private fun BottomNavigationBar(
+    modifier: Modifier = Modifier,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit
 ) {
-    Box(
-        modifier = Modifier.padding(horizontal = horizontal, vertical = vertical)
+    val primary = Color(0xFF0DF26C)
+    
+    Card(
+        modifier = modifier.fillMaxWidth(),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.8f)
+        ),
+        shape = RoundedCornerShape(0.dp)
     ) {
-        content()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp, vertical = 16.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            BottomNavItem(
+                icon = Icons.Default.Home,
+                label = "Home",
+                selected = selectedTab == 0,
+                onClick = { onTabSelected(0) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Add,
+                label = "Map",
+                selected = selectedTab == 1,
+                onClick = { onTabSelected(1) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Person,
+                label = "Profile",
+                selected = selectedTab == 2,
+                onClick = { onTabSelected(2) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Add,
+                label = "History",
+                selected = selectedTab == 3,
+                onClick = { onTabSelected(3) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomNavItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val primary = Color(0xFF0DF26C)
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Icon(
+            icon,
+            contentDescription = label,
+            tint = if (selected) primary else Color.Gray,
+            modifier = Modifier.size(24.dp)
+        )
+        Text(
+            label,
+            color = if (selected) primary else Color.Gray,
+            fontSize = 10.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+        )
     }
 }

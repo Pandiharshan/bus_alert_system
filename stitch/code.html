@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Login Selection Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+      tailwind.config = {
+        darkMode: "class",
+        theme: {
+          extend: {
+            colors: {
+              "primary": "#0df26c",
+              "background-light": "#f5f8f7",
+              "background-dark": "#102217",
+            },
+            fontFamily: {
+              "display": ["Inter"]
+            },
+            borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+          },
+        },
+      }
+    </script>
+<style>
+      body {
+        font-family: 'Inter', sans-serif;
+      }
+      .material-symbols-outlined {
+        font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+      }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex flex-col transition-colors duration-300">
+<!-- Top Navigation Bar -->
+<header class="flex items-center justify-between p-4 pt-8">
+<div class="w-10"></div> <!-- Spacer for balance -->
+<div class="flex items-center gap-2">
+<div class="bg-primary rounded-lg p-1">
+<span class="material-symbols-outlined text-background-dark font-bold">directions_bus</span>
+</div>
+<h2 class="text-white text-xl font-bold tracking-tight">SmartBus</h2>
+</div>
+<button class="text-white/70 hover:text-primary transition-colors">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</header>
+<main class="flex-1 flex flex-col items-center justify-center px-6 max-w-md mx-auto w-full">
+<!-- Illustration Section -->
+<div class="w-full mb-8">
+<div class="relative aspect-video w-full overflow-hidden rounded-xl bg-gradient-to-br from-[#1a2e23] to-[#102217] flex items-center justify-center border border-white/5 shadow-2xl" data-alt="Modern stylized school bus illustration with neon green accents">
+<div class="flex flex-col items-center">
+<span class="material-symbols-outlined text-primary text-[120px] opacity-90 drop-shadow-[0_0_15px_rgba(13,242,108,0.4)]">airport_shuttle</span>
+<div class="mt-4 flex gap-4">
+<div class="h-1 w-12 bg-primary/20 rounded-full animate-pulse"></div>
+<div class="h-1 w-24 bg-primary/40 rounded-full"></div>
+<div class="h-1 w-8 bg-primary/20 rounded-full animate-pulse"></div>
+</div>
+</div>
+<!-- Abstract Map Lines Background -->
+<div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: radial-gradient(circle at 2px 2px, #0df26c 1px, transparent 0); background-size: 24px 24px;">
+</div>
+</div>
+</div>
+<!-- Headline & Body Text -->
+<div class="text-center mb-10">
+<h1 class="text-white text-3xl font-bold leading-tight mb-3">Track Your Journey</h1>
+<p class="text-white/60 text-base leading-relaxed">
+                Seamless bus attendance and real-time tracking for a safer commute.
+            </p>
+</div>
+<!-- Selection Buttons -->
+<div class="w-full space-y-4">
+<button class="group relative w-full flex items-center justify-center gap-3 bg-primary hover:bg-primary/90 text-background-dark h-14 rounded-xl font-bold text-lg transition-all active:scale-[0.98] shadow-lg shadow-primary/10">
+<span class="material-symbols-outlined">school</span>
+<span>Student Login</span>
+<span class="material-symbols-outlined absolute right-4 opacity-50 group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+<button class="group relative w-full flex items-center justify-center gap-3 bg-white/10 hover:bg-white/15 border border-white/10 text-white h-14 rounded-xl font-bold text-lg transition-all active:scale-[0.98]">
+<span class="material-symbols-outlined">person_pin_circle</span>
+<span>Driver Login</span>
+<span class="material-symbols-outlined absolute right-4 opacity-50 group-hover:translate-x-1 transition-transform">chevron_right</span>
+</button>
+</div>
+<!-- Secondary Info -->
+<div class="mt-12 flex flex-col items-center gap-6">
+<div class="flex items-center gap-2 text-white/40 text-sm">
+<div class="h-px w-8 bg-white/20"></div>
+<span>New to the platform?</span>
+<div class="h-px w-8 bg-white/20"></div>
+</div>
+<a class="text-primary font-medium hover:underline flex items-center gap-1" href="#">
+                Register Your Institution
+                <span class="material-symbols-outlined text-sm">open_in_new</span>
+</a>
+</div>
+</main>
+<!-- Footer Area (iOS Safe Area handling) -->
+<footer class="p-6 pb-10 text-center">
+<p class="text-white/30 text-[10px] uppercase tracking-widest font-semibold">
+            Powered by SmartBus Analytics v2.4
+        </p>
+</footer>
+</body></html>

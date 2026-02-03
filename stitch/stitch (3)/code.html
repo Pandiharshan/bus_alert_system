@@ -1,0 +1,191 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bus Home Dashboard</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df26c",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen">
+<div class="relative mx-auto max-w-[430px] min-h-screen flex flex-col bg-background-light dark:bg-background-dark shadow-2xl overflow-hidden">
+<!-- TopAppBar -->
+<header class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10 border-b border-gray-200 dark:border-white/10">
+<div class="flex size-10 shrink-0 items-center">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary" data-alt="Professional driver profile picture portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDmY_LWJpycRm8I6fZGV-vlCbW6l9hC9cdL6dUirMR_mqANWSjRfBxq7wPuA0nGGpz4q8u45Z6x7Uf9ZevLRPR0sAbfKa9XZPX72cd6wKuYnglePfSwZZntqDLlStQhyhpRC2Fzxlq-KB7ss2STnaIvpQEHuRRObvumOMDuBFvPKrmAoOlvzoXQNyFFm3b9zo30GcsRSi6Kc1nbDgDZWYZs0CYCKBdmmZUspsM-E7QJEc-3ZfL9yq39ZupHiZpkY3D-6yM9KWj4P_E");'>
+</div>
+</div>
+<div class="flex-1 px-3">
+<p class="text-xs text-gray-500 dark:text-gray-400 font-medium">Route 42 - Sector B</p>
+<h2 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Morning Shift</h2>
+</div>
+<div class="flex w-10 items-center justify-end">
+<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-gray-100 dark:bg-white/5 text-gray-900 dark:text-white transition-colors hover:bg-gray-200 dark:hover:bg-white/10">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+</header>
+<main class="flex-1 overflow-y-auto pb-24">
+<!-- Status Indicators -->
+<div class="flex gap-2 px-4 py-2 mt-2">
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+<span class="size-2 rounded-full bg-primary animate-pulse"></span>
+                    GPS Active
+                </div>
+<div class="flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-500 text-xs font-semibold">
+<span class="material-symbols-outlined text-sm">wifi</span>
+                    Online
+                </div>
+</div>
+<!-- Stats -->
+<div class="flex flex-wrap gap-4 p-4">
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a2e21] shadow-sm border border-gray-100 dark:border-white/5 transition-transform active:scale-95">
+<div class="flex items-center justify-between">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">Total Members</p>
+<span class="material-symbols-outlined text-gray-400 text-xl">group</span>
+</div>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">40</p>
+</div>
+<div class="flex min-w-[158px] flex-1 flex-col gap-2 rounded-xl p-6 bg-white dark:bg-[#1a2e21] shadow-sm border border-gray-100 dark:border-white/5 transition-transform active:scale-95">
+<div class="flex items-center justify-between">
+<p class="text-gray-500 dark:text-gray-400 text-sm font-medium leading-normal">Present Today</p>
+<span class="material-symbols-outlined text-primary text-xl">check_circle</span>
+</div>
+<p class="text-gray-900 dark:text-white tracking-light text-3xl font-bold leading-tight">38</p>
+</div>
+</div>
+<!-- Main Trip Button -->
+<div class="px-4 py-4">
+<div class="bg-primary/5 dark:bg-primary/10 border border-primary/20 p-4 rounded-2xl">
+<div class="mb-4">
+<h4 class="text-gray-900 dark:text-white font-bold text-base">Ready to depart?</h4>
+<p class="text-gray-500 dark:text-gray-400 text-sm">Trip to Downtown Campus starts in 10 mins.</p>
+</div>
+<button class="flex w-full cursor-pointer items-center justify-center overflow-hidden rounded-xl h-16 px-5 bg-primary text-[#102217] gap-3 text-lg font-bold leading-normal tracking-wide shadow-lg shadow-primary/20 active:scale-[0.98] transition-all">
+<span class="material-symbols-outlined text-[32px]">play_arrow</span>
+<span>Start Trip</span>
+</button>
+</div>
+</div>
+<!-- SectionHeader -->
+<h3 class="text-gray-900 dark:text-white text-lg font-bold leading-tight tracking-tight px-4 pb-2 pt-6">Management</h3>
+<!-- ListItems -->
+<div class="px-4 flex flex-col gap-2">
+<div class="flex items-center gap-4 bg-white dark:bg-[#1a2e21] px-4 min-h-[72px] justify-between rounded-xl border border-gray-100 dark:border-white/5 active:bg-gray-50 dark:active:bg-white/10 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
+<span class="material-symbols-outlined">group</span>
+</div>
+<div>
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-none mb-1">Bus Members List</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs">Manage students &amp; staff</p>
+</div>
+</div>
+<div class="shrink-0">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-[#1a2e21] px-4 min-h-[72px] justify-between rounded-xl border border-gray-100 dark:border-white/5 active:bg-gray-50 dark:active:bg-white/10 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
+<span class="material-symbols-outlined">directions_bus</span>
+</div>
+<div>
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-none mb-1">Bus Profile</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs">Vehicle info &amp; maintenance</p>
+</div>
+</div>
+<div class="shrink-0">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+<div class="flex items-center gap-4 bg-white dark:bg-[#1a2e21] px-4 min-h-[72px] justify-between rounded-xl border border-gray-100 dark:border-white/5 active:bg-gray-50 dark:active:bg-white/10 transition-colors cursor-pointer group">
+<div class="flex items-center gap-4">
+<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
+<span class="material-symbols-outlined">history</span>
+</div>
+<div>
+<p class="text-gray-900 dark:text-white text-base font-semibold leading-none mb-1">Trip History</p>
+<p class="text-gray-500 dark:text-gray-400 text-xs">View past logs &amp; reports</p>
+</div>
+</div>
+<div class="shrink-0">
+<span class="material-symbols-outlined text-gray-400 group-hover:text-primary transition-colors">chevron_right</span>
+</div>
+</div>
+</div>
+<!-- Quick Map Card -->
+<div class="p-4 mt-4">
+<div class="relative h-40 w-full rounded-2xl overflow-hidden shadow-sm border border-gray-200 dark:border-white/5">
+<div class="absolute inset-0 bg-cover bg-center" data-alt="Abstract dark themed stylized map of city streets" data-location="San Francisco" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuCFSncHymCVx7qCqcwMLJlmsKk_darFsC2OvWceahwBp_7Yq1iRyM2xCazEpb9MP4C4IH_sfmR2JbPtEFMr2gzDa_DfM_8BxGX1gVJoCg9-KPiuzbp9IRCgx2HelS82tcgfVw4Ckk_VaSq3Br_WSpncIuTnobMgYHmj_Z4ImyegbPh0QQ6UoHKp9unyFdUxFZYHsNDp2Ufqq6qFepPGjh75ZRqWFpaUhHdx9shK5tKtY8f0orvBYJ-cs_kzxeMhKIVz5Z2Ux5ZZ1ek');">
+</div>
+<div class="absolute inset-0 bg-gradient-to-t from-background-dark/80 to-transparent"></div>
+<div class="absolute bottom-4 left-4">
+<p class="text-white text-xs font-medium uppercase tracking-wider opacity-80">Current Location</p>
+<p class="text-white text-sm font-bold">128 Oak Street, Block C</p>
+</div>
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+<div class="size-8 rounded-full bg-primary flex items-center justify-center shadow-lg border-2 border-white">
+<span class="material-symbols-outlined text-background-dark text-lg">navigation</span>
+</div>
+</div>
+</div>
+</div>
+</main>
+<!-- Bottom Navigation Bar (iOS Style) -->
+<nav class="fixed bottom-0 left-0 right-0 mx-auto max-w-[430px] bg-white/80 dark:bg-background-dark/80 backdrop-blur-xl border-t border-gray-200 dark:border-white/10 flex justify-around items-center py-3 pb-6">
+<button class="flex flex-col items-center gap-1 text-primary">
+<span class="material-symbols-outlined text-[28px]">home</span>
+<span class="text-[10px] font-bold">Home</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+<span class="material-symbols-outlined text-[28px]">calendar_today</span>
+<span class="text-[10px] font-medium">Schedule</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+<span class="material-symbols-outlined text-[28px]">bar_chart</span>
+<span class="text-[10px] font-medium">Analytics</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200">
+<span class="material-symbols-outlined text-[28px]">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</button>
+</nav>
+<!-- iOS Home Indicator Overlay (Simulated) -->
+<div class="fixed bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-gray-300 dark:bg-white/20 rounded-full z-20 pointer-events-none"></div>
+</div>
+</body></html>

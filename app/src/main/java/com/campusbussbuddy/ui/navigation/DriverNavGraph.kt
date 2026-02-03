@@ -11,8 +11,12 @@ fun NavGraphBuilder.driverNavGraph(
 ) {
     navigation(
         route = Destinations.DRIVER,
-        startDestination = Destinations.DRIVER_PORTAL
+        startDestination = Destinations.DRIVER_HOME
     ) {
+        composable(Destinations.DRIVER_HOME) {
+            DriverHomeScreen(navController = navController)
+        }
+        
         composable(Destinations.DRIVER_PORTAL) {
             DriverPortalScreen(navController = navController)
         }
@@ -33,21 +37,17 @@ fun NavGraphBuilder.driverNavGraph(
             BusProfileScreen(navController = navController)
         }
         
-        // Legacy screens (keeping for backward compatibility)
-        composable(Destinations.DRIVER_HOME) {
-            DriverHomeScreen(navController = navController)
+        composable(Destinations.DRIVER_PROFILE) {
+            DriverProfileScreen(navController = navController)
         }
         
+        // Legacy screens (keeping for backward compatibility)
         composable(Destinations.TRIP_MANAGEMENT) {
             TripManagementScreen(navController = navController)
         }
         
         composable(Destinations.QR_GENERATOR) {
             QrGeneratorScreen(navController = navController)
-        }
-        
-        composable(Destinations.DRIVER_PROFILE) {
-            DriverProfileScreen(navController = navController)
         }
         
         // Placeholder screens for missing destinations

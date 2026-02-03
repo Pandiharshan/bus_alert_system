@@ -1,13 +1,12 @@
 package com.campusbussbuddy.ui.screens.driver
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -15,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
@@ -25,364 +25,246 @@ import com.campusbussbuddy.ui.navigation.Destinations
 fun DriverHomeScreen(
     navController: NavHostController
 ) {
-    Box(
+    val primary = Color(0xFF0DF26C)
+    val backgroundDark = Color(0xFF102217)
+    val cardBackground = Color(0xFF1A2E22)
+    
+    Column(
         modifier = Modifier
             .fillMaxSize()
-            .background(Color(0xFFFAFAFA))
+            .background(backgroundDark)
     ) {
-        Column(
+        // TopAppBar
+        Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 20.dp)
+                .fillMaxWidth()
+                .padding(16.dp)
+                .padding(top = 32.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Header
-            Row(
+            IconButton(onClick = { }) {
+                Icon(
+                    Icons.Default.Menu,
+                    contentDescription = "Menu",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            Text(
+                text = "Smart Bus Tracking",
+                color = Color.White,
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold
+            )
+            
+            IconButton(onClick = { }) {
+                Icon(
+                    Icons.Default.Notifications,
+                    contentDescription = "Notifications",
+                    tint = Color.White,
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+        }
+        
+        // HeadlineText
+        Text(
+            text = "Good Morning, Captain!",
+            color = Color.White,
+            fontSize = 30.sp,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .padding(top = 32.dp, bottom = 8.dp)
+        )
+        
+        // ProfileHeader Card
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp),
+            colors = CardDefaults.cardColors(containerColor = cardBackground),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp, bottom = 32.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Column {
-                    Text(
-                        text = "Good morning",
-                        fontSize = 16.sp,
-                        color = Color(0xFF6B7280)
-                    )
-                    Text(
-                        text = "Mike",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.SemiBold,
-                        color = Color(0xFF111827)
+                // Profile Image
+                Box(
+                    modifier = Modifier
+                        .size(128.dp)
+                        .clip(CircleShape)
+                        .border(4.dp, primary.copy(alpha = 0.3f), CircleShape)
+                        .background(Color.Gray)
+                ) {
+                    // Placeholder for profile image
+                    Icon(
+                        Icons.Default.Person,
+                        contentDescription = "Profile",
+                        tint = Color.White,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(24.dp)
                     )
                 }
                 
-                IconButton(
-                    onClick = { navController.navigate(Destinations.AUTH) },
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(10.dp))
-                        .background(Color.White)
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.ArrowBack,
-                        contentDescription = "Sign Out",
-                        tint = Color(0xFF6B7280),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-            }
-            
-            // Status Card
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color(0xFF10B981)
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(16.dp)
-            ) {
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Text(
+                    text = "Captain John Doe",
+                    color = Color.White,
+                    fontSize = 22.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                
+                Text(
+                    text = "Employee ID: #BUS-9921",
+                    color = Color(0xFF9CBAA8),
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+                
+                // Status Badge
                 Row(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(top = 12.dp)
+                        .background(
+                            Color(0xFF374151),
+                            RoundedCornerShape(20.dp)
+                        )
+                        .padding(horizontal = 12.dp, vertical = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    Column(
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        Text(
-                            text = "Bus 001 - Campus Loop",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.SemiBold,
-                            color = Color.White
-                        )
-                        Text(
-                            text = "Ready to start route",
-                            fontSize = 14.sp,
-                            color = Color.White.copy(alpha = 0.8f),
-                            modifier = Modifier.padding(top = 2.dp)
-                        )
-                    }
-                    
-                    Surface(
-                        color = Color.White.copy(alpha = 0.2f),
-                        shape = RoundedCornerShape(20.dp)
-                    ) {
-                        Text(
-                            text = "OFFLINE",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White,
-                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
-                        )
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // Quick Actions
-            Text(
-                text = "Quick Actions",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF111827),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            Column(
-                modifier = Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                // Trip Management Card
-                Card(
-                    onClick = { navController.navigate(Destinations.TRIP_MANAGEMENT) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
+                    Box(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFF3B82F6).copy(alpha = 0.1f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Build,
-                                contentDescription = "Trip Management",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color(0xFF3B82F6)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "Trip Management",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF111827)
-                            )
-                            Text(
-                                text = "Start/stop trips and track location",
-                                fontSize = 14.sp,
-                                color = Color(0xFF6B7280)
-                            )
-                        }
-                        
-                        Text(
-                            text = "→",
-                            fontSize = 18.sp,
-                            color = Color(0xFF9CA3AF)
-                        )
-                    }
-                }
-                
-                // QR Generator Card
-                Card(
-                    onClick = { navController.navigate(Destinations.QR_GENERATOR) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFF8B5CF6).copy(alpha = 0.1f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Settings,
-                                contentDescription = "QR Generator",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color(0xFF8B5CF6)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "QR Generator",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF111827)
-                            )
-                            Text(
-                                text = "Generate QR codes for boarding",
-                                fontSize = 14.sp,
-                                color = Color(0xFF6B7280)
-                            )
-                        }
-                        
-                        Text(
-                            text = "→",
-                            fontSize = 18.sp,
-                            color = Color(0xFF9CA3AF)
-                        )
-                    }
-                }
-                
-                // Profile Card
-                Card(
-                    onClick = { navController.navigate(Destinations.DRIVER_PROFILE) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(80.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                    shape = RoundedCornerShape(12.dp)
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(20.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(40.dp)
-                                .clip(RoundedCornerShape(10.dp))
-                                .background(Color(0xFF10B981).copy(alpha = 0.1f)),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Person,
-                                contentDescription = "Profile",
-                                modifier = Modifier.size(20.dp),
-                                tint = Color(0xFF10B981)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.width(16.dp))
-                        
-                        Column(
-                            modifier = Modifier.weight(1f)
-                        ) {
-                            Text(
-                                text = "Profile",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFF111827)
-                            )
-                            Text(
-                                text = "Manage your account",
-                                fontSize = 14.sp,
-                                color = Color(0xFF6B7280)
-                            )
-                        }
-                        
-                        Text(
-                            text = "→",
-                            fontSize = 18.sp,
-                            color = Color(0xFF9CA3AF)
-                        )
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // Today's Summary
-            Text(
-                text = "Today's Summary",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF111827),
-                modifier = Modifier.padding(bottom = 16.dp)
-            )
-            
-            Card(
-                modifier = Modifier.fillMaxWidth(),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White
-                ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                shape = RoundedCornerShape(12.dp)
-            ) {
-                Column(
-                    modifier = Modifier.padding(20.dp)
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceEvenly
-                    ) {
-                        SummaryItem(
-                            value = "0",
-                            label = "Trips",
-                            color = Color(0xFF3B82F6)
-                        )
-                        
-                        SummaryItem(
-                            value = "0",
-                            label = "Students",
-                            color = Color(0xFF10B981)
-                        )
-                        
-                        SummaryItem(
-                            value = "0h",
-                            label = "Hours",
-                            color = Color(0xFFF59E0B)
-                        )
-                    }
+                            .size(8.dp)
+                            .background(Color.Gray, CircleShape)
+                    )
+                    Text(
+                        text = "STATUS: OFFLINE",
+                        color = Color(0xFF9CBAA8),
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.SemiBold,
+                        letterSpacing = 1.sp
+                    )
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun SummaryItem(
-    value: String,
-    label: String,
-    color: Color
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
+        
+        // BodyText Instruction
         Text(
-            text = value,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            color = color
+            text = "Ready to start your route? Log in to your assigned vehicle to begin tracking.",
+            color = Color.White.copy(alpha = 0.7f),
+            fontSize = 16.sp,
+            textAlign = TextAlign.Center,
+            lineHeight = 24.sp,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
         )
-        Text(
-            text = label,
-            fontSize = 12.sp,
-            color = Color(0xFF6B7280),
-            modifier = Modifier.padding(top = 2.dp)
-        )
+        
+        // SingleButton Login
+        Button(
+            onClick = { navController.navigate(Destinations.BUS_LOGIN) },
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .padding(horizontal = 24.dp)
+                .padding(top = 16.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = primary,
+                contentColor = Color(0xFF111814)
+            ),
+            shape = RoundedCornerShape(12.dp)
+        ) {
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(12.dp)
+            ) {
+                Text("🚌", fontSize = 20.sp)
+                Text(
+                    "Login to Bus",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.weight(1f))
+        
+        // Footer Info
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(32.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                TextButton(
+                    onClick = { navController.navigate(Destinations.DRIVER_PROFILE) },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color.White.copy(alpha = 0.6f)
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Settings,
+                            contentDescription = null,
+                            modifier = Modifier.size(18.dp)
+                        )
+                        Text(
+                            "Settings",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+                
+                TextButton(
+                    onClick = { },
+                    colors = ButtonDefaults.textButtonColors(
+                        contentColor = Color.White.copy(alpha = 0.6f)
+                    )
+                ) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        Text("❓", fontSize = 18.sp)
+                        Text(
+                            "Support",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                }
+            }
+            
+            Text(
+                text = "v2.10.4-stable",
+                color = Color.White.copy(alpha = 0.4f),
+                fontSize = 12.sp,
+                fontWeight = FontWeight.Medium
+            )
+        }
+        
+        // iOS Home Indicator Spacing
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }

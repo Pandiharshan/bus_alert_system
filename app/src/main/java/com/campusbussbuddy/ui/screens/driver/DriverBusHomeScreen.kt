@@ -1,26 +1,22 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package com.campusbussbuddy.ui.screens.driver
 
-import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Person
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.Build
-import androidx.compose.material.icons.filled.PlayArrow
-import androidx.compose.material.icons.filled.List
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -32,284 +28,531 @@ import com.campusbussbuddy.ui.navigation.Destinations
 fun DriverBusHomeScreen(
     navController: NavHostController
 ) {
-    // Animation for the gradient
-    val infiniteTransition = rememberInfiniteTransition(label = "gradient")
-    val animatedOffset by infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 1f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(6000, easing = LinearEasing),
-            repeatMode = RepeatMode.Reverse
-        ),
-        label = "offset"
-    )
+    val primary = Color(0xFF0DF26C)
+    val backgroundDark = Color(0xFF102217)
+    val cardBackground = Color(0xFF1A2E21)
     
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(
-                brush = Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFF667eea).copy(alpha = 0.8f + animatedOffset * 0.2f),
-                        Color(0xFF764ba2).copy(alpha = 0.9f),
-                        Color(0xFF667eea).copy(alpha = 0.7f + animatedOffset * 0.3f)
-                    )
-                )
-            )
+            .background(backgroundDark)
     ) {
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(24.dp),
-            verticalArrangement = Arrangement.spacedBy(20.dp)
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = PaddingValues(bottom = 100.dp)
         ) {
             item {
-                // Header
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier.fillMaxWidth()
+                // TopAppBar
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .background(backgroundDark)
+                        .padding(16.dp)
+                        .padding(top = 32.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = "🚌 Bus #247",
-                        fontSize = 28.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        modifier = Modifier.padding(bottom = 4.dp)
-                    )
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(12.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .border(2.dp, primary, CircleShape)
+                                .background(Color.Gray)
+                        ) {
+                            Icon(
+                                Icons.Default.Person,
+                                contentDescription = "Profile",
+                                tint = Color.White,
+                                modifier = Modifier
+                                    .fillMaxSize()
+                                    .padding(8.dp)
+                            )
+                        }
+                        
+                        Column {
+                            Text(
+                                text = "Route 42 - Sector B",
+                                color = Color.Gray,
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium
+                            )
+                            Text(
+                                text = "Morning Shift",
+                                color = Color.White,
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                     
-                    Text(
-                        text = "Dashboard",
-                        fontSize = 16.sp,
-                        color = Color.White.copy(alpha = 0.8f),
-                        modifier = Modifier.padding(bottom = 32.dp)
-                    )
+                    IconButton(
+                        onClick = { },
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(Color.White.copy(alpha = 0.05f), CircleShape)
+                    ) {
+                        Icon(
+                            Icons.Default.Notifications,
+                            contentDescription = "Notifications",
+                            tint = Color.White
+                        )
+                    }
                 }
             }
             
             item {
-                // Stats Cards Row
+                // Status Indicators
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                primary.copy(alpha = 0.1f),
+                                RoundedCornerShape(20.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Box(
+                            modifier = Modifier
+                                .size(8.dp)
+                                .background(primary, CircleShape)
+                        )
+                        Text(
+                            "GPS Active",
+                            color = primary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                    
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                Color.Blue.copy(alpha = 0.1f),
+                                RoundedCornerShape(20.dp)
+                            )
+                            .padding(horizontal = 12.dp, vertical = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(6.dp)
+                    ) {
+                        Icon(
+                            Icons.Default.Add,
+                            contentDescription = null,
+                            tint = Color.Blue,
+                            modifier = Modifier.size(14.dp)
+                        )
+                        Text(
+                            "Online",
+                            color = Color.Blue,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
+            }
+            
+            item {
+                // Stats Cards
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
                     horizontalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
-                    StatCard(
-                        title = "Total Students",
-                        value = "42",
-                        icon = Icons.Default.Person,
-                        gradient = listOf(Color(0xFF4facfe), Color(0xFF00f2fe)),
-                        modifier = Modifier.weight(1f)
-                    )
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = cardBackground),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Total Members",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Icon(
+                                    Icons.Default.Person,
+                                    contentDescription = null,
+                                    tint = Color.Gray,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Text(
+                                "40",
+                                color = Color.White,
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                     
-                    StatCard(
-                        title = "Present Today",
-                        value = "38",
-                        icon = Icons.Default.CheckCircle,
-                        gradient = listOf(Color(0xFF43e97b), Color(0xFF38f9d7)),
-                        modifier = Modifier.weight(1f)
-                    )
+                    Card(
+                        modifier = Modifier.weight(1f),
+                        colors = CardDefaults.cardColors(containerColor = cardBackground),
+                        shape = RoundedCornerShape(12.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(24.dp),
+                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween,
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    "Present Today",
+                                    color = Color.Gray,
+                                    fontSize = 14.sp,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                Icon(
+                                    Icons.Default.CheckCircle,
+                                    contentDescription = null,
+                                    tint = primary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
+                            Text(
+                                "38",
+                                color = Color.White,
+                                fontSize = 30.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                    }
                 }
             }
             
             item {
-                StatCard(
-                    title = "Trip Status",
-                    value = "Ready to Start",
-                    icon = Icons.Default.Build,
-                    gradient = listOf(Color(0xFFfa709a), Color(0xFFfee140)),
-                    modifier = Modifier.fillMaxWidth()
+                // Main Trip Button
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = primary.copy(alpha = 0.1f)
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ) {
+                    Column(
+                        modifier = Modifier.padding(16.dp)
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
+                            Text(
+                                "Ready to depart?",
+                                color = Color.White,
+                                fontSize = 16.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Text(
+                                "Trip to Downtown Campus starts in 10 mins.",
+                                color = Color.Gray,
+                                fontSize = 14.sp
+                            )
+                        }
+                        
+                        Button(
+                            onClick = { navController.navigate(Destinations.TRIP_SCREEN) },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(64.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = primary,
+                                contentColor = Color(0xFF102217)
+                            ),
+                            shape = RoundedCornerShape(12.dp)
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                horizontalArrangement = Arrangement.spacedBy(12.dp)
+                            ) {
+                                Icon(
+                                    Icons.Default.PlayArrow,
+                                    contentDescription = null,
+                                    modifier = Modifier.size(32.dp)
+                                )
+                                Text(
+                                    "Start Trip",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold
+                                )
+                            }
+                        }
+                    }
+                }
+            }
+            
+            item {
+                // Management Section
+                Text(
+                    "Management",
+                    color = Color.White,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 16.dp)
                 )
             }
             
             item {
-                // Action Buttons
+                // Management List Items
                 Column(
-                    verticalArrangement = Arrangement.spacedBy(16.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    ActionButton(
-                        title = "Start Trip",
-                        subtitle = "Begin today's route",
-                        icon = Icons.Default.PlayArrow,
-                        gradient = listOf(Color(0xFF667eea), Color(0xFF764ba2)),
-                        onClick = { navController.navigate(Destinations.TRIP_SCREEN) }
-                    )
-                    
-                    ActionButton(
-                        title = "Bus Members",
-                        subtitle = "View assigned students",
+                    ManagementListItem(
+                        title = "Bus Members List",
+                        subtitle = "Manage students & staff",
                         icon = Icons.Default.Person,
-                        gradient = listOf(Color(0xFF4facfe), Color(0xFF00f2fe)),
-                        onClick = { navController.navigate(Destinations.BUS_MEMBERS) }
+                        onClick = { }
                     )
                     
-                    ActionButton(
-                        title = "Attendance",
-                        subtitle = "Check today's attendance",
-                        icon = Icons.Default.List,
-                        gradient = listOf(Color(0xFF43e97b), Color(0xFF38f9d7)),
-                        onClick = { navController.navigate(Destinations.ATTENDANCE) }
-                    )
-                    
-                    ActionButton(
+                    ManagementListItem(
                         title = "Bus Profile",
-                        subtitle = "Bus info and QR code",
-                        icon = Icons.Default.Info,
-                        gradient = listOf(Color(0xFFfa709a), Color(0xFFfee140)),
+                        subtitle = "Vehicle info & maintenance",
+                        icon = Icons.Default.Add,
                         onClick = { navController.navigate(Destinations.BUS_PROFILE) }
+                    )
+                    
+                    ManagementListItem(
+                        title = "Trip History",
+                        subtitle = "View past logs & reports",
+                        icon = Icons.Default.Add,
+                        onClick = { navController.navigate(Destinations.TRIP_MANAGEMENT) }
                     )
                 }
             }
             
             item {
-                Spacer(modifier = Modifier.height(16.dp))
-                
-                // Sign Out Button
-                OutlinedButton(
-                    onClick = { navController.navigate(Destinations.AUTH) },
+                // Quick Map Card
+                Card(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(56.dp)
-                        .clip(RoundedCornerShape(16.dp)),
-                    colors = ButtonDefaults.outlinedButtonColors(
-                        contentColor = Color.White
-                    )
+                        .height(160.dp)
+                        .padding(16.dp),
+                    colors = CardDefaults.cardColors(containerColor = Color.Gray.copy(alpha = 0.2f)),
+                    shape = RoundedCornerShape(16.dp)
                 ) {
-                    Text(
-                        text = "← Sign Out",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        // Map placeholder
+                        Box(
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .background(Color.Gray.copy(alpha = 0.3f))
+                        )
+                        
+                        // Current location overlay
+                        Column(
+                            modifier = Modifier
+                                .align(Alignment.BottomStart)
+                                .padding(16.dp)
+                        ) {
+                            Text(
+                                "CURRENT LOCATION",
+                                color = Color.White.copy(alpha = 0.8f),
+                                fontSize = 12.sp,
+                                fontWeight = FontWeight.Medium,
+                                letterSpacing = 1.sp
+                            )
+                            Text(
+                                "128 Oak Street, Block C",
+                                color = Color.White,
+                                fontSize = 14.sp,
+                                fontWeight = FontWeight.Bold
+                            )
+                        }
+                        
+                        // Navigation icon
+                        Box(
+                            modifier = Modifier
+                                .align(Alignment.Center)
+                                .size(32.dp)
+                                .background(primary, CircleShape)
+                                .border(2.dp, Color.White, CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                Icons.Default.Add,
+                                contentDescription = null,
+                                tint = backgroundDark,
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    }
                 }
             }
         }
+        
+        // Bottom Navigation Bar
+        BottomNavigationBar(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            selectedTab = 0,
+            onTabSelected = { }
+        )
     }
 }
 
 @Composable
-private fun StatCard(
-    title: String,
-    value: String,
-    icon: ImageVector,
-    gradient: List<Color>,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(120.dp)
-            .clip(RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            verticalArrangement = Arrangement.SpaceBetween
-        ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.Top
-            ) {
-                Column {
-                    Text(
-                        text = title,
-                        fontSize = 14.sp,
-                        color = Color(0xFF718096),
-                        fontWeight = FontWeight.Medium
-                    )
-                    Text(
-                        text = value,
-                        fontSize = 24.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF2D3748)
-                    )
-                }
-                
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(12.dp))
-                        .background(brush = Brush.linearGradient(gradient)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        imageVector = icon,
-                        contentDescription = title,
-                        modifier = Modifier.size(20.dp),
-                        tint = Color.White
-                    )
-                }
-            }
-        }
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-private fun ActionButton(
+private fun ManagementListItem(
     title: String,
     subtitle: String,
-    icon: ImageVector,
-    gradient: List<Color>,
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
     onClick: () -> Unit
 ) {
+    val primary = Color(0xFF0DF26C)
+    val cardBackground = Color(0xFF1A2E21)
+    
     Card(
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(80.dp)
-            .clip(RoundedCornerShape(20.dp)),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
-        ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 12.dp)
+        colors = CardDefaults.cardColors(containerColor = cardBackground),
+        shape = RoundedCornerShape(12.dp)
     ) {
         Row(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .fillMaxWidth()
+                .padding(16.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
-                    .clip(RoundedCornerShape(14.dp))
-                    .background(brush = Brush.linearGradient(gradient)),
+                    .background(primary.copy(alpha = 0.1f), RoundedCornerShape(12.dp)),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    imageVector = icon,
-                    contentDescription = title,
-                    modifier = Modifier.size(24.dp),
-                    tint = Color.White
+                    icon,
+                    contentDescription = null,
+                    tint = primary
                 )
             }
-            
-            Spacer(modifier = Modifier.width(16.dp))
             
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = title,
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF2D3748)
+                    title,
+                    color = Color.White,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.SemiBold
                 )
                 Text(
-                    text = subtitle,
-                    fontSize = 14.sp,
-                    color = Color(0xFF718096)
+                    subtitle,
+                    color = Color.Gray,
+                    fontSize = 12.sp
                 )
             }
             
             Icon(
-                imageVector = Icons.Default.ArrowForward,
-                contentDescription = "Navigate",
-                tint = Color(0xFF718096)
+                Icons.Default.KeyboardArrowRight,
+                contentDescription = null,
+                tint = Color.Gray
             )
         }
+    }
+}
+
+@Composable
+private fun BottomNavigationBar(
+    modifier: Modifier = Modifier,
+    selectedTab: Int,
+    onTabSelected: (Int) -> Unit
+) {
+    val primary = Color(0xFF0DF26C)
+    val backgroundDark = Color(0xFF102217)
+    
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = Color.White.copy(alpha = 0.8f)
+        ),
+        shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 12.dp, horizontal = 24.dp),
+            horizontalArrangement = Arrangement.SpaceAround
+        ) {
+            BottomNavItem(
+                icon = Icons.Default.Home,
+                label = "Home",
+                selected = selectedTab == 0,
+                onClick = { onTabSelected(0) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.DateRange,
+                label = "Schedule",
+                selected = selectedTab == 1,
+                onClick = { onTabSelected(1) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Add,
+                label = "Analytics",
+                selected = selectedTab == 2,
+                onClick = { onTabSelected(2) }
+            )
+            BottomNavItem(
+                icon = Icons.Default.Add,
+                label = "Settings",
+                selected = selectedTab == 3,
+                onClick = { onTabSelected(3) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomNavItem(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    label: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    val primary = Color(0xFF0DF26C)
+    
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(4.dp),
+        modifier = Modifier.clickable { onClick() }
+    ) {
+        Icon(
+            icon,
+            contentDescription = label,
+            tint = if (selected) primary else Color.Gray,
+            modifier = Modifier.size(28.dp)
+        )
+        Text(
+            label,
+            color = if (selected) primary else Color.Gray,
+            fontSize = 10.sp,
+            fontWeight = if (selected) FontWeight.Bold else FontWeight.Medium
+        )
     }
 }

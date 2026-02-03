@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Bus Profile Details</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df26c",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen text-slate-900 dark:text-white">
+<!-- Top Navigation Bar -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-white/5">
+<div class="text-white flex size-12 shrink-0 items-center cursor-pointer">
+<span class="material-symbols-outlined text-slate-900 dark:text-white">arrow_back_ios</span>
+</div>
+<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Bus Details</h2>
+<div class="flex w-12 items-center justify-end">
+<button class="flex size-12 cursor-pointer items-center justify-center rounded-lg bg-transparent text-slate-900 dark:text-white transition-colors hover:bg-white/10">
+<span class="material-symbols-outlined">share</span>
+</button>
+</div>
+</div>
+<main class="max-w-md mx-auto pb-12">
+<!-- Profile Header Section -->
+<div class="flex flex-col items-center">
+<h1 class="text-slate-900 dark:text-white tracking-light text-[32px] font-bold leading-tight px-4 text-center pb-1 pt-6">BUS-102</h1>
+<div class="flex items-center gap-2 pb-3 pt-1 px-4">
+<span class="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
+<p class="text-[#9cbaa8] text-sm font-medium leading-normal">Status: Active Service</p>
+</div>
+</div>
+<!-- Main QR Card -->
+<div class="p-4 @container">
+<div class="flex flex-col items-stretch justify-start rounded-xl shadow-xl bg-white dark:bg-[#1b2720] border border-white/10 overflow-hidden">
+<div class="p-8 flex justify-center items-center bg-white dark:bg-white/5">
+<!-- QR Code Placeholder -->
+<div class="relative group cursor-pointer">
+<div class="absolute -inset-1 bg-primary/20 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000"></div>
+<div class="relative bg-white p-4 rounded-lg shadow-inner">
+<img alt="QR Code for Bus 102" class="w-56 h-56" data-alt="High-resolution QR code for student attendance" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBedQ8y0zuvXoTIJlOcWedvx4g8eo86meiZmsSg--uDGRQHmOOpuMjDun-GdwIXdf3w1K2qWn27DvBmI5Fk9zKp6xpYc5z-as1Hiyyz0uNmNUu_di-3H5BxGyJ2OzN8LItj3y7LSEwvyKEDk6rqBmc4BN5oIO6dmFyxlHbd1L8zvozx2Gy37JZSOjQGgj77usecUggGcubpPw1JBNP9AjDR2yC3dKh4inI1YaP2khrqO4RLd68qxWVV-gKoJ2ZNTOY6cN1vG2ertRM"/>
+</div>
+</div>
+</div>
+<div class="flex w-full min-w-72 grow flex-col items-stretch justify-center gap-1 py-6 px-6">
+<p class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Scan for Attendance</p>
+<div class="flex items-center gap-3 justify-between mt-1">
+<p class="text-slate-500 dark:text-[#9cbaa8] text-base font-normal leading-normal">Students: Use app to check-in</p>
+<button class="flex min-w-[100px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-10 px-4 bg-primary text-background-dark text-sm font-bold leading-normal hover:brightness-110 transition-all shadow-lg shadow-primary/20">
+<span class="truncate">Download</span>
+</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Technical Specifications Section -->
+<div class="px-4">
+<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] pb-3 pt-6">Vehicle Specifications</h3>
+<div class="grid grid-cols-2 gap-3">
+<!-- Capcity Item -->
+<div class="bg-white dark:bg-[#1b2720] p-4 rounded-xl border border-white/5">
+<div class="text-primary mb-2">
+<span class="material-symbols-outlined">group</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-[#9cbaa8] uppercase font-bold tracking-wider">Capacity</p>
+<p class="text-slate-900 dark:text-white text-lg font-bold">52 Seats</p>
+</div>
+<!-- Route Item -->
+<div class="bg-white dark:bg-[#1b2720] p-4 rounded-xl border border-white/5">
+<div class="text-primary mb-2">
+<span class="material-symbols-outlined">route</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-[#9cbaa8] uppercase font-bold tracking-wider">Route</p>
+<p class="text-slate-900 dark:text-white text-lg font-bold">North Loop</p>
+</div>
+<!-- Driver Item -->
+<div class="bg-white dark:bg-[#1b2720] p-4 rounded-xl border border-white/5">
+<div class="text-primary mb-2">
+<span class="material-symbols-outlined">person</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-[#9cbaa8] uppercase font-bold tracking-wider">Primary Driver</p>
+<p class="text-slate-900 dark:text-white text-lg font-bold">James Wilson</p>
+</div>
+<!-- Model Item -->
+<div class="bg-white dark:bg-[#1b2720] p-4 rounded-xl border border-white/5">
+<div class="text-primary mb-2">
+<span class="material-symbols-outlined">directions_bus</span>
+</div>
+<p class="text-xs text-slate-500 dark:text-[#9cbaa8] uppercase font-bold tracking-wider">Model</p>
+<p class="text-slate-900 dark:text-white text-lg font-bold">Volvo B8R</p>
+</div>
+</div>
+</div>
+<!-- Secondary Details -->
+<div class="mt-8 px-4">
+<div class="bg-white dark:bg-[#1b2720] rounded-xl overflow-hidden divide-y divide-white/5">
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">calendar_today</span>
+<span class="text-slate-900 dark:text-white font-medium">Next Maintenance</span>
+</div>
+<span class="text-slate-500 dark:text-[#9cbaa8]">Oct 24, 2024</span>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">speed</span>
+<span class="text-slate-900 dark:text-white font-medium">Odometer</span>
+</div>
+<span class="text-slate-500 dark:text-[#9cbaa8]">12,450 km</span>
+</div>
+<div class="flex items-center justify-between p-4">
+<div class="flex items-center gap-3">
+<span class="material-symbols-outlined text-slate-400">pin_drop</span>
+<span class="text-slate-900 dark:text-white font-medium">Current Yard</span>
+</div>
+<span class="text-slate-500 dark:text-[#9cbaa8]">Main Station</span>
+</div>
+</div>
+</div>
+<!-- Floating Action Button -->
+<div class="mt-8 px-4 flex flex-col gap-3">
+<button class="w-full bg-primary/20 border border-primary/30 text-primary py-4 rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-primary/30 transition-colors">
+<span class="material-symbols-outlined">map</span>
+                Live Track Location
+            </button>
+<button class="w-full bg-transparent text-slate-500 dark:text-[#9cbaa8] py-2 rounded-xl text-sm font-medium">
+                View Maintenance Logs
+            </button>
+</div>
+</main>
+<!-- Simple Bottom Spacer for iOS -->
+<div class="h-8"></div>
+</body></html>

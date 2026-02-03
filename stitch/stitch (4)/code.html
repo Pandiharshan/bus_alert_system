@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Driver Active Trip Screen</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0df26c",
+                        "background-light": "#f5f8f7",
+                        "background-dark": "#102217",
+                    },
+                    fontFamily: {
+                        "display": ["Inter"]
+                    },
+                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
+<!-- TopAppBar -->
+<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-white/10">
+<div class="flex items-center p-4 justify-between max-w-md mx-auto">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-primary">directions_bus</span>
+</div>
+<div>
+<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Route 42B</h2>
+<div class="flex items-center gap-1.5">
+<span class="relative flex h-2 w-2">
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+</span>
+<p class="text-primary text-xs font-semibold uppercase tracking-wider">Active Trip</p>
+</div>
+</div>
+</div>
+<button class="bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-full border border-red-500/30 transition-colors">
+<span class="text-red-500 text-sm font-bold tracking-widest">SOS</span>
+</button>
+</div>
+</header>
+<main class="flex-1 flex flex-col max-w-md mx-auto w-full">
+<!-- Map Section -->
+<div class="px-4 py-3">
+<div class="relative w-full bg-slate-800 aspect-[16/10] rounded-xl overflow-hidden border border-white/5 shadow-2xl">
+<div class="absolute inset-0 bg-center bg-no-repeat bg-cover" data-alt="Interactive dark themed navigation map showing bus route" data-location="Oak Street, San Francisco" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7ZhRDBNeimwSOWAiN63L9Z4geO1rzidLBXix3JiG-p1iibD7FC2oOqCYXLSnXSd3CZhukAU0Xi9viPyw2qg4if5V4CCwaskX_dD0PCM2Y2VpK2JQeXBZxEDnofXhhtip4x6XAPoWrNOaeCr_1pfmbv8PxdT1adzFl8apRav4-XIQlFBzw6NIn93YHOriPKdySWRjgGrZDuENMqJ5D6XG0gpOhim2q1kU3vqKeIUTeGmjRbJWed2oEcy7kuX25eZG2Y5uOB98wctU");'>
+</div>
+<!-- Map Overlay: ETA -->
+<div class="absolute top-3 left-3 bg-background-dark/80 backdrop-blur-md p-2 rounded-lg border border-white/10">
+<p class="text-[10px] text-slate-400 font-bold uppercase">Next Stop</p>
+<p class="text-white font-bold text-sm">3 mins • 0.8 miles</p>
+</div>
+</div>
+</div>
+<!-- Stop Header & QR Area -->
+<div class="flex items-center justify-between px-4 pt-4 pb-2">
+<div>
+<p class="text-primary text-xs font-bold uppercase tracking-widest mb-1">Current Stop</p>
+<h2 class="text-white text-[24px] font-bold leading-tight tracking-tight">Oak Street</h2>
+<p class="text-slate-400 text-sm">4 of 6 students boarded</p>
+</div>
+<!-- Small QR Code for scanning -->
+<div class="flex flex-col items-center gap-1">
+<div class="p-2 bg-white rounded-lg shadow-lg">
+<div class="w-16 h-16 bg-center bg-no-repeat bg-cover" data-alt="Small QR code for student check-in" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDlikReLrXVqbtVVkmkrdfepivI4_uxlHFiJPuM9crelFgwRm4XZaSHbff3bIGb7-8vJMka5Sjg6joRy8sW3Q4lnHdY2O5_PLm5-WnAPxvgBeG_eYnm1ymForI0lOGjSDNNOxjK8A4t4HQ5XSbhFl3_l5F2TRUHbktxpUw_sJ_hvDFoaMwtBL_HuPjTeFIjCTwcsLD5Vw4aXXg_Y5M-AVvQEmb0tNyMeoqlPr_WzkRqR3fLBg0Aa7xK7Ycqw10veDRcOpJNcu1vTM0");'>
+</div>
+</div>
+<span class="text-[10px] text-slate-500 font-medium">Scan to Board</span>
+</div>
+</div>
+<!-- Section Header -->
+<div class="px-4 py-4 flex items-center justify-between">
+<h3 class="text-slate-200 text-sm font-semibold uppercase tracking-wider">Expected Students</h3>
+<span class="material-symbols-outlined text-slate-500 text-xl">group</span>
+</div>
+<!-- Student List -->
+<div class="flex-1 space-y-1 overflow-y-auto no-scrollbar px-2">
+<!-- ListItem 1 -->
+<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary" data-alt="Profile photo of Alice Johnson" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCcPEuTTWeZ2DueufMCxdGFuzShfIyGO7GnTA1WrOp92VYbos-tjMMutc_Cnt66gR5sq_2pEZyyEVwSmRztcXvmCnoTJNwB0czbmhTiahAVuhC3fi2ZS7gDr6hq4vW-AmCQlZQI2oKt0VePZutbMImxlfgJ9gcmemNAzQukrgQuSjbT6hBmpOMrJxpMozI9HkLXJFEubLBR_xyfEu8lcvOiZXSC_TrZ2LY-WCdkJbfHhf-5CGG00wZ-zpyFL-xZDNs0Al6yQ75nhdY");'>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary rounded-full p-0.5 border-2 border-background-dark">
+<span class="material-symbols-outlined text-background-dark text-[14px] font-bold">check</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-white text-base font-semibold leading-none">Alice Johnson</p>
+<p class="text-slate-500 text-xs mt-1">Grade 4 • Boarded 08:12 AM</p>
+</div>
+<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+</button>
+</div>
+<!-- ListItem 2 -->
+<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-slate-700" data-alt="Profile photo of Marcus Chen" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBdr3pEn1HES7v24c70qTlH0tJ_0snR2-123rkPuWaNwnbMJyRL0yMIxJ17g--jClLiTV2jQ1jdDPGQWrzjP_sLBkU3BLkoE2B-ArvdZQmyPvppDdHE_ShUUDL-PPc0XUI7VnJCYNSP54A7LB0uU_r8shfpeF7-mIfqqV5TGvMKPxbCCly1y0zCkZrnKpqnjnHG_QvkA37sfLQbC5067XUOctOJARxyq24MmUeUC0MBKUyFpdgeicYd6EbLCD6f4JpT9FqSCDkge0");'>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-white text-base font-semibold leading-none">Marcus Chen</p>
+<p class="text-slate-500 text-xs mt-1">Grade 2 • Waiting</p>
+</div>
+<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+</button>
+</div>
+<!-- ListItem 3 -->
+<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary" data-alt="Profile photo of Sarah Smith" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYEpp5MYytkNsdwIVPQ1n8M6z5OPaE5ClsAsyzMaZl9Cy6YS6kCT1aX0Wc1XvyW_BgXkPrq9JQpCkMjTXrP3h7snNm1mpw4VkjK_0QySaTxG1Rr9vKU78XYVYRC68zQiVkshYlgipI6oCmVQf36zkyB8bn4vSmYUBLVLewYF4GVHIxuNiuaGLYvS5U64CNNu296mD13hPTDgaXZY-QXXytT3ZJyaBz4jbqyvd1GzIJMpmzsPc0PUYfHCGFUKiV8x9D7jsKLlfD6YQ");'>
+</div>
+<div class="absolute -bottom-1 -right-1 bg-primary rounded-full p-0.5 border-2 border-background-dark">
+<span class="material-symbols-outlined text-background-dark text-[14px] font-bold">check</span>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-white text-base font-semibold leading-none">Sarah Smith</p>
+<p class="text-slate-500 text-xs mt-1">Grade 5 • Boarded 08:14 AM</p>
+</div>
+<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+</button>
+</div>
+<!-- ListItem 4 -->
+<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
+<div class="relative">
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-slate-700" data-alt="Profile photo of Leo Garcia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDn1DGq9b75rQCXsIISXoCPxJa4U_c932WF8_bXaf77O0Gk7CSuwOJsMTtWQuRMmyd0HdvPWYUY1530zdj1KLRoL34V78vgF4t9CgyuaLJIrgWdOf9peFzr8SNmVtFKAOR2nu5IssqaIl3m9FZtuFTvYQDtbA853TREWY71oMfM_SVmzpxd6ySwq88tT42xSBBu-4VhqXOTnTtIIAoCN141ohjaoOz0lAjqfuWW6mZt3EG58oZ860JSdUNYQ1GZWc9jR-DuoEaPNL4");'>
+</div>
+</div>
+<div class="flex-1">
+<p class="text-white text-base font-semibold leading-none">Leo Garcia</p>
+<p class="text-slate-500 text-xs mt-1">Grade 3 • Waiting</p>
+</div>
+<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
+<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+</button>
+</div>
+</div>
+<!-- Sticky Bottom Action -->
+<div class="p-4 bg-background-light dark:bg-background-dark border-t border-white/5">
+<button class="w-full bg-primary hover:bg-primary/90 text-background-dark py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
+<span>Depart Stop</span>
+<span class="material-symbols-outlined">arrow_forward</span>
+</button>
+<div class="mt-4 flex items-center gap-2">
+<div class="flex-1 bg-white/10 h-1.5 rounded-full overflow-hidden">
+<div class="bg-primary h-full w-[40%] rounded-full"></div>
+</div>
+<span class="text-[10px] text-slate-500 font-bold uppercase">4/12 Stops</span>
+</div>
+</div>
+</main>
+<!-- iOS Indicator (Visual only) -->
+<div class="h-1.5 w-32 bg-slate-800 rounded-full mx-auto mb-2 opacity-50"></div>
+</body></html>

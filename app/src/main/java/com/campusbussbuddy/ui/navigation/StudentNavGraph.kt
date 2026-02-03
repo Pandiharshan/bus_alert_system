@@ -32,5 +32,9 @@ fun NavGraphBuilder.studentNavGraph(
         composable(Destinations.STUDENT_PROFILE) {
             StudentProfileScreen(navController = navController)
         }
+        
+        composable(Destinations.LIVE_TRACKING) {
+            LiveTrackingScreen(navController = navController)
+        }
     }
 }
