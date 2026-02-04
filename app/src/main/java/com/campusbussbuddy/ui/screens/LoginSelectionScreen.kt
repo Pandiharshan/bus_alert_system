@@ -306,6 +306,18 @@ private fun MainContent(
                 letterSpacing = 1.sp,
                 modifier = Modifier.clickable { onSupportClick() }
             )
+            Text(
+                text = "•",
+                fontSize = 10.sp,
+                color = Color(0xFFAAAAAA)
+            )
+            Text(
+                text = "SAFETY",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Medium,
+                color = Color(0xFFAAAAAA),
+                letterSpacing = 1.sp
+            )
         }
     }
 }
