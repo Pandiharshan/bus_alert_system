@@ -34,10 +34,12 @@ import com.campusbussbuddy.R
 @Composable
 fun LoginSelectionScreen(
     onStudentLoginClick: () -> Unit,
-    onDriverAccessClick: () -> Unit
+    onDriverAccessClick: () -> Unit,
+    onAdminLoginClick: () -> Unit = {}
 ) {
     var showPrivacyDialog by remember { mutableStateOf(false) }
     var showSupportDialog by remember { mutableStateOf(false) }
+    var showAppInfoDialog by remember { mutableStateOf(false) }
     
     Box(
         modifier = Modifier
@@ -48,9 +50,11 @@ fun LoginSelectionScreen(
         MainContent(
             onStudentLoginClick = onStudentLoginClick,
             onDriverAccessClick = onDriverAccessClick,
+            onAdminLoginClick = onAdminLoginClick,
             onPrivacyPolicyClick = { showPrivacyDialog = true },
             onSupportClick = { showSupportDialog = true },
-            modifier = if (showPrivacyDialog || showSupportDialog) Modifier.blur(4.dp) else Modifier
+            onAppInfoClick = { showAppInfoDialog = true },
+            modifier = if (showPrivacyDialog || showSupportDialog || showAppInfoDialog) Modifier.blur(4.dp) else Modifier
         )
         
         // Privacy Policy Dialog
@@ -66,6 +70,13 @@ fun LoginSelectionScreen(
                 onDismiss = { showSupportDialog = false }
             )
         }
+        
+        // App Info Dialog
+        if (showAppInfoDialog) {
+            AppInfoDialog(
+                onDismiss = { showAppInfoDialog = false }
+            )
+        }
     }
 }
 
@@ -73,8 +84,10 @@ fun LoginSelectionScreen(
 private fun MainContent(
     onStudentLoginClick: () -> Unit,
     onDriverAccessClick: () -> Unit,
+    onAdminLoginClick: () -> Unit,
     onPrivacyPolicyClick: () -> Unit,
     onSupportClick: () -> Unit,
+    onAppInfoClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -105,7 +118,7 @@ private fun MainContent(
             }
             
             IconButton(
-                onClick = { /* Help action */ }
+                onClick = { onAppInfoClick() }
             ) {
                 Text(
                     text = "?",
@@ -312,11 +325,12 @@ private fun MainContent(
                 color = Color(0xFFAAAAAA)
             )
             Text(
-                text = "SAFETY",
+                text = "ADMIN",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Medium,
                 color = Color(0xFFAAAAAA),
-                letterSpacing = 1.sp
+                letterSpacing = 1.sp,
+                modifier = Modifier.clickable { onAdminLoginClick() }
             )
         }
     }
@@ -704,5 +718,145 @@ private fun ContactItem(
             tint = Color(0xFF888888),
             modifier = Modifier.size(20.dp)
         )
+    }
+}
+
+@Composable
+private fun AppInfoDialog(
+    onDismiss: () -> Unit
+) {
+    var visible by remember { mutableStateOf(false) }
+    
+    LaunchedEffect(Unit) {
+        visible = true
+    }
+    
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (visible) 1f else 0f,
+        animationSpec = tween(300),
+        label = "alpha"
+    )
+    
+    val animatedScale by animateFloatAsState(
+        targetValue = if (visible) 1f else 0.8f,
+        animationSpec = tween(300),
+        label = "scale"
+    )
+    
+    Dialog(
+        onDismissRequest = {
+            visible = false
+            onDismiss()
+        },
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.4f * animatedAlpha))
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null
+                ) {
+                    visible = false
+                    onDismiss()
+                },
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(animatedScale)
+                    .alpha(animatedAlpha)
+                    .shadow(
+                        elevation = 16.dp,
+                        shape = RoundedCornerShape(24.dp),
+                        ambientColor = Color.Black.copy(alpha = 0.2f),
+                        spotColor = Color.Black.copy(alpha = 0.2f)
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null
+                    ) { /* Prevent dismiss when clicking on dialog */ },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                )
+            ) {
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    // Title
+                    Text(
+                        text = "About Campus Buddy",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.Black,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    // Body text - smaller, detailed content
+                    Text(
+                        text = "This smart bus attendance and tracking system is a student-developed project designed to help colleges digitally manage bus routes, real-time tracking, and student attendance using QR-based check-ins and live location updates.\n\nThe app simplifies daily transportation operations, improves student safety, and provides instant visibility into bus movements and attendance status.\n\nKey Features:\n• Smart bus tracking with GPS\n• QR-based attendance system\n• Student absence planning\n• Real-time stop management\n• Driver and student role management\n• Designed for college transportation efficiency",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF444444),
+                        textAlign = TextAlign.Start,
+                        lineHeight = 20.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    // Close button - Glass pill style
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp)
+                            .shadow(
+                                elevation = 4.dp,
+                                shape = RoundedCornerShape(28.dp),
+                                ambientColor = Color.Black.copy(alpha = 0.1f),
+                                spotColor = Color.Black.copy(alpha = 0.1f)
+                            )
+                            .background(
+                                Color(0xFF7DD3C0).copy(alpha = 0.9f),
+                                RoundedCornerShape(28.dp)
+                            )
+                            .clip(RoundedCornerShape(28.dp))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = rememberRipple(
+                                    color = Color.White.copy(alpha = 0.3f),
+                                    bounded = true
+                                )
+                            ) {
+                                visible = false
+                                onDismiss()
+                            }
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text(
+                            text = "Close",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black
+                        )
+                    }
+                }
+            }
+        }
     }
 }

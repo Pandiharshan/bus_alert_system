@@ -21,6 +21,9 @@ fun RootNavHost() {
                 },
                 onDriverAccessClick = { 
                     // TODO: Navigate to driver access when implemented
+                },
+                onAdminLoginClick = {
+                    // TODO: Navigate to admin login when implemented
                 }
             )
         }
