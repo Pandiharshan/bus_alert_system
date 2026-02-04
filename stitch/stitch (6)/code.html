@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Student Bus Hub</title>
+<title>Student Portal Home</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -14,17 +14,19 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df26c",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#102217",
+                        "primary": "#beb3d6",
+                        "background-light": "#F8F9F6", // Cloud Ivory
+                        "background-dark": "#18161c",
+                        "mist-teal": "#AFEEEE",
+                        "charcoal": "#2E2E2E"
                     },
                     fontFamily: {
-                        "display": ["Inter", "sans-serif"]
+                        "display": ["Space Grotesk", "sans-serif"]
                     },
                     borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
                         "full": "9999px"
                     },
                 },
@@ -32,11 +34,16 @@
         }
     </script>
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        .glass-tile {
+            background: rgba(255, 255, 255, 0.45);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: inset 2px 2px 5px rgba(175, 238, 238, 0.2);
         }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        .dark .glass-tile {
+            background: rgba(24, 22, 28, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 <style>
@@ -45,131 +52,130 @@
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen pb-24">
+<body class="bg-background-light dark:bg-background-dark font-display min-h-screen">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden max-w-[480px] mx-auto shadow-2xl">
 <!-- Top App Bar -->
-<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
-<div class="flex size-12 shrink-0 items-center">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="User profile picture of a smiling student" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuC2KAnpivmEM1Q-6L3_M8nTTZFnAM8uwqim_OBb9RHHIgyTTtg7lYwGQ3ZiI4JUmApriIZUSbwzjRi5A9FqxEztfhXIN1lcNmiyWCUb8pslqOEJY_SZN8fpVjjUKIq_W9Js_PLLKyAEqVNBPqDRE8Ii_f-lJq-zSVWi_SxZBNLWzL5itJCJbvf1z23kYEhAWPGoZuCLrlXF26EsBvIq-vKa2LcA-b2SHg75fKSx6akKbnlMWnRAeEitziqaG2ekPOZ8s_OTZM257mU");'>
+<div class="flex items-center p-6 pb-2 justify-between">
+<div class="flex size-10 shrink-0 items-center overflow-hidden rounded-full border-2 border-primary/30">
+<img alt="Student profile picture" class="object-cover w-full h-full" data-alt="Close up portrait of a young student" src="https://lh3.googleusercontent.com/aida-public/AB6AXuA3R3ZyAvi6WHJWWuckJKTLUofcfBtiu1S4JlVt7qd7xd1LLEViPVkEzxUDpfgZ5O5Bp7fmbJDxTof8Ai9WUzvIcUrzfO_MpDS-Wkf_4yxuSrGSu7el4aX4ckRJwAfz4JVPmR_VZ35nyjRvdA-Vfgd6IdxFYCuu3ZuV0ZFJO6-TH-KvxOTxJJLpT5VgXhToWJSHCz3FWIb0uwqt5H3xfCgY2DkyMDRUB29tSkmGBfKR9VzAZbKRTdsS5StqAquGd8cWvBHx7lGj3Eo"/>
+</div>
+<h2 class="text-charcoal dark:text-white text-lg font-bold leading-tight tracking-tight flex-1 px-4">Student Portal</h2>
+<div class="flex items-center justify-end relative">
+<button class="flex items-center justify-center rounded-full size-10 bg-white dark:bg-zinc-800 shadow-sm">
+<span class="material-symbols-outlined text-charcoal dark:text-white text-[24px]">notifications</span>
+</button>
+<!-- Mist Teal alert dot -->
+<div class="absolute top-0 right-0 size-3 bg-mist-teal rounded-full border-2 border-background-light dark:border-background-dark"></div>
 </div>
 </div>
-<div class="flex-1 ml-3">
-<h2 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight">Good Morning, Alex</h2>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs">Student ID: #8829</p>
+<!-- Hero Greeting -->
+<div class="px-6 pt-8 pb-2">
+<h1 class="text-charcoal dark:text-white text-[32px] font-bold leading-tight tracking-tight">Good Morning, Alex</h1>
+<p class="text-charcoal/60 dark:text-zinc-400 text-base font-normal mt-1 flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-[18px]">directions_bus</span>
+                Bus 42B • On its way
+            </p>
 </div>
-<div class="flex w-12 items-center justify-end">
-<button class="flex size-10 cursor-pointer items-center justify-center rounded-full bg-slate-100 dark:bg-[#1b2720] text-slate-900 dark:text-white">
-<span class="material-symbols-outlined">notifications</span>
+<!-- Status Panel -->
+<div class="px-6 py-4">
+<div class="glass-tile rounded-xl p-5 flex items-center justify-between border-l-4 border-l-mist-teal">
+<div class="flex flex-col gap-1">
+<p class="text-charcoal dark:text-white text-sm font-bold uppercase tracking-wider">Estimated Arrival</p>
+<p class="text-charcoal/80 dark:text-zinc-300 text-lg font-medium">5 mins away</p>
+</div>
+<button class="flex items-center justify-center size-12 rounded-full bg-primary text-charcoal shadow-lg">
+<span class="material-symbols-outlined">map</span>
 </button>
 </div>
 </div>
-<!-- Live Status Card -->
-<div class="p-4">
-<div class="flex items-stretch justify-between gap-4 rounded-xl bg-white dark:bg-[#1b2720] p-4 shadow-sm border border-slate-100 dark:border-primary/10">
-<div class="flex flex-col gap-1 flex-[3_3_0px]">
-<div class="flex items-center gap-2">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-</span>
-<p class="text-primary text-xs font-bold leading-normal tracking-wider">LIVE STATUS</p>
+<!-- Glass Grid (2x2) -->
+<div class="grid grid-cols-2 gap-4 p-6 pt-2">
+<!-- Live Tracking -->
+<div class="glass-tile aspect-square rounded-xl p-5 flex flex-col justify-between cursor-pointer group hover:bg-white/60 transition-colors">
+<div class="flex items-start justify-between">
+<div class="bg-primary/20 p-2 rounded-lg">
+<span class="material-symbols-outlined text-charcoal dark:text-primary text-[28px]">location_on</span>
 </div>
-<p class="text-slate-900 dark:text-white text-xl font-bold leading-tight">Next Bus: 10 mins away</p>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-sm font-normal leading-normal">Bus 42B - South High School Route</p>
-</div>
-<div class="w-full bg-center bg-no-repeat aspect-square bg-cover rounded-lg flex-1 min-w-[80px]" data-alt="Illustration of a modern school bus" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD5LmJVEkrHuZ0nzj1KBjeUklXAmJKwOYDWfwgEHBNef6ZkXQDPSi1dAbT7WT2Ux9eson9Xey5H1O8YvuIAULXb5nhKp1yITger1745rY38GklkAAfU3JipB-doqKXgNy7MGUWoqiyMq2iq5lCZaJfHciy8qe5bcS9okot2CFEr7S6qlt-h0O5fihLA88LFuPUOU_m9NhmrRbNLurrRalQkis3T5AduUvqETK0vf89DGsu2a2j3t1qOQQUhOl-lchb_lRVYgvn1b_E");'>
-</div>
-</div>
-</div>
-<!-- Quick Access TextGrid -->
-<div class="grid grid-cols-2 gap-3 p-4">
-<div class="flex flex-1 gap-3 rounded-xl border border-slate-200 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] p-4 flex-col">
-<div class="text-primary flex items-center justify-center bg-primary/10 rounded-lg size-10">
-<span class="material-symbols-outlined">person</span>
-</div>
-<div class="flex flex-col gap-1">
-<h2 class="text-slate-900 dark:text-white text-base font-bold leading-tight">My Profile</h2>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs font-normal leading-normal">Alex Johnson</p>
-</div>
-</div>
-<div class="flex flex-1 gap-3 rounded-xl border border-slate-200 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] p-4 flex-col">
-<div class="text-primary flex items-center justify-center bg-primary/10 rounded-lg size-10">
-<span class="material-symbols-outlined">calendar_month</span>
-</div>
-<div class="flex flex-col gap-1">
-<h2 class="text-slate-900 dark:text-white text-base font-bold leading-tight">Absent Calendar</h2>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs font-normal leading-normal">Manage leave</p>
-</div>
-</div>
-<div class="col-span-2 flex flex-1 gap-4 rounded-xl border border-slate-200 dark:border-[#3b5445] bg-white dark:bg-[#1b2720] p-4 items-center">
-<div class="text-primary flex items-center justify-center bg-primary/10 rounded-lg size-12 shrink-0">
-<span class="material-symbols-outlined text-3xl">map</span>
-</div>
-<div class="flex flex-col gap-1 flex-1">
-<div class="flex justify-between items-center">
-<h2 class="text-slate-900 dark:text-white text-base font-bold leading-tight">Live Map</h2>
-<span class="text-[10px] bg-primary/20 text-primary px-2 py-0.5 rounded-full font-bold">3 ACTIVE BUSES</span>
-</div>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs font-normal leading-normal">Track current bus location in real-time</p>
-</div>
-<div class="size-16 rounded-lg bg-cover bg-center border border-slate-200 dark:border-white/10" data-alt="Top down view of a city street map with bus icons" data-location="New York" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBdNdp2zt5yeYajm3LyydWo4wYyxUFcbndfaUwPyJ8CwD2t6MVzoTeVP783KuqHrba_w0cXPFjNF4lVCe_A0XDjQoa2KvhT9aUk_xxLG0F34Z1FQSRtGzbURb65S0hYPL4CVxw1BmvmZ4pbVvZfiMgZNscYldroZEp-GxvJyf8sTuHvTuJN9KwyPiEiGPDzHKZS6AjLbbyeHPhVEmKyFXQwziEz2pxyA6O5TC6cvJy1LTal-LC-c-Ftb9U5A8iJCDyFBJkRnLNZR3E");'>
-</div>
-</div>
-</div>
-<!-- Attendance Section -->
-<h3 class="text-slate-900 dark:text-white text-lg font-bold leading-tight tracking-tight px-4 pb-2 pt-2">Attendance Summary</h3>
-<div class="mx-4 mb-4 rounded-xl overflow-hidden border border-slate-200 dark:border-[#3b5445]">
-<!-- List Item 1 -->
-<div class="flex items-center gap-4 bg-white dark:bg-[#111814] px-4 min-h-16 justify-between border-b border-slate-100 dark:border-[#3b5445]">
-<div class="flex items-center gap-4">
-<div class="text-amber-500 flex items-center justify-center rounded-lg bg-amber-500/10 shrink-0 size-10">
-<span class="material-symbols-outlined">pending</span>
+<div class="size-2 bg-mist-teal rounded-full animate-pulse shadow-[0_0_8px_#AFEEEE]"></div>
 </div>
 <div>
-<p class="text-slate-900 dark:text-white text-sm font-semibold leading-none">Attendance Marked</p>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs mt-1">Status: Pending scan</p>
+<p class="text-charcoal dark:text-white text-lg font-bold leading-tight">Live<br/>Tracking</p>
 </div>
 </div>
-<div class="shrink-0"><p class="text-slate-400 dark:text-[#9cbaa8] text-xs font-medium">Today</p></div>
-</div>
-<!-- List Item 2 -->
-<div class="flex items-center gap-4 bg-white dark:bg-[#111814] px-4 min-h-16 justify-between">
-<div class="flex items-center gap-4">
-<div class="text-primary flex items-center justify-center rounded-lg bg-primary/10 shrink-0 size-10">
-<span class="material-symbols-outlined">check_circle</span>
+<!-- Attendance Log -->
+<div class="glass-tile aspect-square rounded-xl p-5 flex flex-col justify-between cursor-pointer group hover:bg-white/60 transition-colors">
+<div class="bg-primary/20 p-2 rounded-lg w-fit">
+<span class="material-symbols-outlined text-charcoal dark:text-primary text-[28px]">calendar_today</span>
 </div>
 <div>
-<p class="text-slate-900 dark:text-white text-sm font-semibold leading-none">Morning Trip</p>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-xs mt-1">Yesterday • Arrived 8:15 AM</p>
+<p class="text-charcoal dark:text-white text-lg font-bold leading-tight">Attendance<br/>Log</p>
 </div>
 </div>
-<div class="shrink-0"><p class="text-slate-400 dark:text-[#9cbaa8] text-xs font-medium">May 24</p></div>
+<!-- Bus Route -->
+<div class="glass-tile aspect-square rounded-xl p-5 flex flex-col justify-between cursor-pointer group hover:bg-white/60 transition-colors">
+<div class="bg-primary/20 p-2 rounded-lg w-fit">
+<span class="material-symbols-outlined text-charcoal dark:text-primary text-[28px]">route</span>
+</div>
+<div>
+<p class="text-charcoal dark:text-white text-lg font-bold leading-tight">Bus<br/>Route</p>
 </div>
 </div>
-<!-- Floating QR Scan Button -->
-<div class="fixed bottom-24 left-1/2 -translate-x-1/2 z-50">
-<button class="flex items-center gap-3 bg-primary hover:bg-primary/90 text-black px-8 py-4 rounded-full shadow-[0_8px_30px_rgb(13,242,108,0.4)] transition-all active:scale-95 font-bold text-lg">
-<span class="material-symbols-outlined text-2xl">qr_code_scanner</span>
-<span>Scan QR</span>
-</button>
+<!-- Support & SOS -->
+<div class="glass-tile aspect-square rounded-xl p-5 flex flex-col justify-between cursor-pointer group hover:bg-white/60 transition-colors">
+<div class="bg-primary/20 p-2 rounded-lg w-fit">
+<span class="material-symbols-outlined text-charcoal dark:text-primary text-[28px]">gpp_maybe</span>
 </div>
-<!-- iOS Bottom Navigation Bar -->
-<div class="fixed bottom-0 w-full bg-white dark:bg-[#111814] border-t border-slate-200 dark:border-white/10 px-6 py-3 flex justify-between items-center z-40">
+<div>
+<p class="text-charcoal dark:text-white text-lg font-bold leading-tight">Support<br/>&amp; SOS</p>
+</div>
+</div>
+</div>
+<!-- Quick Activity Section -->
+<div class="px-6 py-2">
+<h3 class="text-charcoal dark:text-white text-base font-bold mb-4">Recent Activity</h3>
+<div class="space-y-3">
+<div class="flex items-center gap-4 p-3 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20">
+<div class="size-10 rounded-full bg-mist-teal/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-charcoal text-[20px]">check_circle</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-charcoal dark:text-white">Boarded Bus</p>
+<p class="text-xs text-charcoal/60 dark:text-zinc-400">Yesterday, 4:15 PM</p>
+</div>
+</div>
+<div class="flex items-center gap-4 p-3 rounded-lg bg-white/30 dark:bg-white/5 border border-white/20">
+<div class="size-10 rounded-full bg-primary/20 flex items-center justify-center">
+<span class="material-symbols-outlined text-charcoal text-[20px]">info</span>
+</div>
+<div class="flex-1">
+<p class="text-sm font-bold text-charcoal dark:text-white">Schedule Update</p>
+<p class="text-xs text-charcoal/60 dark:text-zinc-400">Oct 12, 09:00 AM</p>
+</div>
+</div>
+</div>
+</div>
+<!-- Bottom Navigation Bar -->
+<div class="mt-auto p-6">
+<div class="glass-tile rounded-full px-6 py-3 flex items-center justify-between shadow-xl">
 <button class="flex flex-col items-center gap-1 text-primary">
 <span class="material-symbols-outlined">home</span>
 <span class="text-[10px] font-bold">Home</span>
 </button>
-<button class="flex flex-col items-center gap-1 text-slate-400">
+<button class="flex flex-col items-center gap-1 text-charcoal/40 dark:text-zinc-500">
 <span class="material-symbols-outlined">map</span>
-<span class="text-[10px]">Track</span>
+<span class="text-[10px] font-medium">Map</span>
 </button>
-<div class="w-16"></div> <!-- Spacer for FAB -->
-<button class="flex flex-col items-center gap-1 text-slate-400">
+<button class="flex flex-col items-center gap-1 text-charcoal/40 dark:text-zinc-500">
 <span class="material-symbols-outlined">history</span>
-<span class="text-[10px]">History</span>
+<span class="text-[10px] font-medium">Logs</span>
 </button>
-<button class="flex flex-col items-center gap-1 text-slate-400">
-<span class="material-symbols-outlined">settings</span>
-<span class="text-[10px]">Settings</span>
+<button class="flex flex-col items-center gap-1 text-charcoal/40 dark:text-zinc-500">
+<span class="material-symbols-outlined">person</span>
+<span class="text-[10px] font-medium">Profile</span>
 </button>
+</div>
+</div>
+<!-- Safe Area Spacer -->
+<div class="h-8"></div>
 </div>
 </body></html>

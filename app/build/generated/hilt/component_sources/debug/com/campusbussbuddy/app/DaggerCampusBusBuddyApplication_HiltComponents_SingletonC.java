@@ -8,14 +8,6 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.SavedStateHandle;
 import androidx.lifecycle.ViewModel;
 import com.campusbussbuddy.MainActivity;
-import com.campusbussbuddy.data.remote.FirebaseService;
-import com.campusbussbuddy.data.repository.AuthRepositoryImpl;
-import com.campusbussbuddy.data.repository.FirebaseAuthRepository;
-import com.campusbussbuddy.di.AppModule;
-import com.campusbussbuddy.di.AppModule_ProvideFirebaseAuthRepositoryFactory;
-import com.campusbussbuddy.di.AppModule_ProvideFirebaseServiceFactory;
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel;
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel_HiltModules_KeyModule_ProvideFactory;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.ImmutableSet;
 import dagger.hilt.android.ActivityRetainedLifecycle;
@@ -60,15 +52,6 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
 
   public static final class Builder {
     private Builder() {
-    }
-
-    /**
-     * @deprecated This module is declared, but an instance is not used in the component. This method is a no-op. For more, see https://dagger.dev/unused-modules.
-     */
-    @Deprecated
-    public Builder appModule(AppModule appModule) {
-      Preconditions.checkNotNull(appModule);
-      return this;
     }
 
     /**
@@ -375,12 +358,12 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
 
     @Override
     public DefaultViewModelFactories.InternalFactoryFactory getHiltInternalFactoryFactory() {
-      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(getViewModelKeys(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
+      return DefaultViewModelFactories_InternalFactoryFactory_Factory.newInstance(ImmutableSet.<String>of(), new ViewModelCBuilder(singletonCImpl, activityRetainedCImpl));
     }
 
     @Override
     public Set<String> getViewModelKeys() {
-      return ImmutableSet.<String>of(AuthViewModel_HiltModules_KeyModule_ProvideFactory.provide());
+      return ImmutableSet.<String>of();
     }
 
     @Override
@@ -406,56 +389,18 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
 
     private final ViewModelCImpl viewModelCImpl = this;
 
-    private Provider<AuthViewModel> authViewModelProvider;
-
     private ViewModelCImpl(SingletonCImpl singletonCImpl,
         ActivityRetainedCImpl activityRetainedCImpl, SavedStateHandle savedStateHandleParam,
         ViewModelLifecycle viewModelLifecycleParam) {
       this.singletonCImpl = singletonCImpl;
       this.activityRetainedCImpl = activityRetainedCImpl;
 
-      initialize(savedStateHandleParam, viewModelLifecycleParam);
 
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initialize(final SavedStateHandle savedStateHandleParam,
-        final ViewModelLifecycle viewModelLifecycleParam) {
-      this.authViewModelProvider = new SwitchingProvider<>(singletonCImpl, activityRetainedCImpl, viewModelCImpl, 0);
     }
 
     @Override
     public Map<String, Provider<ViewModel>> getHiltViewModelMap() {
-      return ImmutableMap.<String, Provider<ViewModel>>of("com.campusbussbuddy.viewmodel.auth.AuthViewModel", ((Provider) authViewModelProvider));
-    }
-
-    private static final class SwitchingProvider<T> implements Provider<T> {
-      private final SingletonCImpl singletonCImpl;
-
-      private final ActivityRetainedCImpl activityRetainedCImpl;
-
-      private final ViewModelCImpl viewModelCImpl;
-
-      private final int id;
-
-      SwitchingProvider(SingletonCImpl singletonCImpl, ActivityRetainedCImpl activityRetainedCImpl,
-          ViewModelCImpl viewModelCImpl, int id) {
-        this.singletonCImpl = singletonCImpl;
-        this.activityRetainedCImpl = activityRetainedCImpl;
-        this.viewModelCImpl = viewModelCImpl;
-        this.id = id;
-      }
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public T get() {
-        switch (id) {
-          case 0: // com.campusbussbuddy.viewmodel.auth.AuthViewModel 
-          return (T) new AuthViewModel(singletonCImpl.authRepositoryImplProvider.get());
-
-          default: throw new AssertionError(id);
-        }
-      }
+      return ImmutableMap.<String, Provider<ViewModel>>of();
     }
   }
 
@@ -530,23 +475,9 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
   private static final class SingletonCImpl extends CampusBusBuddyApplication_HiltComponents.SingletonC {
     private final SingletonCImpl singletonCImpl = this;
 
-    private Provider<FirebaseService> provideFirebaseServiceProvider;
-
-    private Provider<FirebaseAuthRepository> provideFirebaseAuthRepositoryProvider;
-
-    private Provider<AuthRepositoryImpl> authRepositoryImplProvider;
-
     private SingletonCImpl() {
 
-      initialize();
 
-    }
-
-    @SuppressWarnings("unchecked")
-    private void initialize() {
-      this.provideFirebaseServiceProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseService>(singletonCImpl, 2));
-      this.provideFirebaseAuthRepositoryProvider = DoubleCheck.provider(new SwitchingProvider<FirebaseAuthRepository>(singletonCImpl, 1));
-      this.authRepositoryImplProvider = DoubleCheck.provider(new SwitchingProvider<AuthRepositoryImpl>(singletonCImpl, 0));
     }
 
     @Override
@@ -566,34 +497,6 @@ public final class DaggerCampusBusBuddyApplication_HiltComponents_SingletonC {
     @Override
     public ServiceComponentBuilder serviceComponentBuilder() {
       return new ServiceCBuilder(singletonCImpl);
-    }
-
-    private static final class SwitchingProvider<T> implements Provider<T> {
-      private final SingletonCImpl singletonCImpl;
-
-      private final int id;
-
-      SwitchingProvider(SingletonCImpl singletonCImpl, int id) {
-        this.singletonCImpl = singletonCImpl;
-        this.id = id;
-      }
-
-      @SuppressWarnings("unchecked")
-      @Override
-      public T get() {
-        switch (id) {
-          case 0: // com.campusbussbuddy.data.repository.AuthRepositoryImpl 
-          return (T) new AuthRepositoryImpl(singletonCImpl.provideFirebaseAuthRepositoryProvider.get());
-
-          case 1: // com.campusbussbuddy.data.repository.FirebaseAuthRepository 
-          return (T) AppModule_ProvideFirebaseAuthRepositoryFactory.provideFirebaseAuthRepository(singletonCImpl.provideFirebaseServiceProvider.get());
-
-          case 2: // com.campusbussbuddy.data.remote.FirebaseService 
-          return (T) AppModule_ProvideFirebaseServiceFactory.provideFirebaseService();
-
-          default: throw new AssertionError(id);
-        }
-      }
     }
   }
 }

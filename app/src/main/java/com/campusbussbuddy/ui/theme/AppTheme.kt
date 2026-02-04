@@ -5,63 +5,67 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
-// SmartBus Dark Green Theme - Professional Bus Tracking System
+// Omnibus Light Theme - Based on UI Designs
 object AppColors {
-    // Primary Colors - Dark Green Theme
-    val Primary = Color(0xFF00E676)  // Bright green accent
-    val PrimaryDark = Color(0xFF00C853)  // Darker green
-    val PrimaryContainer = Color(0xFF1B5E20)  // Dark green container
+    // Primary Colors - Light Theme with Purple/Teal Accents
+    val Primary = Color(0xFF9C88D4)  // Purple accent from designs
+    val PrimaryDark = Color(0xFF7B68B8)  // Darker purple
+    val PrimaryContainer = Color(0xFFE8E0F5)  // Light purple container
+    val TealAccent = Color(0xFF7DD3C0)  // Teal accent for buttons
+    val TealDark = Color(0xFF5BB5A2)  // Darker teal
     
-    // Background Colors - Dark Theme
-    val Background = Color(0xFF0A1A0D)  // Very dark green-black
-    val BackgroundDark = Color(0xFF0F1B11)  // Main dark background
-    val Surface = Color(0xFF1A2E1D)  // Card surface
-    val SurfaceVariant = Color(0xFF243529)  // Elevated surface
-    val SurfaceDim = Color(0xFF162419)  // Dimmed surface
+    // Background Colors - Light Theme
+    val Background = Color(0xFFF5F5F5)  // Light gray background
+    val BackgroundLight = Color(0xFFFFFFFF)  // Pure white
+    val BackgroundDark = Color(0xFF1A1A1A)  // Dark background for contrast
+    val Surface = Color(0xFFFFFFFF)  // White card surface
+    val SurfaceVariant = Color(0xFFF8F8F8)  // Light gray surface
+    val SurfaceDim = Color(0xFFF0F0F0)  // Dimmed surface
     
-    // Text Colors - High Contrast
-    val OnBackground = Color(0xFFFFFFFF)  // White text on dark
-    val OnSurface = Color(0xFFFFFFFF)  // White text on surface
-    val OnSurfaceVariant = Color(0xFFB8C8BC)  // Light green-gray text
-    val OnPrimary = Color(0xFF000000)  // Black text on green
-    val TextSecondary = Color(0xFF9CBAA8)  // Muted green-gray
-    val TextTertiary = Color(0xFF6B7B6F)  // Darker muted text
+    // Text Colors - Dark on Light
+    val OnBackground = Color(0xFF1A1A1A)  // Dark text on light
+    val OnSurface = Color(0xFF1A1A1A)  // Dark text on surface
+    val OnSurfaceVariant = Color(0xFF666666)  // Gray text
+    val OnPrimary = Color(0xFFFFFFFF)  // White text on purple
+    val TextSecondary = Color(0xFF888888)  // Muted gray text
+    val TextTertiary = Color(0xFFAAAAAA)  // Light gray text
     
     // Border & Outline Colors
-    val Outline = Color(0xFF3B5445)  // Border color
-    val OutlineVariant = Color(0xFF2A3F2E)  // Subtle border
-    val Border = Color(0xFF3B5445)  // Standard border
-    val BorderLight = Color(0xFF4A5F4E)  // Lighter border
+    val Outline = Color(0xFFE0E0E0)  // Light border color
+    val OutlineVariant = Color(0xFFF0F0F0)  // Subtle border
+    val Border = Color(0xFFE0E0E0)  // Standard border
+    val BorderLight = Color(0xFFF0F0F0)  // Lighter border
     
-    // Status Colors - Consistent with green theme
+    // Status Colors
     val Success = Color(0xFF4CAF50)  // Green success
     val Warning = Color(0xFFFF9800)  // Orange warning
     val Error = Color(0xFFF44336)  // Red error
     val Info = Color(0xFF2196F3)  // Blue info
+    val Online = Color(0xFF4CAF50)  // Online status green
     
     // Status Container Colors
-    val SuccessContainer = Color(0xFF1B4332)  // Dark green container
-    val WarningContainer = Color(0xFF3D2914)  // Dark orange container
-    val ErrorContainer = Color(0xFF3D1A16)  // Dark red container
-    val InfoContainer = Color(0xFF1A2332)  // Dark blue container
+    val SuccessContainer = Color(0xFFE8F5E8)  // Light green container
+    val WarningContainer = Color(0xFFFFF3E0)  // Light orange container
+    val ErrorContainer = Color(0xFFFFEBEE)  // Light red container
+    val InfoContainer = Color(0xFFE3F2FD)  // Light blue container
     
     // Special UI Colors
-    val CardBackground = Color(0xFF1A2E1D)  // Card background
-    val CardElevated = Color(0xFF243529)  // Elevated card
-    val ButtonBackground = Color(0xFF00E676)  // Button background
-    val ButtonText = Color(0xFF000000)  // Button text
-    val IconTint = Color(0xFFB8C8BC)  // Icon tint
-    val IconActive = Color(0xFF00E676)  // Active icon
+    val CardBackground = Color(0xFFFFFFFF)  // White card background
+    val CardElevated = Color(0xFFFFFFFF)  // White elevated card
+    val ButtonBackground = Color(0xFF7DD3C0)  // Teal button background
+    val ButtonText = Color(0xFFFFFFFF)  // White button text
+    val IconTint = Color(0xFF666666)  // Gray icon tint
+    val IconActive = Color(0xFF9C88D4)  // Purple active icon
     
     // Map & Location Colors
-    val LocationPin = Color(0xFF00E676)  // Location marker
+    val LocationPin = Color(0xFF9C88D4)  // Purple location marker
     val RouteActive = Color(0xFF4CAF50)  // Active route
-    val RouteInactive = Color(0xFF6B7B6F)  // Inactive route
+    val RouteInactive = Color(0xFFAAAAAA)  // Inactive route
     
     // Status Indicator Colors
     val StatusOnline = Color(0xFF4CAF50)  // Online status
     val StatusOffline = Color(0xFF9E9E9E)  // Offline status
-    val StatusActive = Color(0xFF00E676)  // Active status
+    val StatusActive = Color(0xFF9C88D4)  // Active status
     val StatusPending = Color(0xFFFF9800)  // Pending status
 }
 

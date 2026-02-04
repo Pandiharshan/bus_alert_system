@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Live Tracking &amp; Smart Alert</title>
+<title>Live Bus Location</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
@@ -14,25 +14,42 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df26c",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#102217",
+                        "primary": "#beb3d6",
+                        "background-light": "#f7f6f7",
+                        "background-dark": "#18161c",
                     },
                     fontFamily: {
-                        "display": ["Inter"]
+                        "display": ["Space Grotesk", "sans-serif"]
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
                 },
             },
         }
     </script>
 <style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
         }
-        .map-gradient-overlay {
-            background: linear-gradient(180deg, rgba(16,34,23,0.8) 0%, rgba(16,34,23,0) 25%, rgba(16,34,23,0) 75%, rgba(16,34,23,0.9) 100%);
+        .dark .glass-panel {
+            background: rgba(24, 22, 28, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .pulse-live {
+            box-shadow: 0 0 0 0 rgba(190, 179, 214, 0.7);
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(190, 179, 214, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(190, 179, 214, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(190, 179, 214, 0); }
         }
     </style>
 <style>
@@ -41,123 +58,104 @@
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white antialiased overflow-hidden">
+<body class="bg-background-light dark:bg-background-dark font-display text-[#141316] dark:text-white">
 <div class="relative flex h-screen w-full flex-col overflow-hidden">
-<!-- Top Navigation Bar -->
-<div class="z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between border-b border-primary/10">
-<div class="flex size-10 shrink-0 items-center justify-center rounded-full hover:bg-primary/10 transition-colors">
-<span class="material-symbols-outlined text-white">arrow_back_ios_new</span>
-</div>
-<div class="flex flex-col items-center">
-<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Live Tracking</h2>
-<p class="text-xs text-slate-400">Route 42A • Morning Trip</p>
-</div>
-<div class="flex w-12 items-center justify-end">
-<div class="flex items-center gap-1.5 px-2 py-1 bg-primary/20 rounded-full border border-primary/30">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-</span>
-<p class="text-primary text-[10px] font-bold leading-none tracking-wider uppercase">LIVE</p>
-</div>
-</div>
-</div>
-<!-- Main Content (Map Area) -->
-<div class="relative flex-1 @container overflow-hidden">
-<!-- Map Background Placeholder -->
-<div class="absolute inset-0 bg-cover bg-center" data-location="San Francisco downtown map dark mode" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBc8yr7lix1pyEBUIi6FYxkHmRt2Q8ONDOlFSAA8Fc_QG96o8rTZGUTs20psQkLalxD7EuMiOk3pRW3gDAk9Guw1e_Due62qaNtngBK1mWRBiNGXOEquNUo4lz4D12wAgOf1jg7Hb9UQDUit2afauceXmUxpAGMw67mVxrNMsGryt7Lc_PVbcfKCC5DsQxePTLv5QKKE7FREJupoDv9ywGYlGMFs0JH3zn48Cg3wWLrZjoUYGWpdNP_cdx30gMhjqRGLgXn2bA_VZI");'>
-<div class="absolute inset-0 map-gradient-overlay"></div>
-<!-- Simulated Bus Marker -->
+<!-- Full-Screen Map Background -->
+<div class="absolute inset-0 z-0 bg-cover bg-center grayscale-[0.2] contrast-[0.9]" data-alt="Detailed city map with a bus route highlighted in purple" data-location="San Francisco City Map" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuD0Gfdjgzt3IaY0xGISo2g2FtPAa8ZgtExeFE-8pnE5dTtDgT0ZbugRPKMUCdk90kPVjBA6wmyvkVvxk4QEeTOARby6jljRrB6aziEaMiuPMe4HEm20bV2n0Vkvc4Hl6zZ_ksLcOklLKGDvqQ9j4PfTvZq5CHQ4KjpAgIwiGms7rIsJhMcsBgbQ0t2d-zyHyjUrOQWFkzIgqVoi3SA7pIPJ37bkhwuGJf8NiNbRJIHFqvVGK_nnuRw-DS3asd4bMfB5jQYYuQ4KfcI");'>
+<!-- Map Overlay / Bus Marker -->
 <div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
 <div class="relative flex items-center justify-center">
-<div class="absolute h-24 w-24 rounded-full bg-primary/10 border border-primary/20 animate-pulse"></div>
-<div class="bg-primary p-2 rounded-xl shadow-[0_0_20px_rgba(13,242,108,0.5)] z-10">
-<span class="material-symbols-outlined text-background-dark font-bold">directions_bus</span>
+<div class="absolute h-12 w-12 rounded-full bg-primary/40 pulse-live"></div>
+<div class="relative z-10 flex h-8 w-8 items-center justify-center rounded-full bg-primary text-white shadow-lg border-2 border-white">
+<span class="material-symbols-outlined text-sm">directions_bus</span>
 </div>
 </div>
 </div>
-<!-- Simulated Student Marker -->
-<div class="absolute bottom-1/3 right-1/4">
-<div class="flex flex-col items-center gap-1">
-<div class="bg-blue-500 size-4 rounded-full border-2 border-white shadow-lg ring-4 ring-blue-500/20"></div>
-<div class="bg-background-dark/80 backdrop-blur-sm px-2 py-1 rounded text-[10px] text-white font-medium border border-white/10">You</div>
 </div>
+<!-- Top Navigation Bar (Frosted) -->
+<div class="relative z-20 flex items-center justify-between p-4 pt-6">
+<button class="flex h-12 w-12 items-center justify-center rounded-full glass-panel shadow-sm">
+<span class="material-symbols-outlined">arrow_back</span>
+</button>
+<div class="flex h-12 flex-1 items-center justify-center mx-4 rounded-full glass-panel px-4 shadow-sm">
+<h2 class="text-sm font-bold uppercase tracking-widest text-[#141316] dark:text-white">Live Tracking</h2>
 </div>
+<button class="flex h-12 w-12 items-center justify-center rounded-full glass-panel shadow-sm">
+<span class="material-symbols-outlined">notifications</span>
+</button>
 </div>
-<!-- Floating Top Card -->
-<div class="absolute top-4 left-4 right-4 z-20">
-<div class="flex items-center justify-between gap-4 rounded-xl bg-background-dark/80 backdrop-blur-xl border border-white/10 p-4 shadow-2xl">
-<div class="flex flex-col gap-1">
-<p class="text-primary text-xs font-semibold uppercase tracking-wider">Estimated Arrival</p>
-<p class="text-white text-xl font-bold leading-tight">5 mins <span class="text-slate-400 font-normal">| 1.2 km</span></p>
-<p class="text-slate-400 text-xs font-normal">Bus #42 • John Doe</p>
-</div>
-<div class="h-12 w-12 rounded-lg bg-cover bg-center border border-white/10" data-alt="Portrait of the bus driver John Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuA9NEN7L72U_DUtWsOwJCzQbcdcLU3Vo_k5zETdAMX-nbXz_NYMudIAGCLqwSaP9W7qXXMG7QGzTps6LdbT89-8R2dWr5o5FJUTxb2bI8QSWTM3Ezw_WjgHgaNYPBayWIcvLDGRolvGcYMPR_Vm6_4xH9aKkXK3F3hfpCH5z2ZLW0Zo0SKvzgEQhSW742tTXtzs5dSIqrocikzdG-9BV1oG5GG_K1FB6zo_8wQY_2e363i7X7KaDkNWj2dIMJpS2Z0nCjZbFeKHA6Y");'></div>
-</div>
-</div>
-<!-- Map Controls -->
-<div class="absolute right-4 top-36 flex flex-col gap-2 z-20">
-<div class="flex flex-col bg-background-dark/80 backdrop-blur-md rounded-lg border border-white/10 overflow-hidden">
-<button class="p-3 text-white hover:bg-white/5 transition-colors">
+<!-- Right Side Map Controls -->
+<div class="absolute right-4 top-1/2 -translate-y-1/2 z-20 flex flex-col gap-3">
+<div class="flex flex-col rounded-full glass-panel overflow-hidden shadow-md">
+<button class="flex h-12 w-12 items-center justify-center hover:bg-white/20 transition-colors">
 <span class="material-symbols-outlined">add</span>
 </button>
-<div class="h-[1px] bg-white/10 mx-2"></div>
-<button class="p-3 text-white hover:bg-white/5 transition-colors">
+<div class="h-[1px] w-8 mx-auto bg-white/30"></div>
+<button class="flex h-12 w-12 items-center justify-center hover:bg-white/20 transition-colors">
 <span class="material-symbols-outlined">remove</span>
 </button>
 </div>
-<button class="bg-primary p-3 rounded-lg shadow-lg text-background-dark flex items-center justify-center">
-<span class="material-symbols-outlined font-bold">my_location</span>
+<button class="flex h-12 w-12 items-center justify-center rounded-full glass-panel shadow-md">
+<span class="material-symbols-outlined">my_location</span>
+</button>
+</div>
+<!-- Floating Info Panel -->
+<div class="absolute bottom-6 left-4 right-4 z-30 flex flex-col gap-4">
+<!-- Attendance Summary Mini-Pill -->
+<div class="flex justify-center">
+<div class="flex items-center gap-2 rounded-full glass-panel px-4 py-1.5 shadow-sm border border-white/40">
+<span class="material-symbols-outlined text-sm text-primary">group</span>
+<span class="text-xs font-semibold">12 / 20 Students Checked-in</span>
+</div>
+</div>
+<!-- Main Frosted Glass Sheet -->
+<div class="flex flex-col rounded-xl glass-panel p-5 shadow-2xl overflow-hidden">
+<!-- Handle for visual cue -->
+<div class="mx-auto mb-4 h-1 w-10 rounded-full bg-[#e0dfe2]/60"></div>
+<!-- Status & ETA Section -->
+<div class="flex items-start justify-between mb-6">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2">
+<span class="flex h-2 w-2 rounded-full bg-primary pulse-live"></span>
+<span class="text-[10px] font-bold uppercase tracking-widest text-primary">Live Now</span>
+</div>
+<h3 class="text-2xl font-bold leading-tight">Arriving in <span class="text-primary">5 mins</span></h3>
+<p class="text-sm text-[#736e7c] dark:text-gray-400">Next: North Gate Academy</p>
+</div>
+<div class="h-14 w-14 rounded-2xl bg-primary/20 flex items-center justify-center text-primary">
+<span class="material-symbols-outlined text-3xl">map</span>
+</div>
+</div>
+<!-- Driver Card (Subtle Container) -->
+<div class="flex items-center justify-between rounded-xl bg-white/40 dark:bg-white/5 p-3 mb-5 border border-white/20">
+<div class="flex items-center gap-3">
+<div class="h-12 w-12 rounded-full bg-center bg-cover border-2 border-white shadow-sm" data-alt="Profile photo of the bus driver" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDKkrScyLib43I-VExDj7IdQxKTCRm9WbsknF2gVwyCADAzaSYv3GfoWVDOKnQxOadvdAuuENS2WveRTz-C-7JN6SAouelBOJWZNRlXmSdo4jymmh5Cxa3-y0vMRO5gAAyvpOfs6B_75a_taRjfH8Z6oCIpx3fg_7-eWZUmcsOKwmQekAvU6iJ4EwnERSQDY5hFah7D1v7nDyb-ftMEPA2FyTUcsSHQG44l3-FoXhqstKuXA2xjRteVEhDVJ-utBONLRr3KLXh80_I");'></div>
+<div class="flex flex-col">
+<p class="text-sm font-bold">Robert Fox</p>
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-xs text-yellow-500" style="font-variation-settings: 'FILL' 1">star</span>
+<span class="text-xs text-[#736e7c] dark:text-gray-400">4.9 • Verified Driver</span>
+</div>
+</div>
+</div>
+<div class="text-right">
+<p class="text-xs font-bold text-[#141316] dark:text-white">Bus 402</p>
+<p class="text-[10px] text-[#736e7c] dark:text-gray-400 uppercase tracking-tighter">ABC-1234</p>
+</div>
+</div>
+<!-- Action Buttons -->
+<div class="flex gap-3">
+<button class="flex-1 flex h-12 items-center justify-center gap-2 rounded-full bg-primary text-white font-bold shadow-lg shadow-primary/20">
+<span class="material-symbols-outlined text-xl">phone</span>
+<span>Contact Driver</span>
+</button>
+<button class="flex h-12 w-12 items-center justify-center rounded-full bg-white/60 dark:bg-white/10 border border-white/30 text-[#141316] dark:text-white">
+<span class="material-symbols-outlined">more_horiz</span>
 </button>
 </div>
 </div>
-<!-- Bottom Sheet Control Panel -->
-<div class="z-50 flex flex-col bg-background-dark/95 backdrop-blur-2xl border-t border-white/10 rounded-t-3xl pb-8">
-<button class="flex h-6 w-full items-center justify-center pt-2">
-<div class="h-1.5 w-12 rounded-full bg-slate-700"></div>
-</button>
-<div class="px-6 py-2">
-<div class="flex items-center justify-between mb-6">
-<div>
-<h3 class="text-white text-lg font-bold leading-tight tracking-tight">Smart Proximity Alert</h3>
-<p class="text-slate-400 text-sm">Notify when within 500m</p>
 </div>
-<label class="relative inline-flex items-center cursor-pointer">
-<input checked="" class="sr-only peer" type="checkbox"/>
-<div class="w-14 h-8 bg-slate-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[4px] after:start-[4px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-primary"></div>
-</label>
-</div>
-<div class="grid grid-cols-3 gap-3">
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border-2 border-primary bg-primary/10 text-primary">
-<span class="material-symbols-outlined">notifications_active</span>
-<span class="text-xs font-bold uppercase">Alarm</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-colors">
-<span class="material-symbols-outlined">vibration</span>
-<span class="text-xs font-bold uppercase">Vibrate</span>
-</button>
-<button class="flex flex-col items-center justify-center gap-2 p-3 rounded-xl border border-white/10 bg-white/5 text-slate-400 hover:text-white transition-colors">
-<span class="material-symbols-outlined">notifications_paused</span>
-<span class="text-xs font-bold uppercase">Both</span>
-</button>
-</div>
-<div class="mt-6 flex gap-4 items-center bg-white/5 p-4 rounded-xl border border-white/5">
-<div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-primary/20">
-<span class="material-symbols-outlined text-primary">speed</span>
-</div>
-<div class="flex-1">
-<p class="text-slate-400 text-xs">Current Speed</p>
-<p class="text-white text-base font-bold">45 <span class="text-xs font-normal text-slate-400">km/h</span></p>
-</div>
-<div class="h-8 w-[1px] bg-white/10"></div>
-<div class="flex-1 pl-2">
-<p class="text-slate-400 text-xs">Traffic</p>
-<p class="text-yellow-500 text-sm font-bold">Moderate</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Home Indicator (iOS) -->
-<div class="absolute bottom-1 left-1/2 -translate-x-1/2 w-32 h-1 bg-white/20 rounded-full z-[100]"></div>
+<!-- iOS Home Indicator Area -->
+<div class="absolute bottom-0 h-8 w-full bg-transparent"></div>
 </div>
 </body></html>

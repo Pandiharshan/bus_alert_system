@@ -1,9 +1,6 @@
 package com.campusbussbuddy.app;
 
 import com.campusbussbuddy.MainActivity_GeneratedInjector;
-import com.campusbussbuddy.di.AppModule;
-import com.campusbussbuddy.di.RepositoryModule;
-import com.campusbussbuddy.viewmodel.auth.AuthViewModel_HiltModules;
 import dagger.Binds;
 import dagger.Component;
 import dagger.Module;
@@ -118,12 +115,10 @@ public final class CampusBusBuddyApplication_HiltComponents {
 
   @Component(
       modules = {
-          AppModule.class,
           ApplicationContextModule.class,
           ActivityRetainedCBuilderModule.class,
           ServiceCBuilderModule.class,
-          HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class,
-          RepositoryModule.class
+          HiltWrapper_FragmentGetContextFix_FragmentGetContextFixModule.class
       }
   )
   @Singleton
@@ -146,7 +141,6 @@ public final class CampusBusBuddyApplication_HiltComponents {
 
   @Subcomponent(
       modules = {
-          AuthViewModel_HiltModules.KeyModule.class,
           ActivityCBuilderModule.class,
           ViewModelCBuilderModule.class,
           HiltWrapper_ActivityRetainedComponentManager_LifecycleModule.class
@@ -184,10 +178,7 @@ public final class CampusBusBuddyApplication_HiltComponents {
   }
 
   @Subcomponent(
-      modules = {
-          AuthViewModel_HiltModules.BindsModule.class,
-          HiltWrapper_HiltViewModelFactory_ViewModelModule.class
-      }
+      modules = HiltWrapper_HiltViewModelFactory_ViewModelModule.class
   )
   @ViewModelScoped
   public abstract static class ViewModelC implements ViewModelComponent,

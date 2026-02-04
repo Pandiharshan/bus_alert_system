@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Absent Calendar Screen</title>
+<title>Attendance Calendar</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
@@ -14,17 +14,19 @@
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df26c",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#102217",
+                        "primary": "#beb3d6",
+                        "mist-teal": "#A7C7C5",
+                        "warm-pearl": "#F3F1EC",
+                        "background-light": "#F3F1EC",
+                        "background-dark": "#18161c",
                     },
                     fontFamily: {
-                        "display": ["Inter", "sans-serif"]
+                        "display": ["Space Grotesk"]
                     },
                     borderRadius: {
-                        "DEFAULT": "0.25rem",
-                        "lg": "0.5rem",
-                        "xl": "0.75rem",
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
                         "full": "9999px"
                     },
                 },
@@ -32,11 +34,11 @@
         }
     </script>
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
         }
     </style>
 <style>
@@ -45,120 +47,190 @@
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-white min-h-screen flex justify-center">
-<div class="relative flex h-full min-h-screen w-full max-w-[430px] flex-col bg-background-light dark:bg-background-dark overflow-x-hidden shadow-2xl">
-<!-- TopAppBar -->
-<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
-<div class="text-black dark:text-white flex size-12 shrink-0 items-center cursor-pointer">
-<span class="material-symbols-outlined">arrow_back_ios</span>
+<body class="font-display bg-background-light dark:bg-background-dark min-h-screen text-[#141316] dark:text-white">
+<!-- Top Navigation Bar -->
+<nav class="sticky top-0 z-50 glass-card px-4 py-4 flex items-center justify-between">
+<button class="flex items-center justify-center size-10 rounded-full bg-white/50 dark:bg-white/10">
+<span class="material-symbols-outlined text-[24px]">chevron_left</span>
+</button>
+<h2 class="text-lg font-bold tracking-tight">Attendance Tracking</h2>
+<div class="size-10 rounded-full overflow-hidden border-2 border-white shadow-sm">
+<img class="w-full h-full object-cover" data-alt="Student profile avatar portrait" src="https://lh3.googleusercontent.com/aida-public/AB6AXuChdahff2mLBIYggagieqQPZhwYOtxOS_ltKLDC9Dbkd9RBbpX0gfTyE2lW1ro03Gldq-BPNnK1q-d0ltaBpm61v561vwvGwBxqj0tPfHHvLOuRfl3Lh3C_BXWrMQnIYptED_4YajrAxinmXgbhTmiEB8d_rZbOIm-JF8ANLqh62ni-_q5y9N4tNeczGQzJnqghAnOG-EeIo_bUFQHlUle9TMIiuuCGbHIbbb7Jyd9-4jjhfHShGFbXt-kYvYbYJLdoenvH7QFiFC8"/>
 </div>
-<h2 class="text-black dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center pr-12">Report Absence</h2>
+</nav>
+<main class="px-4 pb-24">
+<!-- Header Section -->
+<div class="pt-8 pb-6">
+<h1 class="text-[32px] font-bold leading-tight tracking-tight">Absent Calendar</h1>
+<p class="text-black/60 dark:text-white/60 text-sm mt-1">Route 42 • North Valley Express</p>
 </div>
-<!-- HeadlineText -->
-<div class="px-4">
-<h3 class="text-black dark:text-white tracking-light text-2xl font-bold leading-tight pb-2 pt-5">Schedule your absence</h3>
-</div>
-<!-- BodyText -->
-<div class="px-4">
-<p class="text-gray-600 dark:text-gray-400 text-base font-normal leading-normal pb-3 pt-1">Select tomorrow's date to notify your driver. You can only mark absence for one day in advance.</p>
-</div>
-<!-- Calendar Section -->
-<div class="flex flex-wrap items-center justify-center gap-6 p-4">
-<div class="flex min-w-full flex-col gap-0.5">
-<!-- Month Header -->
-<div class="flex items-center p-1 justify-between mb-4">
-<button class="text-black dark:text-white">
+<!-- Glassmorphic Calendar Container -->
+<div class="glass-card rounded-xl p-4 shadow-xl shadow-black/5 mb-6">
+<div class="flex items-center justify-between mb-6 px-2">
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-white/40">
 <span class="material-symbols-outlined">chevron_left</span>
 </button>
-<p class="text-black dark:text-white text-base font-bold leading-tight flex-1 text-center">October 2023</p>
-<button class="text-black dark:text-white">
+<div class="text-center">
+<p class="text-lg font-bold">October 2023</p>
+</div>
+<button class="size-10 flex items-center justify-center rounded-full hover:bg-white/40">
 <span class="material-symbols-outlined">chevron_right</span>
 </button>
 </div>
-<!-- Days of Week -->
-<div class="grid grid-cols-7 mb-2 border-b border-gray-200 dark:border-gray-800 pb-2">
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">S</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">M</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">T</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">W</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">T</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">F</p>
-<p class="text-gray-500 text-[13px] font-bold leading-normal tracking-[0.015em] flex h-10 w-full items-center justify-center">S</p>
-</div>
+<div class="grid grid-cols-7 gap-y-2">
+<!-- Day Headers -->
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">SUN</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">MON</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">TUE</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">WED</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">THU</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">FRI</div>
+<div class="text-center text-[11px] font-bold text-black/40 dark:text-white/40 py-2">SAT</div>
 <!-- Calendar Days -->
-<div class="grid grid-cols-7 gap-y-1">
-<!-- Placeholder days for start of month -->
-<div class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium flex items-center justify-center col-start-1">1</div>
-<div class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium flex items-center justify-center">2</div>
-<div class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium flex items-center justify-center">3</div>
-<!-- Today (4th) - Disabled state -->
-<button class="h-12 w-full text-gray-400 dark:text-gray-600 text-sm font-medium leading-normal cursor-not-allowed">
-<div class="flex size-full items-center justify-center rounded-full border border-gray-300 dark:border-gray-800">4</div>
+<div class="h-12 flex items-center justify-center text-sm font-medium text-black/20">28</div>
+<div class="h-12 flex items-center justify-center text-sm font-medium text-black/20">29</div>
+<div class="h-12 flex items-center justify-center text-sm font-medium text-black/20">30</div>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">1</span>
 </button>
-<!-- Tomorrow (5th) - Active state -->
-<button class="h-12 w-full text-black text-sm font-bold leading-normal">
-<div class="flex size-full items-center justify-center rounded-full bg-primary shadow-lg shadow-primary/20 ring-4 ring-primary/30">5</div>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">2</span>
 </button>
-<!-- Future days - Disabled -->
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">6</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">7</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">8</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">9</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">10</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">11</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">12</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">13</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">14</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">15</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">16</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">17</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">18</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">19</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">20</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">21</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">22</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">23</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">24</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">25</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">26</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">27</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">28</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">29</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">30</div></button>
-<button class="h-12 w-full text-gray-300 dark:text-gray-700 text-sm font-medium leading-normal cursor-not-allowed"><div class="flex size-full items-center justify-center rounded-full">31</div></button>
-</div>
-</div>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium bg-rose-200/50 text-rose-700">3</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">4</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium bg-mist-teal text-white shadow-lg shadow-mist-teal/30">5</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">6</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">7</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">8</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center relative">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium bg-primary/30">9</span>
+<div class="absolute bottom-1 size-1 bg-primary rounded-full"></div>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">10</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">11</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">12</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">13</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">14</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">15</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">16</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">17</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">18</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">19</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">20</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">21</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">22</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">23</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">24</span>
+</button>
+<button class="h-12 w-full flex items-center justify-center">
+<span class="size-10 flex items-center justify-center rounded-full text-sm font-medium hover:bg-white/40">25</span>
+</button>
 </div>
 <!-- Legend -->
-<div class="px-6 flex gap-4 text-xs font-medium text-gray-500 mb-4">
+<div class="flex items-center justify-center gap-6 mt-6 pt-4 border-t border-white/20">
 <div class="flex items-center gap-1.5">
-<div class="size-2 rounded-full bg-primary"></div>
-<span>Selectable (Tomorrow)</span>
+<div class="size-2 rounded-full bg-mist-teal"></div>
+<span class="text-[10px] font-bold uppercase tracking-wider text-black/40">Selected</span>
 </div>
 <div class="flex items-center gap-1.5">
-<div class="size-2 rounded-full bg-gray-300 dark:bg-gray-800"></div>
-<span>Unavailable</span>
+<div class="size-2 rounded-full bg-rose-300"></div>
+<span class="text-[10px] font-bold uppercase tracking-wider text-black/40">Absent</span>
+</div>
+<div class="flex items-center gap-1.5">
+<div class="size-2 rounded-full bg-primary/40"></div>
+<span class="text-[10px] font-bold uppercase tracking-wider text-black/40">Upcoming</span>
 </div>
 </div>
-<!-- Card Note -->
-<div class="p-4">
-<div class="flex items-stretch justify-between gap-4 rounded-xl bg-gray-100 dark:bg-gray-900/50 p-4 border border-gray-200 dark:border-gray-800">
-<div class="flex flex-col gap-1 flex-[2_2_0px]">
-<p class="text-black dark:text-white text-base font-bold leading-tight">Note for Driver</p>
-<p class="text-gray-600 dark:text-gray-400 text-sm font-normal leading-normal">Tapping 'Mark Absent' will instantly update the bus manifest for tomorrow's route.</p>
 </div>
-<div class="w-24 bg-center bg-no-repeat bg-cover rounded-lg flex-none" data-alt="Abstract green glowing network pattern" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCg5cZ18FsOKc5GqTnFKICewyiT4VqySO1Dl9V6oai2pZATSuPIa8_Fo5uNlHwJWV4V0BpD7fJqOg68eWhAQHcfcWZ2RWPXIwiEUIrubzg0Aaw8apNxQ1FuFAL92dgqFdDLpiLCjx0sIQHsIeY5OlckFpSN-QlUTypMatzJo1PUWBCwhyYvaKDaZS8tplSgu8QFUwyAnN3hF--oEO3Z9dZqO7zSfW3lvybY5QoaHHM8Ff-0bjID_eJBxlLvUM_BGKxFu7a0Oh99TIQ");'></div>
+<!-- Attendance Summary Title -->
+<h3 class="text-xl font-bold mb-4 px-1">Attendance Summary</h3>
+<!-- Stats Grid -->
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-card p-6 rounded-xl border-l-4 border-rose-400">
+<p class="text-sm font-medium text-black/60">Total Absent</p>
+<p class="text-3xl font-bold mt-1">04</p>
+<p class="text-[11px] font-bold text-rose-500 mt-2 tracking-tight">DAYS MISSED</p>
+</div>
+<div class="glass-card p-6 rounded-xl border-l-4 border-primary">
+<p class="text-sm font-medium text-black/60">Upcoming</p>
+<p class="text-3xl font-bold mt-1">02</p>
+<p class="text-[11px] font-bold text-primary mt-2 tracking-tight">APPROVED LEAVES</p>
+</div>
+<div class="col-span-2 glass-card p-6 rounded-xl border-l-4 border-mist-teal flex items-center justify-between">
+<div>
+<p class="text-sm font-medium text-black/60">Current Month Present</p>
+<p class="text-3xl font-bold mt-1">18 Days</p>
+</div>
+<div class="size-14 rounded-full border-4 border-mist-teal flex items-center justify-center">
+<span class="text-xs font-bold">82%</span>
 </div>
 </div>
-<!-- Action Button -->
-<div class="mt-auto p-4 pb-10">
-<button class="w-full bg-primary text-black font-bold py-4 rounded-xl shadow-lg active:scale-95 transition-transform flex items-center justify-center gap-2">
-<span class="material-symbols-outlined">event_busy</span>
-                Mark Absent for Oct 5
-            </button>
-<p class="text-center text-xs text-gray-500 mt-3 font-medium">Changes can be reverted until 6:00 PM today</p>
 </div>
-<!-- Bottom Safe Area iOS -->
-<div class="h-2 bg-background-light dark:bg-background-dark"></div>
+</main>
+<!-- Floating Action Button -->
+<div class="fixed bottom-24 right-6">
+<button class="size-16 rounded-full bg-primary text-white shadow-xl shadow-primary/30 flex items-center justify-center transition-transform active:scale-90">
+<span class="material-symbols-outlined text-[32px]">add</span>
+</button>
+</div>
+<!-- Bottom Tab Bar -->
+<div class="fixed bottom-0 w-full glass-card border-t border-white/40 pb-6 pt-3 px-8 flex justify-between items-center rounded-t-xl z-50">
+<button class="flex flex-col items-center gap-1 text-black/40">
+<span class="material-symbols-outlined">home</span>
+<span class="text-[10px] font-bold">HOME</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-mist-teal">
+<span class="material-symbols-outlined font-fill">calendar_month</span>
+<span class="text-[10px] font-bold">CALENDAR</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-black/40">
+<span class="material-symbols-outlined">directions_bus</span>
+<span class="text-[10px] font-bold">TRACK</span>
+</button>
+<button class="flex flex-col items-center gap-1 text-black/40">
+<span class="material-symbols-outlined">notifications</span>
+<span class="text-[10px] font-bold">ALERTS</span>
+</button>
 </div>
 </body></html>

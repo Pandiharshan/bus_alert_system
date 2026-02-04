@@ -24,6 +24,10 @@
         "source": "com.campusbussbuddy.app-main-63:/drawable/ic_chevron_right.xml"
     },
     {
+        "merged": "com.campusbussbuddy.app-merged_res-61:/drawable_ic_visibility.xml.flat",
+        "source": "com.campusbussbuddy.app-main-63:/drawable/ic_visibility.xml"
+    },
+    {
         "merged": "com.campusbussbuddy.app-merged_res-61:/drawable_ic_settings.xml.flat",
         "source": "com.campusbussbuddy.app-main-63:/drawable/ic_settings.xml"
     },
@@ -98,6 +102,10 @@
     {
         "merged": "com.campusbussbuddy.app-merged_res-61:/drawable_ic_star_filled.png.flat",
         "source": "com.campusbussbuddy.app-main-63:/drawable/ic_star_filled.png"
+    },
+    {
+        "merged": "com.campusbussbuddy.app-merged_res-61:/drawable_ic_visibility_off.xml.flat",
+        "source": "com.campusbussbuddy.app-main-63:/drawable/ic_visibility_off.xml"
     },
     {
         "merged": "com.campusbussbuddy.app-merged_res-61:/drawable_ic_call.xml.flat",

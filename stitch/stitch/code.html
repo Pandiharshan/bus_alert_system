@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Welcome - Smart Bus Tracking</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#beb3d6",
+                        "mist-teal": "#A7C7C5",
+                        "background-light": "#f7f6f7",
+                        "background-dark": "#18161c",
+                        "porcelain": "#F6F7F4",
+                        "pearl": "#F3F1EC",
+                    },
+                    fontFamily: {
+                        "display": ["Space Grotesk", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        .glass-card {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .glass-button-primary {
+            background: rgba(167, 199, 197, 0.8);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 15px 0 rgba(167, 199, 197, 0.4);
+        }
+        .glass-button-secondary {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="font-display bg-background-light dark:bg-background-dark antialiased">
+<!-- Background Gradient Container -->
+<div class="relative min-h-screen w-full flex flex-col items-center justify-center overflow-hidden bg-gradient-to-br from-porcelain to-pearl dark:from-background-dark dark:to-[#121014]">
+<!-- Decorative subtle glow -->
+<div class="absolute top-[-10%] left-[-10%] w-[50%] h-[50%] rounded-full bg-primary/20 blur-[120px]"></div>
+<div class="absolute bottom-[-10%] right-[-10%] w-[50%] h-[50%] rounded-full bg-mist-teal/20 blur-[120px]"></div>
+<!-- Top App Bar (Hidden/Subtle for welcome screen) -->
+<div class="fixed top-0 left-0 w-full flex items-center justify-between p-6 z-10">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-[#141316] dark:text-white">language</span>
+<span class="text-sm font-medium text-[#141316] dark:text-white">EN</span>
+</div>
+<button class="text-[#141316] dark:text-white">
+<span class="material-symbols-outlined">help_outline</span>
+</button>
+</div>
+<!-- Main Glass Content Card -->
+<main class="relative z-10 w-full max-w-[400px] px-6">
+<div class="glass-card rounded-xl p-8 flex flex-col items-center text-center">
+<!-- Logo Section -->
+<div class="mb-8 mt-4">
+<div class="w-20 h-20 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/30 mb-6">
+<span class="material-symbols-outlined text-white text-4xl" style="font-variation-settings: 'FILL' 1">directions_bus</span>
+</div>
+<h1 class="text-[#141316] dark:text-white text-4xl font-bold tracking-tight mb-2">Omnibus</h1>
+<p class="text-[#141316]/60 dark:text-white/60 text-sm tracking-widest uppercase font-medium">Smart Bus Tracking</p>
+</div>
+<!-- Tagline -->
+<div class="mb-12">
+<h2 class="text-[#141316] dark:text-white text-xl font-medium leading-relaxed">
+                        Effortless commuting and <br/>
+<span class="text-mist-teal dark:text-primary font-bold">real-time attendance.</span>
+</h2>
+</div>
+<!-- Buttons Section -->
+<div class="w-full flex flex-col gap-4">
+<!-- Student Login (Primary) -->
+<button class="glass-button-primary w-full h-14 rounded-full flex items-center justify-between px-8 group transition-all">
+<span class="text-[#141316] text-lg font-bold">Student Login</span>
+<span class="material-symbols-outlined text-[#141316] group-hover:translate-x-1 transition-transform">arrow_forward_ios</span>
+</button>
+<!-- Driver Login (Secondary) -->
+<button class="glass-button-secondary w-full h-14 rounded-full flex items-center justify-between px-8 group transition-all">
+<span class="text-[#141316] dark:text-white text-lg font-medium">Driver Access</span>
+<span class="material-symbols-outlined text-[#141316] dark:text-white opacity-60">local_shipping</span>
+</button>
+</div>
+<!-- App Store/Badge Style Visual -->
+<div class="mt-10 flex flex-col items-center gap-2">
+<div class="flex -space-x-3 overflow-hidden">
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800" data-alt="Portrait of a female student" src="https://lh3.googleusercontent.com/aida-public/AB6AXuDBjz3B-k-Fm1q8fPnOizT20I-N3Vi5C-uRJpalwijQMHoQgif3E8isF7ou8kDyGIGxcd-heWoCIDyxnaBNDwy6jd90BoJvv-D2P67LX7kd9CRpgJVkBWNkGBfQ6MKXEYFtSgpcXobRBPVLbXBL8oPjzvxif6UbeoIzE6Q9yUEZAv-gB6WZRoSLqqvcPyMnj7CAB6CTH4_0_NwHIbt9maolZEuwypUTnIXAz1MWjvNT8-h3Zax7ER3k7Ty3qM2F9WQal1Ox3bT2JpI"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800" data-alt="Portrait of a male driver" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCoTsDDfr5EEgTekY1RWQgOQoHKmdZX8EzVLtMTl-OSgmMxf2ZxV9AajoLqKTLx-q8J4l5srDrpPEbMvNMDc6PGxXY3XgVuvLFR_1Y4fGmpfFj8DSwlIM80Q1ljpYSdRr7CPRDyY6a1tN0F4yUyXjGoo5t6xfqrYPCaqOngQvXLzrbYvUKShi0YPiQP9vc8o94BQ9YPaVeeTrbkIPj1E3s9ZnlZqRtH3DOvcChRVPLAgqOpJgdXuws8kO5tn7CThBeW-2eHQBbRHks"/>
+<img alt="" class="inline-block h-8 w-8 rounded-full ring-2 ring-white dark:ring-gray-800" data-alt="Portrait of a young commuter" src="https://lh3.googleusercontent.com/aida-public/AB6AXuC1Il3yQEDZY_VZN6J0KWbiT89s7b0rp4FJHzqc0Kz5pgqwZloW2gNekcKAdGsueAPzHFs9pmRrhO2esnoUBTDy1sj8b57rWd8qrZzpJLn8wh_2Jf7GlAJSusFG87c5gT_4PT-Toj0FyZFUoNK0UXgz5IBe-OdVppl6oEhRTy7ORqUWHLTFcT4sKPe5Y9EblfIi03ttCREnWNu6AxGtPg1pvrAf3I3jsZYGeU9Cnk6CSM-eP_RlTrccLBv2U7dqZqT8njE7mYq-NHk"/>
+</div>
+<p class="text-[10px] text-[#141316]/40 dark:text-white/40 font-bold uppercase tracking-widest">Trusted by 2,000+ Students</p>
+</div>
+</div>
+</main>
+<!-- Footer -->
+<footer class="fixed bottom-8 w-full text-center px-4 z-10">
+<div class="flex justify-center gap-6 text-[12px] font-medium text-[#141316]/50 dark:text-white/40 uppercase tracking-widest">
+<a class="hover:text-primary transition-colors" href="#">Privacy Policy</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">Support</a>
+<span>•</span>
+<a class="hover:text-primary transition-colors" href="#">Safety</a>
+</div>
+</footer>
+<!-- Hidden Image for Structure Reference -->
+<div class="hidden">
+<div class="w-full bg-center bg-no-repeat bg-cover min-h-[218px]" data-alt="Abstract soft pastel gradient backgrounds with translucent glass effects" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBOAPN_45aqbSqy7oWEbC_aeJ6l1fa06bL72jlVybHKBQxm-MmEtbJiNQyLCBlFgY_NxCuT1ZCergLl1Lbor0KzPK-mRp1Mm4KQQh1wQmXX_kN0cWDOEo6qlfoBdCqsIy5ssHCYrjB3l9ulzY31cqi7D8UKdD_G2udcWUbRTdv1ZiIDQI7tsyVjg8edgTb_56I9Yj__PUG-MQVNG2dLRWfRkbUDuoqjK7yZZpLJX7Bam4uCENVEFYKp209iq-edFf44xHV6-NsZcBo");'></div>
+</div>
+</div>
+</body></html>

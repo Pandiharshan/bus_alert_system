@@ -1,6 +1,7 @@
 R_DEF: Internal format may change without notice
 local
 color black
+color colorOnSurface
 color purple_500
 color purple_700
 color teal_200
@@ -44,6 +45,8 @@ drawable ic_speed
 drawable ic_star
 drawable ic_star_filled
 drawable ic_vibration
+drawable ic_visibility
+drawable ic_visibility_off
 string app_name
 string gcm_defaultSenderId
 string google_api_key

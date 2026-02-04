@@ -60,6 +60,7 @@ color browser_actions_text_color
 color browser_actions_title_color
 color call_notification_answer_color
 color call_notification_decline_color
+color colorOnSurface
 color common_google_signin_btn_text_dark
 color common_google_signin_btn_text_dark_default
 color common_google_signin_btn_text_dark_disabled
@@ -169,6 +170,8 @@ drawable ic_speed
 drawable ic_star
 drawable ic_star_filled
 drawable ic_vibration
+drawable ic_visibility
+drawable ic_visibility_off
 drawable notification_action_background
 drawable notification_bg
 drawable notification_bg_low

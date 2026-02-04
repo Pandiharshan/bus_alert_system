@@ -1,35 +1,54 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Student Profile Screen</title>
+<title>Student Account Profile</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df26c",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#102217",
+                        "primary": "#beb3d6",
+                        "background-light": "#F8F9F6", // Cloud Ivory
+                        "background-dark": "#18161c",
+                        "text-primary": "#2E2E2E",
+                        "text-secondary": "#6B6B6B",
                     },
                     fontFamily: {
-                        "display": ["Inter"]
+                        "display": ["Space Grotesk", "sans-serif"]
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
                 },
             },
         }
     </script>
 <style>
-        body { font-family: 'Inter', sans-serif; }
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.4);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.05);
+        }
+        .dark .glass-card {
+            background: rgba(24, 22, 28, 0.6);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
         }
     </style>
 <style>
@@ -38,145 +57,151 @@
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-white font-display min-h-screen">
-<div class="max-w-md mx-auto min-h-screen flex flex-col pb-20">
-<!-- TopAppBar -->
-<div class="flex items-center bg-background-light dark:bg-background-dark p-4 pb-2 justify-between sticky top-0 z-10">
-<div class="text-slate-800 dark:text-white flex size-12 shrink-0 items-center cursor-pointer">
-<span class="material-symbols-outlined">arrow_back_ios</span>
+<body class="bg-background-light dark:bg-background-dark font-display text-text-primary dark:text-white transition-colors duration-300">
+<div class="relative flex h-auto min-h-screen w-full flex-col max-w-md mx-auto overflow-x-hidden">
+<!-- Top App Bar -->
+<div class="sticky top-0 z-50 flex items-center bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md p-4 pb-2 justify-between">
+<div class="flex size-12 shrink-0 items-center justify-center rounded-full hover:bg-primary/20 cursor-pointer">
+<span class="material-symbols-outlined text-text-primary dark:text-white">arrow_back_ios_new</span>
 </div>
-<h2 class="text-slate-800 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Student Profile</h2>
+<h2 class="text-text-primary dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] flex-1 text-center">Student Profile</h2>
 <div class="flex w-12 items-center justify-end">
-<button class="flex max-w-[480px] cursor-pointer items-center justify-center overflow-hidden rounded-lg h-12 bg-transparent text-slate-800 dark:text-white gap-2 text-base font-bold leading-normal tracking-[0.015em] min-w-0 p-0">
+<button class="flex size-12 cursor-pointer items-center justify-center rounded-full hover:bg-primary/20 text-text-primary dark:text-white transition-colors">
 <span class="material-symbols-outlined">settings</span>
 </button>
 </div>
 </div>
-<!-- ProfileHeader -->
-<div class="flex p-4 @container">
-<div class="flex w-full flex-col gap-4 items-center">
-<div class="flex gap-4 flex-col items-center">
+<!-- Profile Header -->
+<div class="flex p-6 flex-col items-center">
 <div class="relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full min-h-32 w-32 border-4 border-primary/20" data-alt="Portrait of student Alex Smith" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBBXDoJHj-JG6wSCHHz0oDJ0jR0pjDHkl2rhgnJMmoGAvvzJEzIb5-6a6EkMh24pTBcXecsJ5dkbOmwk0vhqMJ4k3BnnXilwf7zjDOcwJjLUOyWjQWzwa8a8ryZNOxukA8pWEF1_czYNnb_XL7H3KcX5uckRWMKyPir5pcUhriWb78oNUxMBcgHRpNc_XQVKdOKHy8Wh-KVeIT73gs497ekIXb0Zb-8xEbUP7OPaEJ0yt5ZTTAMFeKa7V6YbWtN_50w04tR82a5UjM");'>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-36 w-36 shadow-xl border-4 border-white dark:border-gray-800" data-alt="Portrait of a smiling student Alex Rivera" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDFf25jTCumjo210Cnhmil7dRxmBgbodijgUnK_VwTLzGhvdnZjvPuOCM504LNdJ4XDawYORRRclKdpOOT2Z-hcre_YZ5gqpLYuENvGlRLdiUBB1MzWKt_buirPAltnx1x-Rztq8pq2stLoDsMrMZBPnTEQGezR-JVgUa1Nd3_bmi1fdfv80957Oh7XoV76jSFMIqI26VmuBromWExGASDfdladjfxzg0COqgnJAKlF2GPnCszXbujbvSXeyxDxdRpAqPz1Y8SI5cU");'>
 </div>
-<div class="absolute bottom-1 right-1 bg-primary size-6 rounded-full border-4 border-background-dark flex items-center justify-center">
-<span class="material-symbols-outlined text-[12px] text-background-dark font-bold">check</span>
+<div class="absolute bottom-1 right-1 bg-green-500 w-6 h-6 rounded-full border-4 border-background-light dark:border-background-dark"></div>
 </div>
-</div>
-<div class="flex flex-col items-center justify-center">
-<p class="text-slate-900 dark:text-white text-[24px] font-bold leading-tight tracking-[-0.015em] text-center">Alex Smith</p>
-<p class="text-slate-500 dark:text-primary text-base font-semibold leading-normal text-center">Grade 10 - Student ID: #55291</p>
-<p class="text-slate-400 dark:text-[#9cbaa8] text-sm font-normal leading-normal text-center">Green Line Route • Sector 42</p>
-</div>
+<div class="mt-6 flex flex-col items-center">
+<p class="text-text-primary dark:text-white text-3xl font-bold tracking-tight">Alex Rivera</p>
+<div class="mt-2 flex items-center gap-2 bg-primary/20 px-4 py-1 rounded-full">
+<span class="material-symbols-outlined text-sm text-primary font-bold">school</span>
+<p class="text-text-secondary dark:text-gray-300 text-sm font-medium">Grade 10 • Section B</p>
 </div>
 </div>
 </div>
-<!-- Section: Assigned Bus -->
-<h3 class="text-slate-800 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-6">Assigned Bus</h3>
-<div class="px-4">
-<div class="flex items-center gap-4 bg-white dark:bg-[#1a2e21] rounded-xl px-4 min-h-[80px] py-3 justify-between shadow-sm border border-slate-100 dark:border-white/5">
+<!-- Content Sections -->
+<div class="px-4 pb-12 space-y-6">
+<!-- Personal Info Card -->
+<section>
+<div class="flex items-center gap-2 mb-3 px-2">
+<span class="material-symbols-outlined text-primary">person</span>
+<h3 class="text-text-primary dark:text-white text-lg font-bold">Personal Info</h3>
+</div>
+<div class="glass-card rounded-xl p-5 flex flex-col gap-4">
+<div class="flex justify-between items-center border-b border-black/5 dark:border-white/5 pb-3">
+<div>
+<p class="text-text-secondary dark:text-gray-400 text-xs uppercase tracking-wider font-bold">Student ID</p>
+<p class="text-text-primary dark:text-white font-semibold">#882941-AR</p>
+</div>
+<span class="material-symbols-outlined text-text-secondary/40">id_card</span>
+</div>
+<div class="flex justify-between items-center border-b border-black/5 dark:border-white/5 pb-3">
+<div>
+<p class="text-text-secondary dark:text-gray-400 text-xs uppercase tracking-wider font-bold">Emergency Contact</p>
+<p class="text-text-primary dark:text-white font-semibold">+1 (555) 012-3456</p>
+</div>
+<div class="bg-primary/10 p-2 rounded-full">
+<span class="material-symbols-outlined text-primary">call</span>
+</div>
+</div>
+<div>
+<p class="text-text-secondary dark:text-gray-400 text-xs uppercase tracking-wider font-bold">Primary Pickup Point</p>
+<p class="text-text-primary dark:text-white font-semibold">Oak Ridge Terminal, Gate 4</p>
+</div>
+</div>
+</section>
+<!-- Assigned Bus Details -->
+<section>
+<div class="flex items-center gap-2 mb-3 px-2">
+<span class="material-symbols-outlined text-primary">directions_bus</span>
+<h3 class="text-text-primary dark:text-white text-lg font-bold">Assigned Bus Details</h3>
+</div>
+<div class="glass-card rounded-xl overflow-hidden">
+<div class="w-full bg-center bg-no-repeat aspect-video bg-cover" data-alt="Map showing the school bus current route" data-location="Oak Ridge Area" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuAZ4WjZ3yXm55g7kYtsihSoGiv1J65rBlRpv6wggg9e6Qd83BNLWZVfY8Bqapliu1Koq-PMIEIWh29TmmvO8HbQ-bsNlPpi_2BTJ8_sb4IudWh6vYxLPAUrPcaTtG4ZiMhIw4OY7LLG-TVfiqkM4rdobZG_2U2VWxI0u7ZDXV7wrwUgj7TLq8ejnOSE5ZZmeuk64seXR9qXmHDlEmF4cyGtP3uusaDzqVNYW11ev-I1fr1NS1g0UNN7uLnwv1jNoB9KdjdGNp45xg4");'>
+<div class="w-full h-full bg-gradient-to-t from-black/60 to-transparent flex items-end p-4">
+<div class="bg-primary px-3 py-1 rounded-full flex items-center gap-2">
+<span class="material-symbols-outlined text-sm text-white">satellite_alt</span>
+<span class="text-white text-xs font-bold uppercase tracking-tight">Live Tracking</span>
+</div>
+</div>
+</div>
+<div class="p-5 flex flex-col gap-4">
+<div class="flex justify-between items-start">
+<div class="flex items-center gap-3">
+<div class="bg-primary/20 w-12 h-12 rounded-xl flex items-center justify-center">
+<p class="text-text-primary dark:text-white font-bold text-xl">42</p>
+</div>
+<div>
+<p class="text-text-primary dark:text-white font-bold text-lg leading-none">Route 42-B</p>
+<p class="text-text-secondary dark:text-gray-400 text-sm mt-1">Starlight Express</p>
+</div>
+</div>
+<div class="text-right">
+<p class="text-text-secondary dark:text-gray-400 text-xs font-bold">ETA</p>
+<p class="text-text-primary dark:text-white font-bold text-lg">07:45 AM</p>
+</div>
+</div>
+<div class="flex items-center justify-between p-3 bg-primary/5 rounded-lg border border-primary/20">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-sm">event_seat</span>
+<p class="text-text-primary dark:text-white text-sm font-semibold">Assigned Seat: <span class="text-primary">Row 4, Seat A</span></p>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Driver Contact Details -->
+<section>
+<div class="flex items-center gap-2 mb-3 px-2">
+<span class="material-symbols-outlined text-primary">badge</span>
+<h3 class="text-text-primary dark:text-white text-lg font-bold">Driver Contact</h3>
+</div>
+<div class="glass-card rounded-xl p-5">
 <div class="flex items-center gap-4">
-<div class="text-primary flex items-center justify-center rounded-xl bg-primary/10 shrink-0 size-12">
-<span class="material-symbols-outlined">directions_bus</span>
+<div class="h-16 w-16 rounded-full bg-cover bg-center shadow-md border-2 border-white dark:border-gray-700" data-alt="Driver Marcus Smith's professional portrait" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB8KYNB_qqCGTWBJDdJp_xPpPqxr6mxfCzEAROMZqM8OUto0t7eECalMKrfw9NoCUorhCHIpIoXhILIVFNNCL9-FaYnuzL1qOQZu-vM0ukd7X87kPyL17TrkxoIZG-j5BWSyXepQr6LXV8NMewKJxqu_M6U-YG1FnlNjmHH2HKZxISmTEU385jGYjCUBTcP2DKgZQoq4ISeUy4bf64nCozNTyoDB55Gks8xyk-0V8B6-5NalIvRtKWCHfgEKstTS4kblyC2PEIiGvs");'>
 </div>
-<div class="flex flex-col justify-center">
-<p class="text-slate-900 dark:text-white text-base font-bold leading-normal">BUS-102</p>
-<div class="flex items-center gap-1.5">
-<span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
-</span>
-<p class="text-slate-500 dark:text-[#9cbaa8] text-sm font-medium leading-normal">In Transit - 5 mins away</p>
-</div>
-</div>
-</div>
-<div class="shrink-0">
-<button class="bg-primary/20 text-primary px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider">Track</button>
+<div class="flex-1">
+<p class="text-text-primary dark:text-white text-lg font-bold leading-none">Marcus Smith</p>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-yellow-500 text-sm fill-current">star</span>
+<span class="material-symbols-outlined text-yellow-500 text-sm">star_half</span>
+<span class="text-text-secondary dark:text-gray-400 text-xs font-medium ml-1">(4.8/5)</span>
 </div>
 </div>
-</div>
-<!-- Section: Driver Details -->
-<div class="flex items-center justify-between px-4 pb-2 pt-8">
-<h3 class="text-slate-800 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em]">Driver Details</h3>
-<span class="text-primary text-sm font-semibold cursor-pointer">History</span>
-</div>
-<div class="px-4">
-<div class="bg-white dark:bg-[#1a2e21] rounded-xl p-4 shadow-sm border border-slate-100 dark:border-white/5">
-<div class="flex items-center gap-4 mb-4">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-lg size-14" data-alt="Professional portrait of bus driver John Doe" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBGkMQTb_hv1txr7HhmCG9XmSB2_alIlQW2I-__8mL489MrMozZWRMxdHA6gGncciHK9Cy7w8y7R_6YtApCbyC3MGJPrNoT-Yjayz_2-DhCfRYG39B8qifSWYrxBNDRymvW2JL8CI0K3Jk_WMC_o29ZznPDNJLGBFRgbNvORy7CCehkLtqhjH-S-KzsblqinGKhLWGl9aMywl0pYPMIyQIl0N8AhCAJchC1Anebgc8nbVxLyJjNFdTWmbgGy80wKB5QjvUNB33UD8w");'>
-</div>
-<div class="flex flex-col flex-1">
-<p class="text-slate-900 dark:text-white text-base font-bold">John Doe</p>
-<div class="flex items-center gap-1">
-<span class="material-symbols-outlined text-yellow-400 text-sm" style="font-variation-settings: 'FILL' 1">star</span>
-<p class="text-slate-600 dark:text-[#9cbaa8] text-sm font-medium">4.8 <span class="text-slate-400 font-normal ml-1">(124 trips)</span></p>
+<button class="bg-primary text-white p-4 rounded-full shadow-lg shadow-primary/30 active:scale-95 transition-transform">
+<span class="material-symbols-outlined">call</span>
+</button>
 </div>
 </div>
-<div class="flex gap-2">
-<div class="bg-primary size-10 rounded-full flex items-center justify-center text-background-dark cursor-pointer active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[20px] font-bold">call</span>
+</section>
 </div>
-<div class="bg-white dark:bg-white/10 size-10 rounded-full flex items-center justify-center text-slate-700 dark:text-white border border-slate-200 dark:border-white/10 cursor-pointer active:scale-95 transition-transform">
-<span class="material-symbols-outlined text-[20px]">chat</span>
-</div>
-</div>
-</div>
-<div class="grid grid-cols-2 gap-3 pt-3 border-t border-slate-100 dark:border-white/5">
-<div class="bg-slate-50 dark:bg-black/20 p-2 rounded-lg">
-<p class="text-[10px] uppercase text-slate-400 dark:text-[#9cbaa8] font-bold tracking-wider">License</p>
-<p class="text-slate-700 dark:text-white text-sm font-semibold">TX-99210-A</p>
-</div>
-<div class="bg-slate-50 dark:bg-black/20 p-2 rounded-lg">
-<p class="text-[10px] uppercase text-slate-400 dark:text-[#9cbaa8] font-bold tracking-wider">Experience</p>
-<p class="text-slate-700 dark:text-white text-sm font-semibold">12 Years</p>
-</div>
-</div>
-</div>
-</div>
-<!-- Quick Actions -->
-<h3 class="text-slate-800 dark:text-white text-lg font-bold leading-tight tracking-[-0.015em] px-4 pb-2 pt-8">Account</h3>
-<div class="px-4 space-y-2 mb-8">
-<div class="flex items-center justify-between bg-white dark:bg-[#1a2e21] px-4 py-4 rounded-xl border border-slate-100 dark:border-white/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400 dark:text-[#9cbaa8]">notifications</span>
-<span class="text-slate-700 dark:text-white font-medium">Notifications</span>
-</div>
-<div class="w-10 h-5 bg-primary/20 rounded-full relative">
-<div class="absolute right-0.5 top-0.5 bg-primary size-4 rounded-full shadow-sm"></div>
-</div>
-</div>
-<div class="flex items-center justify-between bg-white dark:bg-[#1a2e21] px-4 py-4 rounded-xl border border-slate-100 dark:border-white/5">
-<div class="flex items-center gap-3">
-<span class="material-symbols-outlined text-slate-400 dark:text-[#9cbaa8]">emergency</span>
-<span class="text-slate-700 dark:text-white font-medium">Emergency Contacts</span>
-</div>
-<span class="material-symbols-outlined text-slate-400">chevron_right</span>
-</div>
-<div class="flex items-center justify-between bg-white dark:bg-[#1a2e21] px-4 py-4 rounded-xl border border-slate-100 dark:border-white/5">
-<div class="flex items-center gap-3 text-red-500">
-<span class="material-symbols-outlined">logout</span>
-<span class="font-medium">Sign Out</span>
-</div>
-</div>
-</div>
-<!-- iOS Style Bottom Navigation -->
-<div class="fixed bottom-0 left-0 right-0 bg-white/80 dark:bg-background-dark/80 backdrop-blur-lg border-t border-slate-200 dark:border-white/5 flex justify-around items-center h-20 px-6 max-w-md mx-auto">
-<div class="flex flex-col items-center gap-1 opacity-40">
+<!-- Bottom Tab Bar Placeholder (Optional visual context) -->
+<div class="fixed bottom-0 left-0 right-0 max-w-md mx-auto glass-card rounded-t-xl border-b-0 h-20 flex items-center justify-around px-6">
+<div class="flex flex-col items-center gap-1 text-text-secondary opacity-40">
 <span class="material-symbols-outlined">home</span>
-<span class="text-[10px] font-bold">Home</span>
 </div>
-<div class="flex flex-col items-center gap-1 opacity-40">
+<div class="flex flex-col items-center gap-1 text-text-secondary opacity-40">
 <span class="material-symbols-outlined">map</span>
-<span class="text-[10px] font-bold">Map</span>
 </div>
 <div class="flex flex-col items-center gap-1 text-primary">
-<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">person</span>
-<span class="text-[10px] font-bold">Profile</span>
+<span class="material-symbols-outlined fill-current">account_circle</span>
+<div class="w-1 h-1 bg-primary rounded-full"></div>
 </div>
-<div class="flex flex-col items-center gap-1 opacity-40">
-<span class="material-symbols-outlined">history</span>
-<span class="text-[10px] font-bold">History</span>
+<div class="flex flex-col items-center gap-1 text-text-secondary opacity-40">
+<span class="material-symbols-outlined">notifications</span>
 </div>
 </div>
+<!-- Spacer for Bottom Tab Bar -->
+<div class="h-24"></div>
 </div>
 </body></html>

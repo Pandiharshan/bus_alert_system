@@ -1,37 +1,55 @@
 <!DOCTYPE html>
 
-<html class="dark" lang="en"><head>
+<html class="light" lang="en"><head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>Driver Active Trip Screen</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<title>Bus Operations Hub</title>
+<!-- Google Fonts -->
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&amp;family=Noto+Sans:wght@400;500;600&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <script id="tailwind-config">
         tailwind.config = {
             darkMode: "class",
             theme: {
                 extend: {
                     colors: {
-                        "primary": "#0df26c",
-                        "background-light": "#f5f8f7",
-                        "background-dark": "#102217",
+                        "primary": "#beb3d6",
+                        "background-light": "#F8F9F6", // Cloud Ivory
+                        "background-dark": "#18161c",
+                        "text-main": "#2E2E2E",
                     },
                     fontFamily: {
-                        "display": ["Inter"]
+                        "display": ["Space Grotesk", "sans-serif"],
+                        "sans": ["Noto Sans", "sans-serif"]
                     },
-                    borderRadius: {"DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px"},
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "2rem",
+                        "xl": "3rem",
+                        "full": "9999px"
+                    },
                 },
             },
         }
     </script>
 <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        .glass-card {
+            background: rgba(255, 255, 255, 0.6);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
         }
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+        .glass-button {
+            background: rgba(190, 179, 214, 0.8);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px rgba(190, 179, 214, 0.3);
         }
     </style>
 <style>
@@ -40,143 +58,103 @@
     }
   </style>
   </head>
-<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white min-h-screen flex flex-col">
-<!-- TopAppBar -->
-<header class="sticky top-0 z-50 bg-background-light/95 dark:bg-background-dark/95 backdrop-blur-md border-b border-white/10">
-<div class="flex items-center p-4 justify-between max-w-md mx-auto">
+<body class="bg-background-light dark:bg-background-dark font-display text-text-main transition-colors duration-300">
+<div class="relative flex h-auto min-h-screen w-full flex-col overflow-x-hidden max-w-[430px] mx-auto shadow-2xl bg-background-light dark:bg-background-dark">
+<!-- Top App Bar -->
+<div class="flex items-center p-6 pb-4 justify-between sticky top-0 z-50 bg-background-light/80 dark:bg-background-dark/80 backdrop-blur-md">
 <div class="flex items-center gap-3">
-<div class="bg-primary/20 p-2 rounded-lg">
-<span class="material-symbols-outlined text-primary">directions_bus</span>
+<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full size-10 border-2 border-primary/30" data-alt="Portrait of a professional bus driver" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuBUyCEdaVnXJASVtZmg_0PsRS0DhApOlwYyYCe-ZD43TxifBI7wNmogHfMT4UFQ76vT1XO8GOn62h4EnR1VID0gTTDMMjMmI9DVj_rAWsxWh7jluzd1eLPeKUu36dvEdNEQQdcH8V5xJVw1oHH1iKBat-n_Yi3YZhi5qf0DBzbFQ5k2h-tTp_8j64LIb7qTwihw5tL6Qv1ob75U-VaR6f2nEhQUijaQ0aZs2hG1jlZj0PMHpVR3j_shjMJ_WzvIQ6Lcf1k9TUCE92U");'>
 </div>
 <div>
-<h2 class="text-white text-lg font-bold leading-tight tracking-tight">Route 42B</h2>
-<div class="flex items-center gap-1.5">
+<h2 class="text-text-main dark:text-white text-lg font-bold leading-tight">Operations Hub</h2>
+<p class="text-xs text-text-main/60 dark:text-white/60">Good morning, Alex</p>
+</div>
+</div>
+<button class="flex size-11 items-center justify-center rounded-full glass-card text-text-main dark:text-white">
+<span class="material-symbols-outlined">notifications</span>
+</button>
+</div>
+<!-- Stats Section -->
+<div class="flex gap-4 p-6 pt-2">
+<div class="flex-1 flex flex-col gap-1 rounded-2xl p-5 glass-card">
+<p class="text-text-main/60 dark:text-white/60 text-sm font-medium">Total Members</p>
+<p class="text-[#2E2E2E] dark:text-white text-3xl font-bold tracking-tight">42</p>
+<div class="mt-2 h-1 w-8 bg-primary rounded-full"></div>
+</div>
+<div class="flex-1 flex flex-col gap-1 rounded-2xl p-5 glass-card">
+<p class="text-text-main/60 dark:text-white/60 text-sm font-medium">Present Today</p>
+<p class="text-[#2E2E2E] dark:text-white text-3xl font-bold tracking-tight">38</p>
+<div class="mt-2 h-1 w-8 bg-green-400 rounded-full"></div>
+</div>
+</div>
+<!-- Center Hero Action -->
+<div class="flex flex-col items-center justify-center flex-1 px-6 py-10">
+<div class="relative mb-8">
+<!-- Decorative Glow -->
+<div class="absolute inset-0 bg-primary/40 blur-3xl rounded-full scale-150"></div>
+<button class="relative flex flex-col items-center justify-center size-56 rounded-full glass-button text-text-main transition-transform active:scale-95">
+<div class="bg-white/90 p-5 rounded-full mb-3 shadow-lg">
+<span class="material-symbols-outlined text-4xl text-[#141316]" style="font-variation-settings: 'FILL' 1">play_arrow</span>
+</div>
+<span class="text-lg font-bold uppercase tracking-widest">Start Trip</span>
+</button>
+<!-- Pulse Indicator -->
+<div class="absolute top-4 right-4 flex items-center gap-2 px-3 py-1 bg-white/90 rounded-full shadow-sm">
 <span class="relative flex h-2 w-2">
-<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span>
-<span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span>
+<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+<span class="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
 </span>
-<p class="text-primary text-xs font-semibold uppercase tracking-wider">Active Trip</p>
+<span class="text-[10px] font-bold text-green-600">GPS READY</span>
 </div>
 </div>
-</div>
-<button class="bg-red-500/10 hover:bg-red-500/20 px-4 py-2 rounded-full border border-red-500/30 transition-colors">
-<span class="text-red-500 text-sm font-bold tracking-widest">SOS</span>
-</button>
-</div>
-</header>
-<main class="flex-1 flex flex-col max-w-md mx-auto w-full">
-<!-- Map Section -->
-<div class="px-4 py-3">
-<div class="relative w-full bg-slate-800 aspect-[16/10] rounded-xl overflow-hidden border border-white/5 shadow-2xl">
-<div class="absolute inset-0 bg-center bg-no-repeat bg-cover" data-alt="Interactive dark themed navigation map showing bus route" data-location="Oak Street, San Francisco" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7ZhRDBNeimwSOWAiN63L9Z4geO1rzidLBXix3JiG-p1iibD7FC2oOqCYXLSnXSd3CZhukAU0Xi9viPyw2qg4if5V4CCwaskX_dD0PCM2Y2VpK2JQeXBZxEDnofXhhtip4x6XAPoWrNOaeCr_1pfmbv8PxdT1adzFl8apRav4-XIQlFBzw6NIn93YHOriPKdySWRjgGrZDuENMqJ5D6XG0gpOhim2q1kU3vqKeIUTeGmjRbJWed2oEcy7kuX25eZG2Y5uOB98wctU");'>
-</div>
-<!-- Map Overlay: ETA -->
-<div class="absolute top-3 left-3 bg-background-dark/80 backdrop-blur-md p-2 rounded-lg border border-white/10">
-<p class="text-[10px] text-slate-400 font-bold uppercase">Next Stop</p>
-<p class="text-white font-bold text-sm">3 mins • 0.8 miles</p>
+<div class="glass-card px-6 py-3 rounded-full">
+<p class="text-[#736e7c] dark:text-white/70 text-sm font-medium text-center">
+<span class="opacity-60">Current:</span> Route 12B - Morning Shift
+                </p>
 </div>
 </div>
+<!-- Navigation Tiles -->
+<div class="px-6 pb-24">
+<h3 class="text-text-main dark:text-white text-lg font-bold mb-4 px-1">Management</h3>
+<div class="grid grid-cols-2 gap-4">
+<div class="glass-card p-5 rounded-2xl flex flex-col gap-4 cursor-pointer active:bg-white/40 transition-all">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center text-text-main">
+<span class="material-symbols-outlined text-2xl">group</span>
 </div>
-<!-- Stop Header & QR Area -->
-<div class="flex items-center justify-between px-4 pt-4 pb-2">
 <div>
-<p class="text-primary text-xs font-bold uppercase tracking-widest mb-1">Current Stop</p>
-<h2 class="text-white text-[24px] font-bold leading-tight tracking-tight">Oak Street</h2>
-<p class="text-slate-400 text-sm">4 of 6 students boarded</p>
-</div>
-<!-- Small QR Code for scanning -->
-<div class="flex flex-col items-center gap-1">
-<div class="p-2 bg-white rounded-lg shadow-lg">
-<div class="w-16 h-16 bg-center bg-no-repeat bg-cover" data-alt="Small QR code for student check-in" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDlikReLrXVqbtVVkmkrdfepivI4_uxlHFiJPuM9crelFgwRm4XZaSHbff3bIGb7-8vJMka5Sjg6joRy8sW3Q4lnHdY2O5_PLm5-WnAPxvgBeG_eYnm1ymForI0lOGjSDNNOxjK8A4t4HQ5XSbhFl3_l5F2TRUHbktxpUw_sJ_hvDFoaMwtBL_HuPjTeFIjCTwcsLD5Vw4aXXg_Y5M-AVvQEmb0tNyMeoqlPr_WzkRqR3fLBg0Aa7xK7Ycqw10veDRcOpJNcu1vTM0");'>
+<p class="font-bold text-sm">Members List</p>
+<p class="text-[10px] opacity-60">Manage students &amp; staff</p>
 </div>
 </div>
-<span class="text-[10px] text-slate-500 font-medium">Scan to Board</span>
+<div class="glass-card p-5 rounded-2xl flex flex-col gap-4 cursor-pointer active:bg-white/40 transition-all">
+<div class="size-12 rounded-xl bg-primary/20 flex items-center justify-center text-text-main">
+<span class="material-symbols-outlined text-2xl">directions_bus</span>
+</div>
+<div>
+<p class="font-bold text-sm">Bus Profile</p>
+<p class="text-[10px] opacity-60">Vehicle &amp; Route Info</p>
 </div>
 </div>
-<!-- Section Header -->
-<div class="px-4 py-4 flex items-center justify-between">
-<h3 class="text-slate-200 text-sm font-semibold uppercase tracking-wider">Expected Students</h3>
-<span class="material-symbols-outlined text-slate-500 text-xl">group</span>
-</div>
-<!-- Student List -->
-<div class="flex-1 space-y-1 overflow-y-auto no-scrollbar px-2">
-<!-- ListItem 1 -->
-<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
-<div class="relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary" data-alt="Profile photo of Alice Johnson" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCcPEuTTWeZ2DueufMCxdGFuzShfIyGO7GnTA1WrOp92VYbos-tjMMutc_Cnt66gR5sq_2pEZyyEVwSmRztcXvmCnoTJNwB0czbmhTiahAVuhC3fi2ZS7gDr6hq4vW-AmCQlZQI2oKt0VePZutbMImxlfgJ9gcmemNAzQukrgQuSjbT6hBmpOMrJxpMozI9HkLXJFEubLBR_xyfEu8lcvOiZXSC_TrZ2LY-WCdkJbfHhf-5CGG00wZ-zpyFL-xZDNs0Al6yQ75nhdY");'>
-</div>
-<div class="absolute -bottom-1 -right-1 bg-primary rounded-full p-0.5 border-2 border-background-dark">
-<span class="material-symbols-outlined text-background-dark text-[14px] font-bold">check</span>
 </div>
 </div>
-<div class="flex-1">
-<p class="text-white text-base font-semibold leading-none">Alice Johnson</p>
-<p class="text-slate-500 text-xs mt-1">Grade 4 • Boarded 08:12 AM</p>
-</div>
-<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
-<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+<!-- Bottom Navigation Bar -->
+<div class="fixed bottom-6 left-1/2 -translate-x-1/2 w-[90%] max-w-[380px] h-16 glass-card rounded-full flex items-center justify-around px-4 z-50">
+<button class="flex flex-col items-center justify-center text-primary">
+<span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1">home</span>
+<span class="text-[10px] font-bold">Home</span>
 </button>
-</div>
-<!-- ListItem 2 -->
-<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
-<div class="relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-slate-700" data-alt="Profile photo of Marcus Chen" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCBdr3pEn1HES7v24c70qTlH0tJ_0snR2-123rkPuWaNwnbMJyRL0yMIxJ17g--jClLiTV2jQ1jdDPGQWrzjP_sLBkU3BLkoE2B-ArvdZQmyPvppDdHE_ShUUDL-PPc0XUI7VnJCYNSP54A7LB0uU_r8shfpeF7-mIfqqV5TGvMKPxbCCly1y0zCkZrnKpqnjnHG_QvkA37sfLQbC5067XUOctOJARxyq24MmUeUC0MBKUyFpdgeicYd6EbLCD6f4JpT9FqSCDkge0");'>
-</div>
-</div>
-<div class="flex-1">
-<p class="text-white text-base font-semibold leading-none">Marcus Chen</p>
-<p class="text-slate-500 text-xs mt-1">Grade 2 • Waiting</p>
-</div>
-<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
-<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+<button class="flex flex-col items-center justify-center text-text-main/40 dark:text-white/40">
+<span class="material-symbols-outlined">history</span>
+<span class="text-[10px] font-medium">History</span>
 </button>
-</div>
-<!-- ListItem 3 -->
-<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
-<div class="relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-primary" data-alt="Profile photo of Sarah Smith" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuCYEpp5MYytkNsdwIVPQ1n8M6z5OPaE5ClsAsyzMaZl9Cy6YS6kCT1aX0Wc1XvyW_BgXkPrq9JQpCkMjTXrP3h7snNm1mpw4VkjK_0QySaTxG1Rr9vKU78XYVYRC68zQiVkshYlgipI6oCmVQf36zkyB8bn4vSmYUBLVLewYF4GVHIxuNiuaGLYvS5U64CNNu296mD13hPTDgaXZY-QXXytT3ZJyaBz4jbqyvd1GzIJMpmzsPc0PUYfHCGFUKiV8x9D7jsKLlfD6YQ");'>
-</div>
-<div class="absolute -bottom-1 -right-1 bg-primary rounded-full p-0.5 border-2 border-background-dark">
-<span class="material-symbols-outlined text-background-dark text-[14px] font-bold">check</span>
-</div>
-</div>
-<div class="flex-1">
-<p class="text-white text-base font-semibold leading-none">Sarah Smith</p>
-<p class="text-slate-500 text-xs mt-1">Grade 5 • Boarded 08:14 AM</p>
-</div>
-<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
-<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+<button class="flex flex-col items-center justify-center text-text-main/40 dark:text-white/40">
+<span class="material-symbols-outlined">map</span>
+<span class="text-[10px] font-medium">Routes</span>
 </button>
-</div>
-<!-- ListItem 4 -->
-<div class="flex items-center gap-4 bg-white/5 hover:bg-white/10 px-4 py-3 rounded-xl transition-all border border-transparent hover:border-white/10">
-<div class="relative">
-<div class="bg-center bg-no-repeat aspect-square bg-cover rounded-full h-12 w-12 border-2 border-slate-700" data-alt="Profile photo of Leo Garcia" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuDn1DGq9b75rQCXsIISXoCPxJa4U_c932WF8_bXaf77O0Gk7CSuwOJsMTtWQuRMmyd0HdvPWYUY1530zdj1KLRoL34V78vgF4t9CgyuaLJIrgWdOf9peFzr8SNmVtFKAOR2nu5IssqaIl3m9FZtuFTvYQDtbA853TREWY71oMfM_SVmzpxd6ySwq88tT42xSBBu-4VhqXOTnTtIIAoCN141ohjaoOz0lAjqfuWW6mZt3EG58oZ860JSdUNYQ1GZWc9jR-DuoEaPNL4");'>
-</div>
-</div>
-<div class="flex-1">
-<p class="text-white text-base font-semibold leading-none">Leo Garcia</p>
-<p class="text-slate-500 text-xs mt-1">Grade 3 • Waiting</p>
-</div>
-<button class="bg-primary/10 hover:bg-primary/20 p-2.5 rounded-full transition-colors group">
-<span class="material-symbols-outlined text-primary group-hover:scale-110 transition-transform">phone</span>
+<button class="flex flex-col items-center justify-center text-text-main/40 dark:text-white/40">
+<span class="material-symbols-outlined">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
 </button>
 </div>
 </div>
-<!-- Sticky Bottom Action -->
-<div class="p-4 bg-background-light dark:bg-background-dark border-t border-white/5">
-<button class="w-full bg-primary hover:bg-primary/90 text-background-dark py-4 rounded-xl font-bold text-lg flex items-center justify-center gap-2 transition-transform active:scale-95">
-<span>Depart Stop</span>
-<span class="material-symbols-outlined">arrow_forward</span>
-</button>
-<div class="mt-4 flex items-center gap-2">
-<div class="flex-1 bg-white/10 h-1.5 rounded-full overflow-hidden">
-<div class="bg-primary h-full w-[40%] rounded-full"></div>
-</div>
-<span class="text-[10px] text-slate-500 font-bold uppercase">4/12 Stops</span>
-</div>
-</div>
-</main>
-<!-- iOS Indicator (Visual only) -->
-<div class="h-1.5 w-32 bg-slate-800 rounded-full mx-auto mb-2 opacity-50"></div>
 </body></html>
