@@ -2,14 +2,18 @@ package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -139,16 +143,29 @@ fun LoginSelectionScreen(
                 
                 Spacer(modifier = Modifier.height(40.dp))
                 
-                // Student Login Button
+                // Student Login Button - Primary Glass Button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(56.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(28.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.1f),
+                            spotColor = Color.Black.copy(alpha = 0.1f)
+                        )
                         .background(
-                            Color(0xFF7DD3C0),
+                            Color(0xFF7DD3C0).copy(alpha = 0.9f),
                             RoundedCornerShape(28.dp)
                         )
-                        .clickable { onStudentLoginClick() }
+                        .clip(RoundedCornerShape(28.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(
+                                color = Color.White.copy(alpha = 0.3f),
+                                bounded = true
+                            )
+                        ) { onStudentLoginClick() }
                         .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
@@ -169,12 +186,30 @@ fun LoginSelectionScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Driver Access Button
+                // Driver Access Button - Secondary Glass Button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onDriverAccessClick() }
-                        .padding(horizontal = 24.dp, vertical = 16.dp),
+                        .height(56.dp)
+                        .shadow(
+                            elevation = 2.dp,
+                            shape = RoundedCornerShape(28.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.08f),
+                            spotColor = Color.Black.copy(alpha = 0.08f)
+                        )
+                        .background(
+                            Color.White.copy(alpha = 0.7f),
+                            RoundedCornerShape(28.dp)
+                        )
+                        .clip(RoundedCornerShape(28.dp))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = rememberRipple(
+                                color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
+                                bounded = true
+                            )
+                        ) { onDriverAccessClick() }
+                        .padding(horizontal = 24.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
