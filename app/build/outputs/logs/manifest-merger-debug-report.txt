@@ -1,9 +1,9 @@
 -- Merging decision tree log ---
 manifest
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-30:12
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-32:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-32:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-32:12
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:2:1-32:12
 MERGED from [androidx.compose.material3:material3:1.1.2] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\331a97ebc1fad6bede55687133b378a7\transformed\material3-1.1.2\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-common:2.7.6] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\5bbecda9efe4d9d147288d0d36d42e8b\transformed\navigation-common-2.7.6\AndroidManifest.xml:17:1-22:12
 MERGED from [androidx.navigation:navigation-runtime:2.7.6] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\44d87fbd1f0d48d56e73a050f5f1caf2\transformed\navigation-runtime-2.7.6\AndroidManifest.xml:17:1-22:12
@@ -122,8 +122,8 @@ MERGED from [io.grpc:grpc-android:1.62.2] C:\Users\PANDI HARSHAN\.gradle\caches\
 	android:name
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:6:22-76
 application
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-28:19
-INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-28:19
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-30:19
+INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:8:5-30:19
 MERGED from [com.google.firebase:firebase-auth:24.0.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\99eb15c2ea196052de5f2f33b7802875\transformed\firebase-auth-24.0.1\AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-auth:24.0.1] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\99eb15c2ea196052de5f2f33b7802875\transformed\firebase-auth-24.0.1\AndroidManifest.xml:28:5-73:19
 MERGED from [com.google.firebase:firebase-firestore:26.1.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\be495d72ee88ad0be4bd6b86aab838d3\transformed\firebase-firestore-26.1.0\AndroidManifest.xml:13:5-24:19
@@ -171,39 +171,43 @@ MERGED from [com.google.android.play:core-common:2.0.3] C:\Users\PANDI HARSHAN\.
 	android:appComponentFactory
 		ADDED from [androidx.core:core:1.12.0] C:\Users\PANDI HARSHAN\.gradle\caches\transforms-3\86f72d3cf891e9dbf79bb02febd4cf09\transformed\core-1.12.0\AndroidManifest.xml:28:18-86
 	android:supportsRtl
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:14:9-35
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:16:9-35
 	android:label
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:13:9-41
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-41
 	android:fullBackupContent
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:12:9-54
+	android:roundIcon
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:14:9-54
 	tools:targetApi
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:16:9-29
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:9-29
+	android:icon
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:13:9-43
 	android:allowBackup
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:10:9-36
 	android:theme
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:15:9-52
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:17:9-52
 	android:dataExtractionRules
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:11:9-65
 	android:name
 		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:9:9-54
 activity#com.campusbussbuddy.MainActivity
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:18:9-26:20
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:9-28:20
 	android:exported
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:20:13-36
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:22:13-36
 	android:theme
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:13-56
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:13-56
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:19:13-41
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:21:13-41
 intent-filter#action:name:android.intent.action.MAIN+category:name:android.intent.category.LAUNCHER
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:22:13-25:29
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:13-27:29
 action#android.intent.action.MAIN
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:17-69
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:25:17-69
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:23:25-66
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:25:25-66
 category#android.intent.category.LAUNCHER
-ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:17-77
+ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:26:17-77
 	android:name
-		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:24:27-74
+		ADDED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml:26:27-74
 uses-sdk
 INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml reason: use-sdk injection requested
 INJECTED from C:\full stack\BusAlertSystem\app\src\main\AndroidManifest.xml
