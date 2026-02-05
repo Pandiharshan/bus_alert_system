@@ -4,7 +4,7 @@
             "outputFile": "com.campusbussbuddy.test.app-mergeDebugAndroidTestResources-32:/values-in/values-in.xml",
             "map": [
                 {
-                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\05a0cf1702463b378991bdb064077999\\transformed\\ui-release\\res\\values-in\\values-in.xml",
+                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\2d2b6892ce5b6e48ce5fd6f3cb0b1b84\\transformed\\ui-release\\res\\values-in\\values-in.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18",
                         "startColumns": "4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4",
@@ -21,7 +21,7 @@
                     }
                 },
                 {
-                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\524799384a4be80818f895f590f0bddd\\transformed\\core-1.12.0\\res\\values-in\\values-in.xml",
+                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\86f72d3cf891e9dbf79bb02febd4cf09\\transformed\\core-1.12.0\\res\\values-in\\values-in.xml",
                     "from": {
                         "startLines": "2,3,4,5,6,7,8,9",
                         "startColumns": "4,4,4,4,4,4,4,4",

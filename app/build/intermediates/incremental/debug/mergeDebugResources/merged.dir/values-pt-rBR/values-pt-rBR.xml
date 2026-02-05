@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Senha"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Chave de acesso"</string>
     <string msgid="6128938260108474660" name="bottom_sheet_collapse_description">"Fechar página inferior"</string>
     <string msgid="1918297411568599192" name="bottom_sheet_dismiss_description">"Dispensar página inferior"</string>
     <string msgid="7772321844937772780" name="bottom_sheet_drag_handle_description">"Alça de arrastar"</string>
@@ -31,7 +33,7 @@
     <string name="common_google_play_services_wear_update_text">É necessária uma nova versão do Google Play Services. Ele será atualizado em breve.</string>
     <string name="common_open_on_phone">Abrir no smartphone</string>
     <string name="common_signin_button_text">Fazer login</string>
-    <string name="common_signin_button_text_long">Fazer login com o Google</string>
+    <string name="common_signin_button_text_long">Fazer Login com o Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Link copiado para a área de transferência"</string>
     <string msgid="3499643850558715142" name="date_input_headline">"Data inserida"</string>
     <string msgid="8562356184193964298" name="date_input_headline_description">"Data inserida: %1$s"</string>

@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Сырсөз"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Киргизүүчү ачкыч"</string>
     <string msgid="6128938260108474660" name="bottom_sheet_collapse_description">"Ылдыйкы экранды жыйыштыруу"</string>
     <string msgid="1918297411568599192" name="bottom_sheet_dismiss_description">"Ылдыйкы экранды жабуу"</string>
     <string msgid="7772321844937772780" name="bottom_sheet_drag_handle_description">"Тизменин керектүү жерине сүйрөп баруу"</string>
@@ -28,7 +30,7 @@
     <string msgid="9053896323427875356" name="common_google_play_services_update_text">Google Play кызматтары жаңыртылмайынча %1$s иштебейт.</string>
     <string msgid="6006316683626838685" name="common_google_play_services_update_title">Google Play кызматтарын жаңыртуу</string>
     <string name="common_google_play_services_updating_text">Google Play кызматтарысыз %1$s иштебейт, алар учурда жаңыртылууда.</string>
-    <string name="common_google_play_services_wear_update_text">Google Play кызматтарынын жаңы версиясы талап кылынат. Бир аздан кийин ал өзү эле жаңыртылат.</string>
+    <string name="common_google_play_services_wear_update_text">Google Play кызматтарынын жаңы версиясы талап кылынат. Бир аздан кийин ал өзү эле жаңырат.</string>
     <string name="common_open_on_phone">Телефондо ачык</string>
     <string name="common_signin_button_text">Кирүү</string>
     <string name="common_signin_button_text_long">Google менен кирүү</string>

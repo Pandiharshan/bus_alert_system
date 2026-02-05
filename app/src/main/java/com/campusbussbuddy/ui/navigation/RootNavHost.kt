@@ -7,6 +7,8 @@ import androidx.navigation.compose.rememberNavController
 import com.campusbussbuddy.ui.screens.LoginSelectionScreen
 import com.campusbussbuddy.ui.screens.DriverAuthenticationScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
+import com.campusbussbuddy.ui.screens.AdminLoginScreen
+import com.campusbussbuddy.ui.screens.AdminHomeScreen
 
 @Composable
 fun RootNavHost() {
@@ -25,7 +27,7 @@ fun RootNavHost() {
                     navController.navigate(Destinations.DRIVER_AUTHENTICATION)
                 },
                 onAdminLoginClick = {
-                    // TODO: Navigate to admin login when implemented
+                    navController.navigate(Destinations.ADMIN_LOGIN)
                 }
             )
         }
@@ -43,6 +45,26 @@ fun RootNavHost() {
         
         composable(Destinations.STUDENT_PORTAL_HOME) {
             StudentPortalHomeScreen()
+        }
+        
+        composable(Destinations.ADMIN_LOGIN) {
+            AdminLoginScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onLoginSuccess = {
+                    navController.navigate(Destinations.ADMIN_HOME) {
+                        // Clear back stack to prevent going back to login
+                        popUpTo(Destinations.LOGIN_SELECTION) {
+                            inclusive = false
+                        }
+                    }
+                }
+            )
+        }
+        
+        composable(Destinations.ADMIN_HOME) {
+            AdminHomeScreen()
         }
     }
 }

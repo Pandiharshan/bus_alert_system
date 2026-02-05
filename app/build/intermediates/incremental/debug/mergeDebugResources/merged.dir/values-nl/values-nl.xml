@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Wachtwoord"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Toegangssleutel"</string>
     <string msgid="6128938260108474660" name="bottom_sheet_collapse_description">"Blad onderaan samenvouwen"</string>
     <string msgid="1918297411568599192" name="bottom_sheet_dismiss_description">"Blad onderaan sluiten"</string>
     <string msgid="7772321844937772780" name="bottom_sheet_drag_handle_description">"Handgreep voor slepen"</string>
@@ -15,7 +17,7 @@
     <string msgid="7573152094250666567" name="close_sheet">"Blad sluiten"</string>
     <string msgid="5389587048670450460" name="collapsed">"Samengevouwen"</string>
     <string msgid="2523291102206661146" name="common_google_play_services_enable_button">Aanzetten</string>
-    <string msgid="227660514972886228" name="common_google_play_services_enable_text">%1$s werkt niet, tenzij je Google Play-services inschakelt.</string>
+    <string msgid="227660514972886228" name="common_google_play_services_enable_text">%1$s werkt niet, tenzij je Google Play-services aanzet.</string>
     <string msgid="5122002158466380389" name="common_google_play_services_enable_title">Google Play-services aanzetten</string>
     <string msgid="7153882981874058840" name="common_google_play_services_install_button">Installeren</string>
     <string name="common_google_play_services_install_text">%1$s kan niet worden uitgevoerd zonder Google Play-services, die je nog niet op je apparaat hebt.</string>

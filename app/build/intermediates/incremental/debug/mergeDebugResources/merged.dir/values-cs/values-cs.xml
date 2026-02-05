@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Heslo"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Přístupový klíč"</string>
     <string msgid="6128938260108474660" name="bottom_sheet_collapse_description">"Sbalit spodní tabulku"</string>
     <string msgid="1918297411568599192" name="bottom_sheet_dismiss_description">"Zavřít spodní tabulku"</string>
     <string msgid="7772321844937772780" name="bottom_sheet_drag_handle_description">"Úchyt pro přetažení"</string>
@@ -31,7 +33,7 @@
     <string name="common_google_play_services_wear_update_text">Je vyžadována nová verze služeb Google Play. Nová verze se brzy sama nainstaluje.</string>
     <string name="common_open_on_phone">Otevřít v telefonu</string>
     <string name="common_signin_button_text">Přihlásit se</string>
-    <string name="common_signin_button_text_long">Přihlásit se k účtu Google</string>
+    <string name="common_signin_button_text_long">Přihlášení přes Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Odkaz zkopírován do schránky"</string>
     <string msgid="3499643850558715142" name="date_input_headline">"Zadané datum"</string>
     <string msgid="8562356184193964298" name="date_input_headline_description">"Zadané datum: %1$s"</string>

@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "254352566066",
-    "project_id": "busalertsystem",
-    "storage_bucket": "busalertsystem.firebasestorage.app"
+    "project_number": "1051542759438",
+    "project_id": "campus-bus-buddy-40b25",
+    "storage_bucket": "campus-bus-buddy-40b25.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:254352566066:android:0897cce7d9588733b9192b",
+        "mobilesdk_app_id": "1:1051542759438:android:876763689d203367c7b45f",
         "android_client_info": {
           "package_name": "com.campusbussbuddy"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyCAUrJ5QZti99h-kLvyOiyy6SMCbf2ENYA"
+          "current_key": "AIzaSyAQT0Ed0rx8d45Hat6MbYz-cttTy66loD8"
         }
       ],
       "services": {

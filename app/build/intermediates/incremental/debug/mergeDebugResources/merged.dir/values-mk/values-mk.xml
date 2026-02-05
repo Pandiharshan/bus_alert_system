@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources xmlns:ns1="urn:oasis:names:tc:xliff:document:1.2">
+    <string msgid="8397015543330865059" name="android.credentials.TYPE_PASSWORD_CREDENTIAL">"Лозинка"</string>
+    <string msgid="3929015085059320822" name="androidx.credentials.TYPE_PUBLIC_KEY_CREDENTIAL">"Криптографски клуч"</string>
     <string msgid="6128938260108474660" name="bottom_sheet_collapse_description">"Собери го долниот лист"</string>
     <string msgid="1918297411568599192" name="bottom_sheet_dismiss_description">"Отфрли го долниот лист"</string>
     <string msgid="7772321844937772780" name="bottom_sheet_drag_handle_description">"Рачка за влечење"</string>
@@ -30,7 +32,7 @@
     <string name="common_google_play_services_updating_text">%1$s нема да се извршува без услугите на Google Play што се ажурираат во моментов.</string>
     <string name="common_google_play_services_wear_update_text">Потребна е нова верзија на услугите на Google Play. Таа наскоро самата ќе се ажурира.</string>
     <string name="common_open_on_phone">Отвори на телефонот</string>
-    <string name="common_signin_button_text">Најави се</string>
+    <string name="common_signin_button_text">Најавете се</string>
     <string name="common_signin_button_text_long">Најави се со Google</string>
     <string msgid="3260749812566568062" name="copy_toast_msg">"Линкот е копиран во привремена меморија"</string>
     <string msgid="3499643850558715142" name="date_input_headline">"Внесен датум"</string>
