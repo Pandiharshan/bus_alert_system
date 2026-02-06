@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-64:/values-watch-v20/values-watch-v20.xml",
+            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-66:/values-watch-v20/values-watch-v20.xml",
             "map": [
                 {
                     "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\65918847e82f6888af9aba9be149af15\\transformed\\play-services-auth-20.7.0\\res\\values-watch-v20\\values.xml",

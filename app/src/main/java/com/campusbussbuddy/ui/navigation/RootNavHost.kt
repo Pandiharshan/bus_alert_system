@@ -6,9 +6,14 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.campusbussbuddy.ui.screens.LoginSelectionScreen
 import com.campusbussbuddy.ui.screens.DriverAuthenticationScreen
+import com.campusbussbuddy.ui.screens.DriverHomeScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
 import com.campusbussbuddy.ui.screens.AdminLoginScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
+import com.campusbussbuddy.ui.screens.AddDriverScreen
+import com.campusbussbuddy.ui.screens.DriverDatabaseScreen
+import com.campusbussbuddy.ui.screens.BusDatabaseScreen
+import com.campusbussbuddy.ui.screens.StudentDatabaseScreen
 
 @Composable
 fun RootNavHost() {
@@ -38,9 +43,18 @@ fun RootNavHost() {
                     navController.popBackStack()
                 },
                 onStartShiftClick = {
-                    // TODO: Navigate to driver dashboard when implemented
+                    navController.navigate(Destinations.DRIVER_HOME) {
+                        // Clear back stack to prevent going back to authentication
+                        popUpTo(Destinations.LOGIN_SELECTION) {
+                            inclusive = false
+                        }
+                    }
                 }
             )
+        }
+        
+        composable(Destinations.DRIVER_HOME) {
+            DriverHomeScreen()
         }
         
         composable(Destinations.STUDENT_PORTAL_HOME) {
@@ -64,7 +78,55 @@ fun RootNavHost() {
         }
         
         composable(Destinations.ADMIN_HOME) {
-            AdminHomeScreen()
+            AdminHomeScreen(
+                onManageDriversClick = {
+                    navController.navigate(Destinations.MANAGE_DRIVERS)
+                },
+                onManageBusesClick = {
+                    navController.navigate(Destinations.MANAGE_BUSES)
+                },
+                onManageStudentsClick = {
+                    navController.navigate(Destinations.MANAGE_STUDENTS)
+                }
+            )
+        }
+        
+        composable(Destinations.ADD_DRIVER) {
+            AddDriverScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onDriverAdded = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(Destinations.MANAGE_DRIVERS) {
+            DriverDatabaseScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onAddDriverClick = {
+                    navController.navigate(Destinations.ADD_DRIVER)
+                }
+            )
+        }
+        
+        composable(Destinations.MANAGE_BUSES) {
+            BusDatabaseScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
+        composable(Destinations.MANAGE_STUDENTS) {
+            StudentDatabaseScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                }
+            )
         }
     }
 }

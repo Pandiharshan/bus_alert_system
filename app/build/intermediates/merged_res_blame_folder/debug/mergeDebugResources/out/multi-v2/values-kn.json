@@ -1,7 +1,7 @@
 {
     "logs": [
         {
-            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-64:/values-kn/values-kn.xml",
+            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-66:/values-kn/values-kn.xml",
             "map": [
                 {
                     "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\331a97ebc1fad6bede55687133b378a7\\transformed\\material3-1.1.2\\res\\values-kn\\values-kn.xml",

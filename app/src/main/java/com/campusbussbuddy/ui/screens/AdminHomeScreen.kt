@@ -23,7 +23,11 @@ import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 
 @Composable
-fun AdminHomeScreen() {
+fun AdminHomeScreen(
+    onManageDriversClick: () -> Unit = {},
+    onManageBusesClick: () -> Unit = {},
+    onManageStudentsClick: () -> Unit = {}
+) {
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -76,16 +80,15 @@ fun AdminHomeScreen() {
             }
             
             item {
-                MainActionTiles()
+                MainActionTiles(
+                    onManageDriversClick = onManageDriversClick,
+                    onManageBusesClick = onManageBusesClick,
+                    onManageStudentsClick = onManageStudentsClick
+                )
             }
             
             item {
                 Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Quick Actions
-                QuickActionBar()
             }
         }
     }
@@ -114,45 +117,31 @@ private fun AdminProfileCard() {
                 .padding(24.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Admin Avatar
+            // Admin Profile Image
             Box(
                 modifier = Modifier
                     .size(64.dp)
-                    .background(
-                        Color(0xFF7DD3C0).copy(alpha = 0.2f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+                    .clip(CircleShape)
+                    .background(Color(0xFFF0F0F0))
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_person),
-                    contentDescription = "Admin",
-                    tint = Color(0xFF7DD3C0),
-                    modifier = Modifier.size(32.dp)
+                    painter = painterResource(id = R.drawable.admin),
+                    contentDescription = "Admin Profile",
+                    modifier = Modifier.fillMaxSize(),
+                    tint = Color.Unspecified
                 )
             }
             
             Spacer(modifier = Modifier.width(16.dp))
             
-            Column(
+            // Admin Name
+            Text(
+                text = "Pandiharshan",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.Black,
                 modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = "Admin Dashboard",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = "System Administrator",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF888888)
-                )
-            }
+            )
             
             // Settings Icon
             IconButton(
@@ -189,9 +178,9 @@ private fun DashboardStatsGrid() {
             )
             
             StatCard(
-                value = "18",
-                label = "Total Drivers",
-                icon = R.drawable.ic_group,
+                value = "842",
+                label = "Total Students",
+                icon = R.drawable.ic_person,
                 modifier = Modifier.weight(1f)
             )
         }
@@ -200,20 +189,13 @@ private fun DashboardStatsGrid() {
         
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.Center
         ) {
-            StatCard(
-                value = "842",
-                label = "Total Students",
-                icon = R.drawable.ic_person,
-                modifier = Modifier.weight(1f)
-            )
-            
             StatCard(
                 value = "756",
                 label = "Present Today",
                 icon = R.drawable.ic_check_circle,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.width(180.dp)
             )
         }
     }
@@ -395,7 +377,11 @@ private fun LiveStatItem(
 }
 
 @Composable
-private fun MainActionTiles() {
+private fun MainActionTiles(
+    onManageDriversClick: () -> Unit = {},
+    onManageBusesClick: () -> Unit = {},
+    onManageStudentsClick: () -> Unit = {}
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -409,13 +395,15 @@ private fun MainActionTiles() {
             ActionTile(
                 icon = R.drawable.ic_directions_bus_vector,
                 title = "Manage\nBuses",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onManageBusesClick
             )
             
             ActionTile(
                 icon = R.drawable.ic_group,
                 title = "Manage\nDrivers",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onManageDriversClick
             )
         }
         
@@ -426,30 +414,27 @@ private fun MainActionTiles() {
             ActionTile(
                 icon = R.drawable.ic_person,
                 title = "Manage\nStudents",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = onManageStudentsClick
             )
             
             ActionTile(
                 icon = R.drawable.ic_calendar_month,
                 title = "Attendance\nOverview",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.weight(1f),
+                onClick = { /* Handle attendance */ }
             )
         }
         
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.Center
         ) {
             ActionTile(
                 icon = R.drawable.ic_map,
                 title = "Live Trips\nMonitor",
-                modifier = Modifier.weight(1f)
-            )
-            
-            ActionTile(
-                icon = R.drawable.ic_notifications,
-                title = "Send\nNotifications",
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.width(180.dp),
+                onClick = { /* Handle live trips */ }
             )
         }
     }
@@ -459,7 +444,8 @@ private fun MainActionTiles() {
 private fun ActionTile(
     icon: Int,
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit = {}
 ) {
     Card(
         modifier = modifier
@@ -476,7 +462,7 @@ private fun ActionTile(
                     color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
                     bounded = true
                 )
-            ) { /* Handle action */ },
+            ) { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.95f)
@@ -513,92 +499,5 @@ private fun ActionTile(
                 lineHeight = 18.sp
             )
         }
-    }
-}
-
-@Composable
-private fun QuickActionBar() {
-    Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-    ) {
-        Text(
-            text = "Quick Actions",
-            fontSize = 16.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 12.dp)
-        )
-        
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            QuickActionButton(
-                icon = R.drawable.ic_add,
-                label = "Add Bus"
-            )
-            
-            QuickActionButton(
-                icon = R.drawable.ic_add,
-                label = "Add Driver"
-            )
-            
-            QuickActionButton(
-                icon = R.drawable.ic_add,
-                label = "Add Student"
-            )
-        }
-    }
-}
-
-@Composable
-private fun QuickActionButton(
-    icon: Int,
-    label: String
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.clickable(
-            interactionSource = remember { MutableInteractionSource() },
-            indication = rememberRipple(
-                color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
-                bounded = false
-            )
-        ) { /* Handle quick action */ }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(56.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = CircleShape,
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
-                )
-                .background(
-                    Color.White.copy(alpha = 0.95f),
-                    CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = label,
-                tint = Color(0xFF7DD3C0),
-                modifier = Modifier.size(24.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        Text(
-            text = label,
-            fontSize = 11.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color(0xFF666666),
-            textAlign = TextAlign.Center
-        )
     }
 }

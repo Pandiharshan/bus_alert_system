@@ -24,15 +24,22 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.DriverAuthResult
+import com.campusbussbuddy.firebase.FirebaseManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun DriverAuthenticationScreen(
     onBackClick: () -> Unit,
     onStartShiftClick: () -> Unit
 ) {
-    var driverId by remember { mutableStateOf("") }
-    var securityPin by remember { mutableStateOf("") }
-    var isPinVisible by remember { mutableStateOf(false) }
+    var email by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    val scope = rememberCoroutineScope()
     
     Box(
         modifier = Modifier
@@ -116,9 +123,9 @@ fun DriverAuthenticationScreen(
                             .padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Driver ID Field
+                        // Email Field
                         Text(
-                            text = "Driver ID",
+                            text = "Email",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black,
@@ -128,18 +135,21 @@ fun DriverAuthenticationScreen(
                         )
                         
                         OutlinedTextField(
-                            value = driverId,
-                            onValueChange = { driverId = it },
+                            value = email,
+                            onValueChange = { 
+                                email = it
+                                errorMessage = null
+                            },
                             placeholder = {
                                 Text(
-                                    text = "Enter your ID",
+                                    text = "Enter your email",
                                     color = Color(0xFFAAAAAA)
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Driver ID",
+                                    contentDescription = "Email",
                                     tint = Color(0xFF888888)
                                 )
                             },
@@ -153,68 +163,60 @@ fun DriverAuthenticationScreen(
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color(0xFFFAFAFA)
                             ),
-                            singleLine = true
+                            singleLine = true,
+                            enabled = !isLoading,
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
                         )
                         
                         Spacer(modifier = Modifier.height(24.dp))
                         
-                        // Security PIN Field
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = "Security PIN",
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Black
-                            )
-                            
-                            Text(
-                                text = "FORGOT?",
-                                fontSize = 12.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color(0xFFB8A9D9),
-                                modifier = Modifier.clickable { /* Handle forgot PIN */ }
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
+                        // Password Field
+                        Text(
+                            text = "Password",
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color.Black,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 8.dp)
+                        )
                         
                         OutlinedTextField(
-                            value = securityPin,
-                            onValueChange = { securityPin = it },
+                            value = password,
+                            onValueChange = { 
+                                password = it
+                                errorMessage = null
+                            },
                             placeholder = {
                                 Text(
-                                    text = "••••••",
+                                    text = "Enter your password",
                                     color = Color(0xFFAAAAAA)
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_visibility_off),
-                                    contentDescription = "Security PIN",
+                                    contentDescription = "Password",
                                     tint = Color(0xFF888888)
                                 )
                             },
                             trailingIcon = {
                                 IconButton(
-                                    onClick = { isPinVisible = !isPinVisible }
+                                    onClick = { isPasswordVisible = !isPasswordVisible }
                                 ) {
                                     Icon(
                                         painter = painterResource(
-                                            id = if (isPinVisible) R.drawable.ic_visibility 
+                                            id = if (isPasswordVisible) R.drawable.ic_visibility 
                                             else R.drawable.ic_visibility_off
                                         ),
-                                        contentDescription = if (isPinVisible) "Hide PIN" else "Show PIN",
+                                        contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
                                         tint = Color(0xFF888888)
                                     )
                                 }
                             },
-                            visualTransformation = if (isPinVisible) VisualTransformation.None 
+                            visualTransformation = if (isPasswordVisible) VisualTransformation.None 
                             else PasswordVisualTransformation(),
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(56.dp),
@@ -225,8 +227,22 @@ fun DriverAuthenticationScreen(
                                 focusedContainerColor = Color.White,
                                 unfocusedContainerColor = Color(0xFFFAFAFA)
                             ),
-                            singleLine = true
+                            singleLine = true,
+                            enabled = !isLoading
                         )
+                        
+                        // Error Message
+                        if (errorMessage != null) {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = errorMessage!!,
+                                fontSize = 13.sp,
+                                fontWeight = FontWeight.Normal,
+                                color = Color(0xFFD32F2F),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                         
                         Spacer(modifier = Modifier.height(40.dp))
                         
@@ -242,36 +258,62 @@ fun DriverAuthenticationScreen(
                                     spotColor = Color.Black.copy(alpha = 0.1f)
                                 )
                                 .background(
-                                    Color(0xFF7DD3C0).copy(alpha = 0.9f),
+                                    if (isLoading) Color(0xFF7DD3C0).copy(alpha = 0.5f)
+                                    else Color(0xFF7DD3C0).copy(alpha = 0.9f),
                                     RoundedCornerShape(28.dp)
                                 )
                                 .clip(RoundedCornerShape(28.dp))
                                 .clickable(
+                                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = rememberRipple(
                                         color = Color.White.copy(alpha = 0.3f),
                                         bounded = true
                                     )
-                                ) { onStartShiftClick() }
+                                ) {
+                                    scope.launch {
+                                        isLoading = true
+                                        errorMessage = null
+                                        
+                                        when (val result = FirebaseManager.authenticateDriver(email.trim(), password)) {
+                                            is DriverAuthResult.Success -> {
+                                                isLoading = false
+                                                onStartShiftClick()
+                                            }
+                                            is DriverAuthResult.Error -> {
+                                                isLoading = false
+                                                errorMessage = result.message
+                                            }
+                                        }
+                                    }
+                                }
                                 .padding(horizontal = 24.dp),
                             horizontalArrangement = Arrangement.Center,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = "Start Shift",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = Color.Black
-                            )
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_chevron_right),
-                                contentDescription = "Start",
-                                tint = Color.Black,
-                                modifier = Modifier.size(20.dp)
-                            )
+                            if (isLoading) {
+                                CircularProgressIndicator(
+                                    modifier = Modifier.size(20.dp),
+                                    color = Color.Black,
+                                    strokeWidth = 2.dp
+                                )
+                            } else {
+                                Text(
+                                    text = "Start Shift",
+                                    fontSize = 16.sp,
+                                    fontWeight = FontWeight.Medium,
+                                    color = Color.Black
+                                )
+                                
+                                Spacer(modifier = Modifier.width(8.dp))
+                                
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_chevron_right),
+                                    contentDescription = "Start",
+                                    tint = Color.Black,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            }
                         }
                     }
                 }
