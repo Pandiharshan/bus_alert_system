@@ -1,5 +1,6 @@
 package com.campusbussbuddy.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -41,9 +42,14 @@ fun DriverHomeScreen() {
     // Load driver data on screen launch
     LaunchedEffect(Unit) {
         scope.launch {
+            Log.d("DriverHomeScreen", "Loading driver info...")
             driverInfo = FirebaseManager.getCurrentDriverInfo()
+            Log.d("DriverHomeScreen", "Driver info loaded: ${driverInfo?.name}")
+            Log.d("DriverHomeScreen", "Photo URL: '${driverInfo?.photoUrl}'")
+            
             if (driverInfo?.assignedBusId?.isNotEmpty() == true) {
                 busInfo = FirebaseManager.getBusInfo(driverInfo!!.assignedBusId)
+                Log.d("DriverHomeScreen", "Bus info loaded: Bus ${busInfo?.busNumber}")
             }
             isLoading = false
         }
@@ -109,15 +115,32 @@ private fun DriverProfileSection(
                 .border(3.dp, Color.White.copy(alpha = 0.3f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
-            val photoUrl = driverInfo?.photoUrl
+            val photoUrl = driverInfo?.photoUrl?.trim() ?: ""
             
-            if (!photoUrl.isNullOrEmpty() && photoUrl.isNotBlank()) {
+            Log.d("DriverProfileSection", "Rendering photo section")
+            Log.d("DriverProfileSection", "Photo URL: '$photoUrl'")
+            Log.d("DriverProfileSection", "Is empty: ${photoUrl.isEmpty()}")
+            Log.d("DriverProfileSection", "Is blank: ${photoUrl.isBlank()}")
+            
+            if (photoUrl.isNotEmpty() && photoUrl.isNotBlank()) {
                 SubcomposeAsyncImage(
                     model = ImageRequest.Builder(context)
                         .data(photoUrl)
                         .crossfade(true)
                         .memoryCacheKey(photoUrl)
                         .diskCacheKey(photoUrl)
+                        .listener(
+                            onStart = {
+                                Log.d("CoilImage", "Loading started for: $photoUrl")
+                            },
+                            onSuccess = { _, _ ->
+                                Log.d("CoilImage", "Loading SUCCESS")
+                            },
+                            onError = { _, result ->
+                                Log.e("CoilImage", "Loading FAILED: ${result.throwable.message}")
+                                result.throwable.printStackTrace()
+                            }
+                        )
                         .build(),
                     contentDescription = "Driver Profile Photo",
                     modifier = Modifier.fillMaxSize(),
@@ -151,6 +174,7 @@ private fun DriverProfileSection(
                     }
                 )
             } else {
+                Log.d("DriverProfileSection", "Showing default icon - no photo URL")
                 // Show default icon if no photo URL
                 Icon(
                     painter = painterResource(id = R.drawable.ic_person),

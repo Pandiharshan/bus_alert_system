@@ -17,7 +17,8 @@ import com.campusbussbuddy.R
 
 @Composable
 fun StudentDatabaseScreen(
-    onBackClick: () -> Unit
+    onBackClick: () -> Unit,
+    onAddStudentClick: () -> Unit
 ) {
     var searchQuery by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
@@ -31,8 +32,9 @@ fun StudentDatabaseScreen(
             modifier = Modifier.fillMaxSize()
         ) {
             // Top Bar
-            TopBar(
+            StudentDatabaseTopBar(
                 onBackClick = onBackClick,
+                onAddClick = onAddStudentClick,
                 title = "Student Database",
                 count = 0
             )
@@ -68,8 +70,9 @@ fun StudentDatabaseScreen(
 }
 
 @Composable
-private fun TopBar(
+private fun StudentDatabaseTopBar(
     onBackClick: () -> Unit,
+    onAddClick: () -> Unit,
     title: String,
     count: Int
 ) {
@@ -111,6 +114,24 @@ private fun TopBar(
                     color = Color(0xFF888888)
                 )
             }
+        }
+        
+        // Add Student Button
+        IconButton(
+            onClick = onAddClick,
+            modifier = Modifier
+                .size(40.dp)
+                .background(
+                    Color(0xFF7DD3C0).copy(alpha = 0.15f),
+                    androidx.compose.foundation.shape.CircleShape
+                )
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = "Add Student",
+                tint = Color(0xFF7DD3C0),
+                modifier = Modifier.size(20.dp)
+            )
         }
     }
 }

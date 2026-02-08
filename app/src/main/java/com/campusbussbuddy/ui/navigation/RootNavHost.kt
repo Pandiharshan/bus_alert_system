@@ -5,12 +5,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.campusbussbuddy.ui.screens.LoginSelectionScreen
+import com.campusbussbuddy.ui.screens.StudentLoginScreen
 import com.campusbussbuddy.ui.screens.DriverAuthenticationScreen
 import com.campusbussbuddy.ui.screens.DriverHomeScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
 import com.campusbussbuddy.ui.screens.AdminLoginScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
 import com.campusbussbuddy.ui.screens.AddDriverScreen
+import com.campusbussbuddy.ui.screens.AddStudentScreen
 import com.campusbussbuddy.ui.screens.DriverDatabaseScreen
 import com.campusbussbuddy.ui.screens.BusDatabaseScreen
 import com.campusbussbuddy.ui.screens.StudentDatabaseScreen
@@ -26,13 +28,29 @@ fun RootNavHost() {
         composable(Destinations.LOGIN_SELECTION) {
             LoginSelectionScreen(
                 onStudentLoginClick = { 
-                    navController.navigate(Destinations.STUDENT_PORTAL_HOME)
+                    navController.navigate(Destinations.STUDENT_LOGIN)
                 },
                 onDriverAccessClick = { 
                     navController.navigate(Destinations.DRIVER_AUTHENTICATION)
                 },
                 onAdminLoginClick = {
                     navController.navigate(Destinations.ADMIN_LOGIN)
+                }
+            )
+        }
+        
+        composable(Destinations.STUDENT_LOGIN) {
+            StudentLoginScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onLoginSuccess = {
+                    navController.navigate(Destinations.STUDENT_PORTAL_HOME) {
+                        // Clear back stack to prevent going back to login
+                        popUpTo(Destinations.LOGIN_SELECTION) {
+                            inclusive = false
+                        }
+                    }
                 }
             )
         }
@@ -102,6 +120,17 @@ fun RootNavHost() {
             )
         }
         
+        composable(Destinations.ADD_STUDENT) {
+            AddStudentScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onStudentAdded = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
         composable(Destinations.MANAGE_DRIVERS) {
             DriverDatabaseScreen(
                 onBackClick = {
@@ -125,6 +154,9 @@ fun RootNavHost() {
             StudentDatabaseScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onAddStudentClick = {
+                    navController.navigate(Destinations.ADD_STUDENT)
                 }
             )
         }

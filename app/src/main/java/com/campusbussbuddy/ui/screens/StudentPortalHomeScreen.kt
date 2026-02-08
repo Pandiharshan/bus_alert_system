@@ -1,5 +1,6 @@
 package com.campusbussbuddy.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,41 +22,80 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.BusInfo
+import com.campusbussbuddy.firebase.StudentInfo
+import com.campusbussbuddy.firebase.FirebaseManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun StudentPortalHomeScreen() {
+    var studentInfo by remember { mutableStateOf<StudentInfo?>(null) }
+    var busInfo by remember { mutableStateOf<BusInfo?>(null) }
+    var isLoading by remember { mutableStateOf(true) }
+    
+    val scope = rememberCoroutineScope()
+    
+    // Load student data on screen launch
+    LaunchedEffect(Unit) {
+        scope.launch {
+            Log.d("StudentPortalHome", "Loading student info...")
+            studentInfo = FirebaseManager.getCurrentStudentInfo()
+            Log.d("StudentPortalHome", "Student info loaded: ${studentInfo?.name}")
+            Log.d("StudentPortalHome", "Bus ID: ${studentInfo?.busId}")
+            
+            if (studentInfo?.busId?.isNotEmpty() == true) {
+                busInfo = FirebaseManager.getBusInfo(studentInfo!!.busId)
+                Log.d("StudentPortalHome", "Bus info loaded: Bus ${busInfo?.busNumber}")
+            }
+            isLoading = false
+        }
+    }
+    
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(Color(0xFFF8F9FA))
     ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 100.dp)
-        ) {
-            item {
-                // Top Header
-                TopHeader()
-            }
-            
-            item {
-                // Welcome Section
-                WelcomeSection()
-            }
-            
-            item {
-                // Bus Status Card
-                BusStatusCard()
-            }
-            
-            item {
-                // Action Grid
-                ActionGrid()
-            }
-            
-            item {
-                // Recent Activity
-                RecentActivitySection()
+        if (isLoading) {
+            // Loading State
+            CircularProgressIndicator(
+                modifier = Modifier.align(Alignment.Center),
+                color = Color(0xFF7DD3C0)
+            )
+        } else {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 100.dp)
+            ) {
+                item {
+                    // Top Header
+                    TopHeader(studentInfo)
+                }
+                
+                item {
+                    // Welcome Section
+                    WelcomeSection(studentInfo, busInfo)
+                }
+                
+                item {
+                    // Bus Status Card
+                    BusStatusCard(busInfo)
+                }
+                
+                item {
+                    // Driver Info Card
+                    DriverInfoCard(busInfo)
+                }
+                
+                item {
+                    // Action Grid
+                    ActionGrid()
+                }
+                
+                item {
+                    // Recent Activity
+                    RecentActivitySection()
+                }
             }
         }
         
@@ -67,7 +107,7 @@ fun StudentPortalHomeScreen() {
 }
 
 @Composable
-private fun TopHeader() {
+private fun TopHeader(studentInfo: StudentInfo?) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -99,7 +139,7 @@ private fun TopHeader() {
             Spacer(modifier = Modifier.width(12.dp))
             
             Text(
-                text = "Student Portal",
+                text = studentInfo?.name ?: "Student Portal",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = Color.Black
@@ -122,14 +162,14 @@ private fun TopHeader() {
 }
 
 @Composable
-private fun WelcomeSection() {
+private fun WelcomeSection(studentInfo: StudentInfo?, busInfo: BusInfo?) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
     ) {
         Text(
-            text = "Good Morning, Alex",
+            text = "Welcome, ${studentInfo?.name ?: "Student"}",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
             color = Color.Black
@@ -150,7 +190,8 @@ private fun WelcomeSection() {
             Spacer(modifier = Modifier.width(8.dp))
             
             Text(
-                text = "Bus 42B • On its way",
+                text = if (busInfo != null) "Bus ${busInfo.busNumber} • ${studentInfo?.stop ?: "Your Stop"}" 
+                       else "No bus assigned",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color(0xFF888888)
@@ -160,7 +201,7 @@ private fun WelcomeSection() {
 }
 
 @Composable
-private fun BusStatusCard() {
+private fun BusStatusCard(busInfo: BusInfo?) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -185,7 +226,7 @@ private fun BusStatusCard() {
         ) {
             Column {
                 Text(
-                    text = "ESTIMATED ARRIVAL",
+                    text = "BUS STATUS",
                     fontSize = 10.sp,
                     fontWeight = FontWeight.Medium,
                     color = Color(0xFF888888),
@@ -195,36 +236,129 @@ private fun BusStatusCard() {
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "5 mins away",
+                    text = if (busInfo?.activeDriverId?.isNotEmpty() == true) "Active" else "Not Active",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    color = if (busInfo?.activeDriverId?.isNotEmpty() == true) Color(0xFF4CAF50) else Color(0xFF888888)
                 )
+                
+                if (busInfo != null) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = "Bus ${busInfo.busNumber}",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF666666)
+                    )
+                }
             }
             
-            // Pause/Play Button
+            // Status Icon
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .background(
                         Color(0xFFB8A9D9).copy(alpha = 0.2f),
                         CircleShape
-                    )
-                    .clickable(
-                        interactionSource = remember { MutableInteractionSource() },
-                        indication = rememberRipple(
-                            color = Color(0xFFB8A9D9).copy(alpha = 0.3f),
-                            bounded = true
-                        )
-                    ) { /* Handle pause/play */ },
+                    ),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_pending),
-                    contentDescription = "Pause",
+                    painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                    contentDescription = "Bus",
                     tint = Color(0xFFB8A9D9),
                     modifier = Modifier.size(24.dp)
                 )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DriverInfoCard(busInfo: BusInfo?) {
+    if (busInfo?.activeDriverId?.isNotEmpty() == true) {
+        Card(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 20.dp, vertical = 8.dp)
+                .shadow(
+                    elevation = 4.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
+                ),
+            shape = RoundedCornerShape(20.dp),
+            colors = CardDefaults.cardColors(
+                containerColor = Color.White
+            )
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp)
+            ) {
+                Text(
+                    text = "ACTIVE DRIVER",
+                    fontSize = 10.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = Color(0xFF888888),
+                    letterSpacing = 1.sp
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(40.dp)
+                            .background(
+                                Color(0xFF7DD3C0).copy(alpha = 0.2f),
+                                CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "Driver",
+                            tint = Color(0xFF7DD3C0),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.width(12.dp))
+                    
+                    Column {
+                        Text(
+                            text = busInfo.activeDriverName,
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color = Color.Black
+                        )
+                        
+                        if (busInfo.activeDriverPhone.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(2.dp))
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_call),
+                                    contentDescription = "Phone",
+                                    tint = Color(0xFF888888),
+                                    modifier = Modifier.size(12.dp)
+                                )
+                                Spacer(modifier = Modifier.width(4.dp))
+                                Text(
+                                    text = busInfo.activeDriverPhone,
+                                    fontSize = 13.sp,
+                                    fontWeight = FontWeight.Normal,
+                                    color = Color(0xFF888888)
+                                )
+                            }
+                        }
+                    }
+                }
             }
         }
     }

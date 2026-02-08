@@ -1,6 +1,7 @@
 package com.campusbussbuddy.firebase
 
 import android.net.Uri
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.storage.FirebaseStorage
@@ -173,10 +174,22 @@ object FirebaseManager {
      */
     private suspend fun uploadDriverPhoto(driverUid: String, photoUri: Uri): String? {
         return try {
+            Log.d("FirebaseManager", "Starting photo upload for UID: $driverUid")
+            Log.d("FirebaseManager", "Photo URI: $photoUri")
+            
             val storageRef = storage.reference.child("driver_photos/$driverUid.jpg")
+            
+            // Upload file
             val uploadTask = storageRef.putFile(photoUri).await()
-            storageRef.downloadUrl.await().toString()
+            Log.d("FirebaseManager", "Upload task completed: ${uploadTask.metadata?.path}")
+            
+            // Get download URL
+            val downloadUrl = storageRef.downloadUrl.await().toString()
+            Log.d("FirebaseManager", "Download URL: $downloadUrl")
+            
+            downloadUrl
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "Photo upload failed", e)
             null
         }
     }
@@ -332,19 +345,28 @@ object FirebaseManager {
             val driverDoc = firestore.collection("drivers").document(currentUser.uid).get().await()
             
             if (driverDoc.exists()) {
+                val photoUrl = driverDoc.getString("photoUrl") ?: ""
+                Log.d("FirebaseManager", "Fetched driver info for UID: ${currentUser.uid}")
+                Log.d("FirebaseManager", "Driver name: ${driverDoc.getString("name")}")
+                Log.d("FirebaseManager", "Photo URL: '$photoUrl'")
+                Log.d("FirebaseManager", "Photo URL isEmpty: ${photoUrl.isEmpty()}")
+                Log.d("FirebaseManager", "Photo URL isBlank: ${photoUrl.isBlank()}")
+                
                 DriverInfo(
                     uid = currentUser.uid,
                     name = driverDoc.getString("name") ?: "Driver",
                     email = driverDoc.getString("email") ?: "",
                     phone = driverDoc.getString("phone") ?: "",
-                    photoUrl = driverDoc.getString("photoUrl") ?: "",
+                    photoUrl = photoUrl,
                     assignedBusId = driverDoc.getString("assignedBusId") ?: "",
                     isActive = driverDoc.getBoolean("isActive") ?: false
                 )
             } else {
+                Log.w("FirebaseManager", "Driver document not found for UID: ${currentUser.uid}")
                 null
             }
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "Get driver info failed", e)
             null
         }
     }
@@ -546,6 +568,214 @@ object FirebaseManager {
             else -> "Authentication failed. Please try again."
         }
     }
+    
+    // ==================== STUDENT MANAGEMENT ====================
+    
+    /**
+     * Create a new student account (Admin function)
+     * @param studentData Student information
+     * @param password Temporary password for student
+     * @return Result with success/error message
+     */
+    suspend fun createStudentAccount(
+        studentData: StudentData,
+        password: String
+    ): StudentResult {
+        return try {
+            Log.d("FirebaseManager", "Creating student account for: ${studentData.email}")
+            
+            // Step 1: Create Firebase Auth account
+            val authResult = auth.createUserWithEmailAndPassword(studentData.email, password).await()
+            val studentUid = authResult.user?.uid ?: return StudentResult.Error("Failed to create account")
+            
+            Log.d("FirebaseManager", "Student Auth UID created: $studentUid")
+            
+            // Step 2: Create student document in Firestore using UID as document ID
+            val studentDocument = hashMapOf(
+                "name" to studentData.name,
+                "email" to studentData.email,
+                "busId" to studentData.busId,
+                "stop" to studentData.stop,
+                "createdAt" to System.currentTimeMillis()
+            )
+            
+            firestore.collection("students").document(studentUid).set(studentDocument).await()
+            
+            Log.d("FirebaseManager", "Student document created in Firestore")
+            
+            StudentResult.Success("Student account created successfully", studentUid)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Create student failed", e)
+            StudentResult.Error(getErrorMessage(e))
+        }
+    }
+    
+    /**
+     * Authenticate student with email and password
+     * @param email Student email
+     * @param password Student password
+     * @return StudentAuthResult with student info or error
+     */
+    suspend fun authenticateStudent(email: String, password: String): StudentAuthResult {
+        return try {
+            Log.d("FirebaseManager", "Authenticating student: $email")
+            
+            // Step 1: Sign in with Firebase Auth
+            val result = auth.signInWithEmailAndPassword(email, password).await()
+            val user = result.user ?: return StudentAuthResult.Error("Authentication failed")
+            
+            Log.d("FirebaseManager", "Student authenticated, UID: ${user.uid}")
+            
+            // Step 2: Fetch student document from Firestore using UID
+            val studentDoc = firestore.collection("students").document(user.uid).get().await()
+            
+            if (!studentDoc.exists()) {
+                auth.signOut()
+                Log.w("FirebaseManager", "Student document not found for UID: ${user.uid}")
+                return StudentAuthResult.Error("Student profile not found")
+            }
+            
+            // Step 3: Parse student data
+            val studentInfo = StudentInfo(
+                uid = user.uid,
+                name = studentDoc.getString("name") ?: "Student",
+                email = studentDoc.getString("email") ?: email,
+                busId = studentDoc.getString("busId") ?: "",
+                stop = studentDoc.getString("stop") ?: ""
+            )
+            
+            Log.d("FirebaseManager", "Student info loaded: ${studentInfo.name}")
+            
+            // Step 4: Fetch assigned bus information
+            val busInfo = if (studentInfo.busId.isNotEmpty()) {
+                getBusInfo(studentInfo.busId)
+            } else {
+                null
+            }
+            
+            Log.d("FirebaseManager", "Bus info loaded: ${busInfo?.busNumber ?: "No bus"}")
+            
+            StudentAuthResult.Success(studentInfo, busInfo)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Student authentication failed", e)
+            StudentAuthResult.Error(getErrorMessage(e))
+        }
+    }
+    
+    /**
+     * Get current student information
+     */
+    suspend fun getCurrentStudentInfo(): StudentInfo? {
+        return try {
+            val currentUser = auth.currentUser ?: return null
+            val studentDoc = firestore.collection("students").document(currentUser.uid).get().await()
+            
+            if (studentDoc.exists()) {
+                Log.d("FirebaseManager", "Fetched student info for UID: ${currentUser.uid}")
+                
+                StudentInfo(
+                    uid = currentUser.uid,
+                    name = studentDoc.getString("name") ?: "Student",
+                    email = studentDoc.getString("email") ?: "",
+                    busId = studentDoc.getString("busId") ?: "",
+                    stop = studentDoc.getString("stop") ?: ""
+                )
+            } else {
+                Log.w("FirebaseManager", "Student document not found for UID: ${currentUser.uid}")
+                null
+            }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Get student info failed", e)
+            null
+        }
+    }
+    
+    /**
+     * Get all students from Firestore (Admin function)
+     * @return List of StudentInfo
+     */
+    suspend fun getAllStudents(): List<StudentInfo> {
+        return try {
+            val studentsSnapshot = firestore.collection("students").get().await()
+            
+            studentsSnapshot.documents.mapNotNull { doc ->
+                try {
+                    StudentInfo(
+                        uid = doc.id,
+                        name = doc.getString("name") ?: "",
+                        email = doc.getString("email") ?: "",
+                        busId = doc.getString("busId") ?: "",
+                        stop = doc.getString("stop") ?: ""
+                    )
+                } catch (e: Exception) {
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Get all students failed", e)
+            emptyList()
+        }
+    }
+    
+    /**
+     * Delete student account completely (Admin function)
+     * Removes from Firebase Auth and Firestore
+     * @param studentUid Student's UID to delete
+     * @return Result with success/error message
+     */
+    suspend fun deleteStudentAccount(studentUid: String): StudentResult {
+        return try {
+            // Step 1: Get student document
+            val studentDoc = firestore.collection("students").document(studentUid).get().await()
+            
+            if (!studentDoc.exists()) {
+                return StudentResult.Error("Student not found")
+            }
+            
+            // Step 2: Delete Firestore document
+            firestore.collection("students").document(studentUid).delete().await()
+            
+            Log.d("FirebaseManager", "Student document deleted: $studentUid")
+            
+            // Note: Firebase Auth user deletion requires Admin SDK or the user to be signed in
+            // For production, implement Cloud Function for complete deletion
+            
+            StudentResult.Success(
+                "Student removed from database. Note: Auth account should be deleted from Firebase Console.",
+                studentUid
+            )
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Failed to delete student", e)
+            StudentResult.Error("Failed to delete student: ${e.message}")
+        }
+    }
+    
+    /**
+     * Update student information (Admin function)
+     * @param studentInfo Updated student information
+     * @return Result with success/error message
+     */
+    suspend fun updateStudentInfo(studentInfo: StudentInfo): StudentResult {
+        return try {
+            val updateData = hashMapOf<String, Any>(
+                "name" to studentInfo.name,
+                "busId" to studentInfo.busId,
+                "stop" to studentInfo.stop
+            )
+            
+            firestore.collection("students")
+                .document(studentInfo.uid)
+                .update(updateData)
+                .await()
+            
+            Log.d("FirebaseManager", "Student info updated: ${studentInfo.uid}")
+            
+            StudentResult.Success("Student information updated successfully", studentInfo.uid)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Update student failed", e)
+            StudentResult.Error("Failed to update student: ${e.message}")
+        }
+    }
 }
 
 /**
@@ -623,4 +853,43 @@ sealed class DriverAuthResult {
 sealed class BusLockResult {
     data class Success(val message: String) : BusLockResult()
     data class Error(val message: String) : BusLockResult()
+}
+
+// ==================== STUDENT MANAGEMENT ====================
+
+/**
+ * Student data for account creation
+ */
+data class StudentData(
+    val name: String,
+    val email: String,
+    val busId: String,
+    val stop: String
+)
+
+/**
+ * Student information data class
+ */
+data class StudentInfo(
+    val uid: String,
+    val name: String,
+    val email: String,
+    val busId: String,
+    val stop: String
+)
+
+/**
+ * Student operation result sealed class
+ */
+sealed class StudentResult {
+    data class Success(val message: String, val studentUid: String) : StudentResult()
+    data class Error(val message: String) : StudentResult()
+}
+
+/**
+ * Student authentication result sealed class
+ */
+sealed class StudentAuthResult {
+    data class Success(val studentInfo: StudentInfo, val busInfo: BusInfo?) : StudentAuthResult()
+    data class Error(val message: String) : StudentAuthResult()
 }

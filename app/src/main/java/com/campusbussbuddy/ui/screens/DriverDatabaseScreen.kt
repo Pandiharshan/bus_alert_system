@@ -1,6 +1,7 @@
 package com.campusbussbuddy.ui.screens
 
 import android.net.Uri
+import android.util.Log
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -352,7 +353,9 @@ private fun DriverCard(
                     .border(2.dp, Color.White.copy(alpha = 0.3f), CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                val photoUrl = driver.photoUrl
+                val photoUrl = driver.photoUrl.trim()
+                
+                Log.d("DriverCard", "Driver: ${driver.name}, Photo URL: '$photoUrl'")
                 
                 if (photoUrl.isNotEmpty() && photoUrl.isNotBlank()) {
                     SubcomposeAsyncImage(
@@ -361,6 +364,17 @@ private fun DriverCard(
                             .crossfade(true)
                             .memoryCacheKey(photoUrl)
                             .diskCacheKey(photoUrl)
+                            .listener(
+                                onStart = {
+                                    Log.d("CoilImage", "Loading driver photo: ${driver.name}")
+                                },
+                                onSuccess = { _, _ ->
+                                    Log.d("CoilImage", "SUCCESS loading photo for: ${driver.name}")
+                                },
+                                onError = { _, result ->
+                                    Log.e("CoilImage", "FAILED loading photo for ${driver.name}: ${result.throwable.message}")
+                                }
+                            )
                             .build(),
                         contentDescription = "Driver Photo",
                         modifier = Modifier.fillMaxSize(),
