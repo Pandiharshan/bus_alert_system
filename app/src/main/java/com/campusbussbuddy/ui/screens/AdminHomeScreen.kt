@@ -1,5 +1,6 @@
 package com.campusbussbuddy.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -21,13 +22,63 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.FirebaseManager
+import kotlinx.coroutines.launch
 
 @Composable
 fun AdminHomeScreen(
     onManageDriversClick: () -> Unit = {},
     onManageBusesClick: () -> Unit = {},
-    onManageStudentsClick: () -> Unit = {}
+    onManageStudentsClick: () -> Unit = {},
+    onLogoutClick: () -> Unit = {}
 ) {
+    var totalStudents by remember { mutableStateOf(0) }
+    var totalDrivers by remember { mutableStateOf(0) }
+    var totalBuses by remember { mutableStateOf(0) }
+    var activeTrips by remember { mutableStateOf(0) }
+    var busesRunning by remember { mutableStateOf(0) }
+    var studentsOnboard by remember { mutableStateOf(0) }
+    var isLoading by remember { mutableStateOf(true) }
+    
+    val scope = rememberCoroutineScope()
+    
+    // Fetch dashboard counts from Firestore
+    LaunchedEffect(Unit) {
+        scope.launch {
+            Log.d("AdminHomeScreen", "Fetching dashboard counts...")
+            
+            // Fetch students count
+            val students = FirebaseManager.getAllStudents()
+            totalStudents = students.size
+            Log.d("AdminHomeScreen", "Total Students: $totalStudents")
+            
+            // Fetch drivers count
+            val drivers = FirebaseManager.getAllDrivers()
+            totalDrivers = drivers.size
+            Log.d("AdminHomeScreen", "Total Drivers: $totalDrivers")
+            
+            // Fetch buses count
+            val buses = FirebaseManager.getAllBuses()
+            totalBuses = buses.size
+            Log.d("AdminHomeScreen", "Total Buses: $totalBuses")
+            
+            // Fetch live system status
+            val activeBuses = buses.filter { it.activeDriverId.isNotEmpty() }
+            busesRunning = activeBuses.size
+            activeTrips = activeBuses.size // Same as buses running
+            
+            // Count students whose buses are active
+            studentsOnboard = students.count { student ->
+                activeBuses.any { bus -> bus.busId == student.busId }
+            }
+            
+            Log.d("AdminHomeScreen", "Active Trips: $activeTrips")
+            Log.d("AdminHomeScreen", "Buses Running: $busesRunning")
+            Log.d("AdminHomeScreen", "Students Onboard: $studentsOnboard")
+            
+            isLoading = false
+        }
+    }
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -42,8 +93,8 @@ fun AdminHomeScreen(
             }
             
             item {
-                // Admin Profile Card
-                AdminProfileCard()
+                // Admin Profile Card with Logout
+                AdminProfileCard(onLogoutClick = onLogoutClick)
             }
             
             item {
@@ -51,8 +102,23 @@ fun AdminHomeScreen(
             }
             
             item {
-                // Dashboard Stats
-                DashboardStatsGrid()
+                // Dashboard Stats with real data
+                if (isLoading) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(200.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(color = Color(0xFF7DD3C0))
+                    }
+                } else {
+                    DashboardStatsGrid(
+                        totalBuses = totalBuses,
+                        totalStudents = totalStudents,
+                        totalDrivers = totalDrivers
+                    )
+                }
             }
             
             item {
@@ -60,8 +126,12 @@ fun AdminHomeScreen(
             }
             
             item {
-                // Real-Time Overview
-                RealTimeOverviewCard()
+                // Real-Time Overview with live data
+                RealTimeOverviewCard(
+                    activeTrips = activeTrips,
+                    busesRunning = busesRunning,
+                    studentsOnboard = studentsOnboard
+                )
             }
             
             item {
@@ -95,7 +165,7 @@ fun AdminHomeScreen(
 }
 
 @Composable
-private fun AdminProfileCard() {
+private fun AdminProfileCard(onLogoutClick: () -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,45 +184,67 @@ private fun AdminProfileCard() {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(24.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(20.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            // Admin Profile Image
-            Box(
-                modifier = Modifier
-                    .size(64.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFF0F0F0))
+            // Logout Button (Left)
+            IconButton(
+                onClick = onLogoutClick,
+                modifier = Modifier.size(36.dp)
             ) {
                 Icon(
-                    painter = painterResource(id = R.drawable.admin),
-                    contentDescription = "Admin Profile",
-                    modifier = Modifier.fillMaxSize(),
-                    tint = Color.Unspecified
+                    painter = painterResource(id = R.drawable.ic_arrow_back_ios_new),
+                    contentDescription = "Logout",
+                    tint = Color(0xFF666666),
+                    modifier = Modifier.size(18.dp)
                 )
             }
             
-            Spacer(modifier = Modifier.width(16.dp))
+            // Center Content: Profile Image + Name
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.weight(1f),
+                horizontalArrangement = Arrangement.Center
+            ) {
+                // Admin Profile Image - Using admin.png
+                Box(
+                    modifier = Modifier
+                        .size(48.dp)
+                        .clip(CircleShape)
+                        .background(Color(0xFFF0F0F0))
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.admin),
+                        contentDescription = "Admin Profile",
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(8.dp),
+                        tint = Color.Unspecified
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(12.dp))
+                
+                // Admin Name - Reduced size
+                Text(
+                    text = "Pandiharshan",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.Black
+                )
+            }
             
-            // Admin Name
-            Text(
-                text = "Pandiharshan",
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color.Black,
-                modifier = Modifier.weight(1f)
-            )
-            
-            // Settings Icon
+            // Settings Icon (Right)
             IconButton(
                 onClick = { /* Handle settings */ },
-                modifier = Modifier.size(40.dp)
+                modifier = Modifier.size(36.dp)
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_settings),
                     contentDescription = "Settings",
-                    tint = Color(0xFF888888),
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFF666666),
+                    modifier = Modifier.size(22.dp)
                 )
             }
         }
@@ -160,7 +252,11 @@ private fun AdminProfileCard() {
 }
 
 @Composable
-private fun DashboardStatsGrid() {
+private fun DashboardStatsGrid(
+    totalBuses: Int,
+    totalStudents: Int,
+    totalDrivers: Int
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -171,14 +267,14 @@ private fun DashboardStatsGrid() {
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             StatCard(
-                value = "24",
+                value = totalBuses.toString(),
                 label = "Total Buses",
                 icon = R.drawable.ic_directions_bus_vector,
                 modifier = Modifier.weight(1f)
             )
             
             StatCard(
-                value = "842",
+                value = totalStudents.toString(),
                 label = "Total Students",
                 icon = R.drawable.ic_person,
                 modifier = Modifier.weight(1f)
@@ -192,9 +288,9 @@ private fun DashboardStatsGrid() {
             horizontalArrangement = Arrangement.Center
         ) {
             StatCard(
-                value = "756",
-                label = "Present Today",
-                icon = R.drawable.ic_check_circle,
+                value = totalDrivers.toString(),
+                label = "Total Drivers",
+                icon = R.drawable.ic_group,
                 modifier = Modifier.width(180.dp)
             )
         }
@@ -255,7 +351,13 @@ private fun StatCard(
 }
 
 @Composable
-private fun RealTimeOverviewCard() {
+private fun RealTimeOverviewCard(
+    activeTrips: Int,
+    busesRunning: Int,
+    studentsOnboard: Int
+) {
+    val isActive = busesRunning > 0
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -288,7 +390,7 @@ private fun RealTimeOverviewCard() {
                     color = Color.Black
                 )
                 
-                // Status Indicator
+                // Status Indicator - Dynamic based on active buses
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -296,7 +398,7 @@ private fun RealTimeOverviewCard() {
                         modifier = Modifier
                             .size(8.dp)
                             .background(
-                                Color(0xFF4CAF50),
+                                if (isActive) Color(0xFF4CAF50) else Color(0xFFFF9800),
                                 CircleShape
                             )
                     )
@@ -304,10 +406,10 @@ private fun RealTimeOverviewCard() {
                     Spacer(modifier = Modifier.width(6.dp))
                     
                     Text(
-                        text = "Active",
+                        text = if (isActive) "Active" else "Idle",
                         fontSize = 12.sp,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF4CAF50)
+                        color = if (isActive) Color(0xFF4CAF50) else Color(0xFFFF9800)
                     )
                 }
             }
@@ -319,7 +421,7 @@ private fun RealTimeOverviewCard() {
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
                 LiveStatItem(
-                    value = "12",
+                    value = activeTrips.toString(),
                     label = "Active Trips"
                 )
                 
@@ -331,7 +433,7 @@ private fun RealTimeOverviewCard() {
                 )
                 
                 LiveStatItem(
-                    value = "12",
+                    value = busesRunning.toString(),
                     label = "Buses Running"
                 )
                 
@@ -343,7 +445,7 @@ private fun RealTimeOverviewCard() {
                 )
                 
                 LiveStatItem(
-                    value = "756",
+                    value = studentsOnboard.toString(),
                     label = "Students Onboard"
                 )
             }

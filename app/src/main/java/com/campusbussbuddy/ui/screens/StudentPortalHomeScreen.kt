@@ -28,7 +28,9 @@ import com.campusbussbuddy.firebase.FirebaseManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun StudentPortalHomeScreen() {
+fun StudentPortalHomeScreen(
+    onLogoutClick: () -> Unit = {}
+) {
     var studentInfo by remember { mutableStateOf<StudentInfo?>(null) }
     var busInfo by remember { mutableStateOf<BusInfo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -68,8 +70,8 @@ fun StudentPortalHomeScreen() {
                 contentPadding = PaddingValues(bottom = 100.dp)
             ) {
                 item {
-                    // Top Header
-                    TopHeader(studentInfo)
+                    // Top Header with Logout
+                    TopHeader(studentInfo, onLogoutClick)
                 }
                 
                 item {
@@ -107,7 +109,7 @@ fun StudentPortalHomeScreen() {
 }
 
 @Composable
-private fun TopHeader(studentInfo: StudentInfo?) {
+private fun TopHeader(studentInfo: StudentInfo?, onLogoutClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -118,6 +120,21 @@ private fun TopHeader(studentInfo: StudentInfo?) {
         Row(
             verticalAlignment = Alignment.CenterVertically
         ) {
+            // Logout Button (Top-Left)
+            IconButton(
+                onClick = onLogoutClick,
+                modifier = Modifier.size(40.dp)
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_arrow_back),
+                    contentDescription = "Logout",
+                    tint = Color(0xFF888888),
+                    modifier = Modifier.size(24.dp)
+                )
+            }
+            
+            Spacer(modifier = Modifier.width(8.dp))
+            
             // Profile Avatar
             Box(
                 modifier = Modifier

@@ -10,6 +10,7 @@ object Destinations {
     const val ADMIN_HOME = "admin_home"
     const val ADD_DRIVER = "add_driver"
     const val ADD_STUDENT = "add_student"
+    const val ADD_BUS = "add_bus"
     const val MANAGE_DRIVERS = "manage_drivers"
     const val MANAGE_BUSES = "manage_buses"
     const val MANAGE_STUDENTS = "manage_students"

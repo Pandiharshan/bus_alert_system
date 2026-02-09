@@ -545,6 +545,92 @@ object FirebaseManager {
     }
     
     /**
+     * Update bus information (Admin function)
+     * @param busInfo Updated bus information
+     * @return Result with success/error message
+     */
+    suspend fun updateBusInfo(busInfo: BusInfo): BusResult {
+        return try {
+            val updateData = hashMapOf<String, Any>(
+                "busNumber" to busInfo.busNumber,
+                "capacity" to busInfo.capacity
+            )
+            
+            firestore.collection("buses")
+                .document(busInfo.busId)
+                .update(updateData)
+                .await()
+            
+            Log.d("FirebaseManager", "Bus info updated: ${busInfo.busId}")
+            
+            BusResult.Success("Bus information updated successfully", busInfo.busId)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Update bus failed", e)
+            BusResult.Error("Failed to update bus: ${e.message}")
+        }
+    }
+    
+    /**
+     * Create a new bus (Admin function)
+     * @param busNumber Bus number
+     * @param capacity Bus capacity
+     * @return Result with success/error message
+     */
+    suspend fun createBus(busNumber: Int, capacity: Int): BusResult {
+        return try {
+            val busData = hashMapOf(
+                "busNumber" to busNumber,
+                "capacity" to capacity,
+                "activeDriverId" to "",
+                "activeDriverName" to "",
+                "activeDriverPhone" to "",
+                "createdAt" to System.currentTimeMillis()
+            )
+            
+            val docRef = firestore.collection("buses").add(busData).await()
+            
+            Log.d("FirebaseManager", "Bus created: ${docRef.id}")
+            
+            BusResult.Success("Bus created successfully", docRef.id)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Create bus failed", e)
+            BusResult.Error("Failed to create bus: ${e.message}")
+        }
+    }
+    
+    /**
+     * Delete bus (Admin function)
+     * @param busId Bus ID to delete
+     * @return Result with success/error message
+     */
+    suspend fun deleteBus(busId: String): BusResult {
+        return try {
+            // Check if bus is currently active
+            val busDoc = firestore.collection("buses").document(busId).get().await()
+            
+            if (!busDoc.exists()) {
+                return BusResult.Error("Bus not found")
+            }
+            
+            val activeDriverId = busDoc.getString("activeDriverId") ?: ""
+            
+            if (activeDriverId.isNotEmpty()) {
+                return BusResult.Error("Cannot delete active bus. Please deactivate first.")
+            }
+            
+            // Delete bus document
+            firestore.collection("buses").document(busId).delete().await()
+            
+            Log.d("FirebaseManager", "Bus deleted: $busId")
+            
+            BusResult.Success("Bus deleted successfully", busId)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Delete bus failed", e)
+            BusResult.Error("Failed to delete bus: ${e.message}")
+        }
+    }
+    
+    /**
      * Convert Firebase exception to user-friendly error message
      */
     private fun getErrorMessage(exception: Exception): String {
@@ -687,6 +773,35 @@ object FirebaseManager {
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Get student info failed", e)
             null
+        }
+    }
+    
+    /**
+     * Get all buses from Firestore (Admin function)
+     * @return List of BusInfo
+     */
+    suspend fun getAllBuses(): List<BusInfo> {
+        return try {
+            val busesSnapshot = firestore.collection("buses").get().await()
+            
+            busesSnapshot.documents.mapNotNull { doc ->
+                try {
+                    BusInfo(
+                        busId = doc.id,
+                        busNumber = doc.getLong("busNumber")?.toInt() ?: 0,
+                        capacity = doc.getLong("capacity")?.toInt() ?: 0,
+                        activeDriverId = doc.getString("activeDriverId") ?: "",
+                        activeDriverName = doc.getString("activeDriverName") ?: "",
+                        activeDriverPhone = doc.getString("activeDriverPhone") ?: ""
+                    )
+                } catch (e: Exception) {
+                    Log.e("FirebaseManager", "Error parsing bus document", e)
+                    null
+                }
+            }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Get all buses failed", e)
+            emptyList()
         }
     }
     
@@ -853,6 +968,14 @@ sealed class DriverAuthResult {
 sealed class BusLockResult {
     data class Success(val message: String) : BusLockResult()
     data class Error(val message: String) : BusLockResult()
+}
+
+/**
+ * Bus operation result sealed class
+ */
+sealed class BusResult {
+    data class Success(val message: String, val busId: String) : BusResult()
+    data class Error(val message: String) : BusResult()
 }
 
 // ==================== STUDENT MANAGEMENT ====================

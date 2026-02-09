@@ -32,7 +32,9 @@ import com.campusbussbuddy.firebase.FirebaseManager
 import kotlinx.coroutines.launch
 
 @Composable
-fun DriverHomeScreen() {
+fun DriverHomeScreen(
+    onLogoutClick: () -> Unit = {}
+) {
     var driverInfo by remember { mutableStateOf<DriverInfo?>(null) }
     var busInfo by remember { mutableStateOf<BusInfo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -70,6 +72,26 @@ fun DriverHomeScreen() {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
+                // Logout Button (Top-Left)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    horizontalArrangement = Arrangement.Start
+                ) {
+                    IconButton(
+                        onClick = onLogoutClick,
+                        modifier = Modifier.size(40.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_arrow_back),
+                            contentDescription = "Logout",
+                            tint = Color(0xFF888888),
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                }
+                
                 // Main Content
                 Column(
                     modifier = Modifier

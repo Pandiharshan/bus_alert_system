@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.ui.screens.LoginSelectionScreen
 import com.campusbussbuddy.ui.screens.StudentLoginScreen
 import com.campusbussbuddy.ui.screens.DriverAuthenticationScreen
@@ -13,6 +14,7 @@ import com.campusbussbuddy.ui.screens.AdminLoginScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
 import com.campusbussbuddy.ui.screens.AddDriverScreen
 import com.campusbussbuddy.ui.screens.AddStudentScreen
+import com.campusbussbuddy.ui.screens.AddBusScreen
 import com.campusbussbuddy.ui.screens.DriverDatabaseScreen
 import com.campusbussbuddy.ui.screens.BusDatabaseScreen
 import com.campusbussbuddy.ui.screens.StudentDatabaseScreen
@@ -72,11 +74,29 @@ fun RootNavHost() {
         }
         
         composable(Destinations.DRIVER_HOME) {
-            DriverHomeScreen()
+            DriverHomeScreen(
+                onLogoutClick = {
+                    // Sign out from Firebase
+                    FirebaseManager.signOut()
+                    // Navigate to Login Selection and clear back stack
+                    navController.navigate(Destinations.LOGIN_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
         
         composable(Destinations.STUDENT_PORTAL_HOME) {
-            StudentPortalHomeScreen()
+            StudentPortalHomeScreen(
+                onLogoutClick = {
+                    // Sign out from Firebase
+                    FirebaseManager.signOut()
+                    // Navigate to Login Selection and clear back stack
+                    navController.navigate(Destinations.LOGIN_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
+                }
+            )
         }
         
         composable(Destinations.ADMIN_LOGIN) {
@@ -105,6 +125,14 @@ fun RootNavHost() {
                 },
                 onManageStudentsClick = {
                     navController.navigate(Destinations.MANAGE_STUDENTS)
+                },
+                onLogoutClick = {
+                    // Sign out from Firebase
+                    FirebaseManager.signOut()
+                    // Navigate to Login Selection and clear back stack
+                    navController.navigate(Destinations.LOGIN_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }
@@ -131,6 +159,17 @@ fun RootNavHost() {
             )
         }
         
+        composable(Destinations.ADD_BUS) {
+            AddBusScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onBusAdded = {
+                    navController.popBackStack()
+                }
+            )
+        }
+        
         composable(Destinations.MANAGE_DRIVERS) {
             DriverDatabaseScreen(
                 onBackClick = {
@@ -146,6 +185,9 @@ fun RootNavHost() {
             BusDatabaseScreen(
                 onBackClick = {
                     navController.popBackStack()
+                },
+                onAddBusClick = {
+                    navController.navigate(Destinations.ADD_BUS)
                 }
             )
         }
