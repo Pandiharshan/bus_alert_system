@@ -1,168 +1,123 @@
-# Bus Alert System
+# 🚌 Campus Bus Buddy (Bus Alert System)
 
-A mobile application for tracking bus locations and managing student boarding through QR code scanning. The system provides real-time location tracking for drivers and allows students to scan QR codes to board buses.
+A smart mobile application designed to **digitalize college bus transportation** by combining **real-time bus tracking**, **QR-based attendance**, and **role-based system management**.  
+The system ensures smooth coordination between **students, drivers, and administrators** using a secure cloud backend powered by Firebase.
 
-## Tech Stack
+---
 
-- **Language**: Kotlin
-- **Platform**: Android
-- **Backend**: Firebase Firestore
-- **Authentication**: Firebase Auth
-- **Location Services**: Google Play Services Location API
-- **Maps**: Google Maps SDK
-- **QR Code**: ML Kit Barcode Scanning, ZXing
-- **Camera**: CameraX
+## 🎯 Core Concept
 
-## Features
+Campus Bus Buddy aims to solve real-world campus transport problems by providing:
 
-### Student Features
-- **QR Code Scanning**: Scan bus QR codes to record boarding information
-- **Real-time Bus Tracking**: View live bus location on Google Maps
-- **Login System**: Basic authentication activity
+- Live bus location tracking  
+- QR code–based boarding and attendance  
+- Advance absence planning by students  
+- Centralized admin monitoring  
+- Secure, real-time data synchronization  
 
-### Driver Features
-- **Location Broadcasting**: Continuous location sharing via foreground service
-- **Driver Home Interface**: Basic driver dashboard
+All without requiring any custom backend server.
 
-### Core Functionality
-- **QR Code Generation**: Generate QR codes containing bus information
-- **Firebase Integration**: Store boarding records and location data
-- **Real-time Updates**: Live location updates using Firestore listeners
+---
+## 📸 Screenshots
 
-## Project Structure
+| Admin Login | Role Selection Screen |
+|-------------|-----------------------|
+| <img src="Screenshots/admin_login.png" width="260" /> | <img src="Screenshots/selection_screen.png" width="260" /> |
 
-```
-app/src/main/java/com/harshan/busalertsystem/
-├── models/
-│   └── User.kt                    # Basic user data model
-├── services/
-│   ├── firestore/
-│   │   └── FirestoreService.kt    # Firebase service (empty implementation)
-│   └── location/
-│       ├── LocationService.kt     # Location service (empty implementation)
-│       └── DriverLocationService.kt # Foreground service for driver location tracking
-├── ui/
-│   ├── login/
-│   │   └── LoginActivity.kt       # Authentication screen
-│   └── student/
-│       ├── QrScannerActivity.kt   # QR code scanning with camera
-│       ├── StudentHomeActivity.kt # Student dashboard
-│       └── StudentMapActivity.kt  # Real-time bus tracking map
-└── utils/
-    └── QrGenerator.kt             # QR code generation utility
+---
 
-app/src/main/res/
-├── drawable/
-│   ├── ic_visibility.xml          # Visibility icon
-│   └── ic_visibility_off.xml      # Hidden visibility icon
-└── layout/
-    ├── activity_driver_home.xml   # Driver interface layout (empty)
-    ├── activity_login.xml         # Login screen layout (empty)
-    ├── activity_qr_scanner.xml    # QR scanner with camera preview
-    ├── activity_student_home.xml  # Student dashboard layout (empty)
-    └── activity_student_map.xml   # Google Maps fragment
-```
+## 🧩 System Roles & Purpose
 
-## Setup & Installation
+### 👑 Admin Module
 
-### Prerequisites
-- Android Studio
-- Firebase project with Firestore enabled
-- Google Maps API key
-- Required permissions in AndroidManifest.xml
+**Purpose:** Central system controller
 
-### Dependencies Required
-Add these dependencies to your `app/build.gradle.kts`:
+Admin responsibilities:
 
-```kotlin
-// CameraX
-implementation "androidx.camera:camera-core:1.3.3"
-implementation "androidx.camera:camera-camera2:1.3.3"
-implementation "androidx.camera:camera-lifecycle:1.3.3"
-implementation "androidx.camera:camera-view:1.3.3"
+- Manage buses, drivers, and students  
+- Monitor total buses, drivers, and student counts  
+- View attendance overview  
+- Monitor live trips and system status  
 
-// ML Kit Barcode Scanning
-implementation 'com.google.mlkit:barcode-scanning:17.2.0'
+Admin ensures the entire transport system runs smoothly.
 
-// ZXing for QR generation
-implementation 'com.google.zxing:core:3.5.1'
+---
 
-// Location Services
-implementation "com.google.android.gms:play-services-location:21.2.0"
+### 🧑‍✈️ Driver Module
 
-// Firebase
-implementation platform("com.google.firebase:firebase-bom:33.1.0")
-implementation "com.google.firebase:firebase-firestore"
-implementation "com.google.firebase:firebase-auth"
+**Purpose:** Trip execution and attendance control
 
-// Google Maps
-implementation "com.google.android.gms:play-services-maps:18.2.0"
-```
+Driver responsibilities:
 
-### Permissions Required
-Add to `AndroidManifest.xml`:
+- Log in securely and access assigned bus  
+- Start and manage trips  
+- Display QR code for student boarding  
+- Broadcast live bus location  
+- View present students for each stop  
 
-```xml
-<uses-permission android:name="android.permission.CAMERA" />
-<uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-<uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
-```
+Drivers act as the operational backbone of the system.
 
-### Installation Steps
-1. Clone the repository
-2. Open in Android Studio
-3. Add required dependencies to build.gradle
-4. Configure Firebase project and add google-services.json
-5. Add Google Maps API key
-6. Register DriverLocationService in AndroidManifest.xml
-7. Build and run the project
+---
 
-## How to Run the Project
+### 🎓 Student Module
 
-1. **Driver Mode**: Start the DriverLocationService to begin broadcasting location
-2. **Student Mode**: 
-   - Use QrScannerActivity to scan bus QR codes
-   - Use StudentMapActivity to view real-time bus location
-3. **QR Code Generation**: Use QrGenerator.generateQrCode() to create bus QR codes
+**Purpose:** Tracking, attendance, and alerts
 
-## Data Structure
+Student capabilities:
 
-### QR Code Format
-```json
-{"busId": "bus_1"}
-```
+- Scan QR code to mark boarding attendance  
+- View live bus location on map  
+- Mark absence for the next day in advance  
+- Receive alerts when the bus reaches their stop  
 
-### Firestore Collections
-- `buses/{busId}`: Bus location data (lat, lng, speed, lastSeen)
-- `boarding/{date}/{busId}/{studentId}`: Boarding records
+Students get transparency and reliability in daily travel.
 
-## Use Cases
+---
 
-- **Educational Institutions**: Track school buses and manage student boarding
-- **Public Transportation**: Monitor bus locations and passenger boarding
-- **Corporate Shuttles**: Manage employee transportation
+## 🔄 Application Workflow
 
-## Limitations
+1. User selects role (Student / Driver / Admin)  
+2. Secure login via Firebase Authentication  
+3. Role-based navigation is applied  
+4. Real-time data sync through Firestore  
+5. Live tracking and attendance updates occur instantly  
 
-- **Incomplete UI**: Most activity layouts are empty and need implementation
-- **Missing Build Configuration**: No build.gradle or AndroidManifest.xml files present
-- **Empty Service Classes**: FirestoreService and LocationService have no implementation
-- **No Error Handling**: Limited error handling in location and scanning services
-- **Single Bus Support**: Currently hardcoded to support only "bus_1"
-- **No User Management**: Basic user model without proper authentication flow
-- **Missing Navigation**: No navigation between activities implemented
+---
 
-## Future Improvements
+## 🛠 Tech Stack
 
-- Implement complete UI for all activities
-- Add proper user authentication and role management
-- Support multiple buses with dynamic bus ID assignment
-- Add offline capability and data synchronization
-- Implement push notifications for bus arrival alerts
-- Add route planning and estimated arrival times
-- Create admin panel for bus and route management
-- Add comprehensive error handling and user feedback
+- **Android (Kotlin)**  
+- **Firebase Authentication**  
+- **Firebase Firestore**  
+- **Google Maps SDK & Location Services**  
+- **CameraX & QR Code Scanning (ZXing / ML Kit)**  
 
-## Author
+---
 
-Harshan - Bus Alert System
+## ✨ Key Features
+
+- Role-based access (Admin, Driver, Student)  
+- QR-based attendance system  
+- Real-time bus tracking  
+- Serverless cloud backend using Firebase  
+- Modern, clean, glass-style UI design  
+- Secure authentication and logout handling  
+
+---
+
+## 🚀 Future Improvements
+
+- Complete UI for all modules  
+- Full role-based authentication enforcement  
+- Multi-bus and multi-route support  
+- Push notifications for bus arrival alerts  
+- Offline data handling and sync  
+- ETA calculation and route optimization  
+- Advanced admin analytics dashboard  
+
+---
+
+## 👨‍💻 Author
+
+**Pandiharshan (Harshan)**  
+Campus Bus Buddy – Smart Bus Attendance & Tracking System
