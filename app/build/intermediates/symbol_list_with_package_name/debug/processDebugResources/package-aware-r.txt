@@ -121,6 +121,7 @@ drawable common_google_signin_btn_text_light
 drawable common_google_signin_btn_text_light_focused
 drawable common_google_signin_btn_text_light_normal
 drawable common_google_signin_btn_text_light_normal_background
+drawable driver_login
 drawable googleg_disabled_color_18
 drawable googleg_standard_color_18
 drawable ic_add
@@ -145,7 +146,6 @@ drawable ic_chevron_right_menu
 drawable ic_directions_bus
 drawable ic_directions_bus_vector
 drawable ic_emergency
-drawable ic_event_busy
 drawable ic_group
 drawable ic_history
 drawable ic_home
@@ -186,6 +186,7 @@ drawable notification_template_icon_bg
 drawable notification_template_icon_low_bg
 drawable notification_tile_bg
 drawable notify_panel_notification_icon_bg
+drawable studentlogin
 id accessibility_action_clickable_span
 id accessibility_custom_action_0
 id accessibility_custom_action_1

@@ -68,12 +68,20 @@
         "source": "com.campusbussbuddy.app-main-70:/mipmap-hdpi/ic_launcher.png"
     },
     {
+        "merged": "com.campusbussbuddy.app-debug-68:/drawable_studentlogin.png.flat",
+        "source": "com.campusbussbuddy.app-main-70:/drawable/studentlogin.png"
+    },
+    {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_logout.xml.flat",
         "source": "com.campusbussbuddy.app-main-70:/drawable/ic_logout.xml"
     },
     {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_history.xml.flat",
         "source": "com.campusbussbuddy.app-main-70:/drawable/ic_history.xml"
+    },
+    {
+        "merged": "com.campusbussbuddy.app-debug-68:/drawable_driver_login.png.flat",
+        "source": "com.campusbussbuddy.app-main-70:/drawable/driver_login.png"
     },
     {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_chevron_right_menu.png.flat",
@@ -138,10 +146,6 @@
     {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_directions_bus_vector.xml.flat",
         "source": "com.campusbussbuddy.app-main-70:/drawable/ic_directions_bus_vector.xml"
-    },
-    {
-        "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_event_busy.png.flat",
-        "source": "com.campusbussbuddy.app-main-70:/drawable/ic_event_busy.png"
     },
     {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_add.xml.flat",

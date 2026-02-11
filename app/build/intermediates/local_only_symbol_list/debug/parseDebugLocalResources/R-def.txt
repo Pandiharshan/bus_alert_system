@@ -10,6 +10,7 @@ color teal_700
 color white
 drawable admin
 drawable app
+drawable driver_login
 drawable ic_add
 drawable ic_arrow_back
 drawable ic_arrow_back_ios_new
@@ -26,7 +27,6 @@ drawable ic_chevron_right_menu
 drawable ic_directions_bus
 drawable ic_directions_bus_vector
 drawable ic_emergency
-drawable ic_event_busy
 drawable ic_group
 drawable ic_history
 drawable ic_home
@@ -51,6 +51,7 @@ drawable ic_star_filled
 drawable ic_vibration
 drawable ic_visibility
 drawable ic_visibility_off
+drawable studentlogin
 mipmap ic_launcher
 mipmap ic_launcher_foreground
 mipmap ic_launcher_round

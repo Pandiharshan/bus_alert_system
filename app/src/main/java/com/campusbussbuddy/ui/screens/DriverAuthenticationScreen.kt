@@ -1,5 +1,6 @@
 package com.campusbussbuddy.ui.screens
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -15,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -61,21 +63,22 @@ fun DriverAuthenticationScreen(
             ) {
                 Spacer(modifier = Modifier.height(40.dp))
                 
-                // Bus Icon
+                // Driver Login Image
                 Box(
                     modifier = Modifier
                         .size(100.dp)
+                        .clip(CircleShape)
                         .background(
-                            Color(0xFFB8A9D9).copy(alpha = 0.3f),
-                            CircleShape
+                            Color(0xFFB8A9D9).copy(alpha = 0.3f)
                         ),
                     contentAlignment = Alignment.Center
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                        contentDescription = "Bus Icon",
-                        modifier = Modifier.size(50.dp),
-                        tint = Color(0xFFB8A9D9)
+                    Image(
+                        painter = painterResource(id = R.drawable.driver_login),
+                        contentDescription = "Driver Login",
+                        modifier = Modifier
+                            .size(100.dp),
+                        contentScale = ContentScale.Fit
                     )
                 }
                 
