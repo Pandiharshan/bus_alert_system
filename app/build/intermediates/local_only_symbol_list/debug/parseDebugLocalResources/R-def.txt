@@ -23,8 +23,6 @@ drawable ic_check
 drawable ic_check_circle
 drawable ic_chevron_left
 drawable ic_chevron_right
-drawable ic_chevron_right_menu
-drawable ic_directions_bus
 drawable ic_directions_bus_vector
 drawable ic_emergency
 drawable ic_group
@@ -35,8 +33,6 @@ drawable ic_logout
 drawable ic_map
 drawable ic_my_location
 drawable ic_notifications
-drawable ic_notifications_active
-drawable ic_notifications_paused
 drawable ic_pending
 drawable ic_person
 drawable ic_pin_drop
@@ -46,9 +42,6 @@ drawable ic_route
 drawable ic_settings
 drawable ic_share
 drawable ic_speed
-drawable ic_star
-drawable ic_star_filled
-drawable ic_vibration
 drawable ic_visibility
 drawable ic_visibility_off
 drawable studentlogin

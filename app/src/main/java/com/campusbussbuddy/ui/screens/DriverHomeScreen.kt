@@ -33,6 +33,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun DriverHomeScreen(
+    onBusLoginClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {}
 ) {
     var driverInfo by remember { mutableStateOf<DriverInfo?>(null) }
@@ -109,7 +110,7 @@ fun DriverHomeScreen(
                     Spacer(modifier = Modifier.height(60.dp))
                     
                     // Bus Login Button
-                    BusLoginButton()
+                    BusLoginButton(onClick = onBusLoginClick)
                     
                     Spacer(modifier = Modifier.weight(1f))
                 }
@@ -233,7 +234,7 @@ private fun DriverProfileSection(
 }
 
 @Composable
-private fun BusLoginButton() {
+private fun BusLoginButton(onClick: () -> Unit = {}) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -250,7 +251,7 @@ private fun BusLoginButton() {
                     color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
                     bounded = true
                 )
-            ) { /* Handle bus login */ },
+            ) { onClick() },
         shape = RoundedCornerShape(32.dp),
         colors = CardDefaults.cardColors(
             containerColor = Color.White.copy(alpha = 0.95f)

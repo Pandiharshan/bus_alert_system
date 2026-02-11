@@ -9,6 +9,8 @@ import com.campusbussbuddy.ui.screens.LoginSelectionScreen
 import com.campusbussbuddy.ui.screens.StudentLoginScreen
 import com.campusbussbuddy.ui.screens.DriverAuthenticationScreen
 import com.campusbussbuddy.ui.screens.DriverHomeScreen
+import com.campusbussbuddy.ui.screens.BusAssignmentLoginScreen
+import com.campusbussbuddy.ui.screens.BusOperationsHubScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
 import com.campusbussbuddy.ui.screens.AdminLoginScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
@@ -75,6 +77,9 @@ fun RootNavHost() {
         
         composable(Destinations.DRIVER_HOME) {
             DriverHomeScreen(
+                onBusLoginClick = {
+                    navController.navigate(Destinations.BUS_ASSIGNMENT_LOGIN)
+                },
                 onLogoutClick = {
                     // Sign out from Firebase
                     FirebaseManager.signOut()
@@ -82,6 +87,34 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
+                }
+            )
+        }
+        
+        composable(Destinations.BUS_ASSIGNMENT_LOGIN) {
+            BusAssignmentLoginScreen(
+                onBackClick = {
+                    navController.popBackStack()
+                },
+                onLoginSuccess = { busNumber, busId ->
+                    navController.navigate("${Destinations.BUS_OPERATIONS_HUB}/$busNumber/$busId") {
+                        popUpTo(Destinations.DRIVER_HOME) {
+                            inclusive = false
+                        }
+                    }
+                }
+            )
+        }
+        
+        composable("${Destinations.BUS_OPERATIONS_HUB}/{busNumber}/{busId}") { backStackEntry ->
+            val busNumber = backStackEntry.arguments?.getString("busNumber") ?: ""
+            val busId = backStackEntry.arguments?.getString("busId") ?: ""
+            
+            BusOperationsHubScreen(
+                busNumber = busNumber,
+                onLogoutClick = {
+                    // Navigate back to driver home
+                    navController.popBackStack(Destinations.DRIVER_HOME, inclusive = false)
                 }
             )
         }

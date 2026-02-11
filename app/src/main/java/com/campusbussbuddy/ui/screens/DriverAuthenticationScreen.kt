@@ -35,7 +35,7 @@ fun DriverAuthenticationScreen(
     onBackClick: () -> Unit,
     onStartShiftClick: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -126,9 +126,9 @@ fun DriverAuthenticationScreen(
                             .padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Email Field
+                        // Username Field
                         Text(
-                            text = "Email",
+                            text = "Username",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black,
@@ -138,21 +138,21 @@ fun DriverAuthenticationScreen(
                         )
                         
                         OutlinedTextField(
-                            value = email,
+                            value = username,
                             onValueChange = { 
-                                email = it
+                                username = it
                                 errorMessage = null
                             },
                             placeholder = {
                                 Text(
-                                    text = "Enter your email",
+                                    text = "Enter username",
                                     color = Color(0xFFAAAAAA)
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Email",
+                                    contentDescription = "Username",
                                     tint = Color(0xFF888888)
                                 )
                             },
@@ -167,8 +167,7 @@ fun DriverAuthenticationScreen(
                                 unfocusedContainerColor = Color(0xFFFAFAFA)
                             ),
                             singleLine = true,
-                            enabled = !isLoading,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                            enabled = !isLoading
                         )
                         
                         Spacer(modifier = Modifier.height(24.dp))
@@ -267,7 +266,7 @@ fun DriverAuthenticationScreen(
                                 )
                                 .clip(RoundedCornerShape(28.dp))
                                 .clickable(
-                                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
+                                    enabled = !isLoading && username.isNotBlank() && password.isNotBlank(),
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = rememberRipple(
                                         color = Color.White.copy(alpha = 0.3f),
@@ -278,7 +277,7 @@ fun DriverAuthenticationScreen(
                                         isLoading = true
                                         errorMessage = null
                                         
-                                        when (val result = FirebaseManager.authenticateDriver(email.trim(), password)) {
+                                        when (val result = FirebaseManager.authenticateDriver(username.trim(), password)) {
                                             is DriverAuthResult.Success -> {
                                                 isLoading = false
                                                 onStartShiftClick()

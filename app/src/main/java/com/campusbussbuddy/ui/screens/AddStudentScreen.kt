@@ -36,7 +36,7 @@ fun AddStudentScreen(
     onStudentAdded: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var busId by remember { mutableStateOf("") }
     var stop by remember { mutableStateOf("") }
@@ -118,18 +118,17 @@ fun AddStudentScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // Email Field
+                        // Username Field
                         StudentFormField(
-                            label = "Email",
-                            value = email,
+                            label = "Username",
+                            value = username,
                             onValueChange = { 
-                                email = it
+                                username = it
                                 errorMessage = null
                             },
-                            placeholder = "student@example.com",
+                            placeholder = "Enter unique username (e.g., pandi)",
                             icon = R.drawable.ic_person,
-                            enabled = !isLoading,
-                            keyboardType = KeyboardType.Email
+                            enabled = !isLoading
                         )
                         
                         Spacer(modifier = Modifier.height(16.dp))
@@ -224,9 +223,9 @@ fun AddStudentScreen(
                                 )
                                 .clip(RoundedCornerShape(28.dp))
                                 .clickable(
-                                    enabled = !isLoading && name.isNotBlank() && email.isNotBlank() 
-                                            && password.isNotBlank() && busId.isNotBlank() 
-                                            && stop.isNotBlank(),
+                                    enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
+                                            && password.isNotBlank() 
+                                            && busId.isNotBlank() && stop.isNotBlank(),
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = rememberRipple(
                                         color = Color.White.copy(alpha = 0.3f),
@@ -240,7 +239,7 @@ fun AddStudentScreen(
                                         
                                         val studentData = StudentData(
                                             name = name.trim(),
-                                            email = email.trim(),
+                                            username = username.trim(),
                                             busId = busId.trim(),
                                             stop = stop.trim()
                                         )
@@ -252,14 +251,8 @@ fun AddStudentScreen(
                                             is StudentResult.Success -> {
                                                 isLoading = false
                                                 successMessage = "Student account created successfully!"
-                                                // Clear form
-                                                name = ""
-                                                email = ""
-                                                password = ""
-                                                busId = ""
-                                                stop = ""
                                                 // Navigate back after delay
-                                                kotlinx.coroutines.delay(1500)
+                                                kotlinx.coroutines.delay(1000)
                                                 onStudentAdded()
                                             }
                                             is StudentResult.Error -> {
@@ -394,14 +387,22 @@ private fun StudentPasswordField(
                 )
             },
             trailingIcon = {
-                IconButton(onClick = onVisibilityToggle) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
+                            else Color(0xFFF5F5F5)
+                        )
+                        .clickable { onVisibilityToggle() },
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
-                        painter = painterResource(
-                            id = if (isPasswordVisible) R.drawable.ic_visibility 
-                            else R.drawable.ic_visibility_off
-                        ),
+                        painter = painterResource(id = R.drawable.ic_check),
                         contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                        tint = Color(0xFF888888)
+                        tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             },

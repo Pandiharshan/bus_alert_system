@@ -18,31 +18,49 @@ object FirebaseManager {
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     
     /**
-     * Authenticate admin user with email and password
-     * @param email Admin email
+     * Authenticate admin user with username and password
+     * Username is converted to email format (username@gmail.com) for Firebase Auth
+     * @param username Admin username (will be converted to email)
      * @param password Admin password
      * @return AuthResult with success status and message
      */
-    suspend fun authenticateAdmin(email: String, password: String): AuthResult {
+    suspend fun authenticateAdmin(username: String, password: String): AuthResult {
         return try {
-            // Sign in with Firebase Auth
+            Log.d("FirebaseManager", "Authenticating admin with username: $username")
+            
+            // Convert username to email format for Firebase Auth
+            val email = "${username.trim()}@gmail.com"
+            
+            Log.d("FirebaseManager", "Using email for auth: $email")
+            
+            // Sign in with Firebase Auth using generated email
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user
             
             if (user != null) {
-                // Verify admin status using email as document ID
-                val isAdmin = verifyAdminStatus(email)
-                if (isAdmin) {
-                    AuthResult.Success("Authentication successful")
+                // Verify admin status
+                val adminDoc = firestore.collection("admins").document(email).get().await()
+                
+                if (adminDoc.exists()) {
+                    val isAdmin = adminDoc.getBoolean("isadmin") ?: false
+                    if (isAdmin) {
+                        Log.d("FirebaseManager", "Admin authentication successful")
+                        AuthResult.Success("Authentication successful")
+                    } else {
+                        // Not an admin - sign out immediately
+                        auth.signOut()
+                        AuthResult.Error("Access denied. Admin privileges required.")
+                    }
                 } else {
-                    // Not an admin - sign out immediately
+                    // Admin document doesn't exist
                     auth.signOut()
-                    AuthResult.Error("Access denied. Admin privileges required.")
+                    AuthResult.Error("Admin account not found.")
                 }
             } else {
                 AuthResult.Error("Authentication failed")
             }
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "Admin authentication failed", e)
             AuthResult.Error(getErrorMessage(e))
         }
     }
@@ -102,6 +120,7 @@ object FirebaseManager {
                 AdminInfo(
                     uid = currentUser.uid,
                     email = email,
+                    username = adminDoc.getString("username") ?: "",
                     name = adminDoc.getString("name") ?: "System Administrator",
                     role = "admin"
                 )
@@ -110,6 +129,7 @@ object FirebaseManager {
                 AdminInfo(
                     uid = currentUser.uid,
                     email = email,
+                    username = "",
                     name = "System Administrator",
                     role = "admin"
                 )
@@ -123,6 +143,7 @@ object FirebaseManager {
     
     /**
      * Create a new driver account (Admin function)
+     * Username is converted to email format (username@gmail.com) for Firebase Auth
      * @param driverData Driver information
      * @param password Temporary password for driver
      * @param photoUri Optional photo URI for driver profile
@@ -134,8 +155,11 @@ object FirebaseManager {
         photoUri: Uri? = null
     ): DriverResult {
         return try {
+            // Convert username to email format for Firebase Auth
+            val email = "${driverData.username.trim()}@gmail.com"
+            
             // Step 1: Create Firebase Auth account
-            val authResult = auth.createUserWithEmailAndPassword(driverData.email, password).await()
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val driverUid = authResult.user?.uid ?: return DriverResult.Error("Failed to create account")
             
             // Step 2: Upload photo to Firebase Storage if provided
@@ -147,7 +171,8 @@ object FirebaseManager {
             // Step 3: Create driver document in Firestore using UID as document ID
             val driverDocument = hashMapOf(
                 "name" to driverData.name,
-                "email" to driverData.email,
+                "username" to driverData.username,
+                "email" to email,
                 "phone" to driverData.phone,
                 "photoUrl" to (photoUrl ?: ""),
                 "assignedBusId" to driverData.assignedBusId,
@@ -195,45 +220,55 @@ object FirebaseManager {
     }
     
     /**
-     * Authenticate driver with email and password
-     * @param email Driver email
+     * Authenticate driver with username and password
+     * Username is converted to email format (username@gmail.com) for Firebase Auth
+     * @param username Driver username (will be converted to email)
      * @param password Driver password
      * @return DriverAuthResult with driver info or error
      */
-    suspend fun authenticateDriver(email: String, password: String): DriverAuthResult {
+    suspend fun authenticateDriver(username: String, password: String): DriverAuthResult {
         return try {
-            // Step 1: Sign in with Firebase Auth
+            Log.d("FirebaseManager", "Authenticating driver with username: $username")
+            
+            // Convert username to email format for Firebase Auth
+            val email = "${username.trim()}@gmail.com"
+            
+            Log.d("FirebaseManager", "Using email for auth: $email")
+            
+            // Step 1: Sign in with Firebase Auth using generated email
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user ?: return DriverAuthResult.Error("Authentication failed")
             
-            // Step 2: Fetch driver document from Firestore using UID
+            // Step 2: Fetch driver data from Firestore
             val driverDoc = firestore.collection("drivers").document(user.uid).get().await()
             
             if (!driverDoc.exists()) {
                 auth.signOut()
-                return DriverAuthResult.Error("Driver profile not found")
+                return DriverAuthResult.Error("Driver account not found")
             }
             
-            // Step 3: Parse driver data
             val driverInfo = DriverInfo(
                 uid = user.uid,
                 name = driverDoc.getString("name") ?: "Driver",
-                email = driverDoc.getString("email") ?: email,
+                username = username.trim(),
+                email = email,
                 phone = driverDoc.getString("phone") ?: "",
                 photoUrl = driverDoc.getString("photoUrl") ?: "",
                 assignedBusId = driverDoc.getString("assignedBusId") ?: "",
                 isActive = driverDoc.getBoolean("isActive") ?: false
             )
             
-            // Step 4: Fetch assigned bus information
+            // Step 3: Fetch assigned bus information
             val busInfo = if (driverInfo.assignedBusId.isNotEmpty()) {
                 getBusInfo(driverInfo.assignedBusId)
             } else {
                 null
             }
             
+            Log.d("FirebaseManager", "Driver authentication successful")
             DriverAuthResult.Success(driverInfo, busInfo)
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "Driver authentication failed", e)
             DriverAuthResult.Error(getErrorMessage(e))
         }
     }
@@ -355,6 +390,7 @@ object FirebaseManager {
                 DriverInfo(
                     uid = currentUser.uid,
                     name = driverDoc.getString("name") ?: "Driver",
+                    username = driverDoc.getString("username") ?: "",
                     email = driverDoc.getString("email") ?: "",
                     phone = driverDoc.getString("phone") ?: "",
                     photoUrl = photoUrl,
@@ -445,6 +481,7 @@ object FirebaseManager {
                     DriverInfo(
                         uid = doc.id,
                         name = doc.getString("name") ?: "",
+                        username = doc.getString("username") ?: "",
                         email = doc.getString("email") ?: "",
                         phone = doc.getString("phone") ?: "",
                         photoUrl = doc.getString("photoUrl") ?: "",
@@ -470,6 +507,7 @@ object FirebaseManager {
         return try {
             val updateData = hashMapOf<String, Any>(
                 "name" to driverInfo.name,
+                "username" to driverInfo.username,
                 "phone" to driverInfo.phone,
                 "assignedBusId" to driverInfo.assignedBusId
             )
@@ -495,10 +533,10 @@ object FirebaseManager {
     
     /**
      * Reset driver password (Admin function)
-     * Note: This requires the driver to be signed in or use Firebase Admin SDK
-     * For production, implement this via Cloud Functions with Admin SDK
+     * Sends password reset email to the driver
+     * Note: For production, implement this via Cloud Functions with Admin SDK for direct password change
      * @param email Driver email
-     * @param newPassword New password
+     * @param newPassword New password (not used in email method, kept for future Admin SDK implementation)
      * @return Result with success/error message
      */
     suspend fun resetDriverPassword(email: String, newPassword: String): DriverResult {
@@ -508,39 +546,13 @@ object FirebaseManager {
                 return DriverResult.Error("Password must be at least 6 characters")
             }
             
-            // Store current admin user
-            val currentAdmin = auth.currentUser
-            val adminEmail = currentAdmin?.email
+            // For now, we'll send a password reset email
+            // In production, use Firebase Admin SDK via Cloud Functions for direct password change
+            auth.sendPasswordResetEmail(email).await()
             
-            // Sign in as the driver temporarily to change password
-            val driverAuth = auth.signInWithEmailAndPassword(email, "temp").await()
-            val driverUser = driverAuth.user
-            
-            if (driverUser != null) {
-                // Update password
-                driverUser.updatePassword(newPassword).await()
-                
-                // Sign out driver
-                auth.signOut()
-                
-                // Re-authenticate admin if needed
-                if (adminEmail != null) {
-                    // Admin needs to re-authenticate manually
-                    // This is a limitation of client-side password reset
-                }
-                
-                DriverResult.Success("Password updated successfully", driverUser.uid)
-            } else {
-                DriverResult.Error("Failed to authenticate driver for password reset")
-            }
+            DriverResult.Success("Password reset email sent to driver. They can set their new password from the email.", "")
         } catch (e: Exception) {
-            // If temporary sign-in fails, try using password reset email
-            try {
-                auth.sendPasswordResetEmail(email).await()
-                DriverResult.Success("Password reset email sent to driver", "")
-            } catch (emailError: Exception) {
-                DriverResult.Error("Password reset failed: ${e.message}")
-            }
+            DriverResult.Error("Password reset failed: ${e.message}")
         }
     }
     
@@ -574,13 +586,15 @@ object FirebaseManager {
      * Create a new bus (Admin function)
      * @param busNumber Bus number
      * @param capacity Bus capacity
+     * @param password Bus password for driver login
      * @return Result with success/error message
      */
-    suspend fun createBus(busNumber: Int, capacity: Int): BusResult {
+    suspend fun createBus(busNumber: Int, capacity: Int, password: String): BusResult {
         return try {
             val busData = hashMapOf(
                 "busNumber" to busNumber,
                 "capacity" to capacity,
+                "password" to password,
                 "activeDriverId" to "",
                 "activeDriverName" to "",
                 "activeDriverPhone" to "",
@@ -631,6 +645,56 @@ object FirebaseManager {
     }
     
     /**
+     * Authenticate bus with bus number and password
+     * @param busNumber Bus number to authenticate
+     * @param password Bus password
+     * @return BusAuthResult with bus info or error
+     */
+    suspend fun authenticateBus(busNumber: Int, password: String): BusAuthResult {
+        return try {
+            Log.d("FirebaseManager", "Authenticating bus: $busNumber")
+            
+            // Query buses collection for matching bus number
+            val busesSnapshot = firestore.collection("buses")
+                .whereEqualTo("busNumber", busNumber)
+                .get()
+                .await()
+            
+            if (busesSnapshot.isEmpty) {
+                Log.d("FirebaseManager", "Bus not found: $busNumber")
+                return BusAuthResult.Error("Bus not found. Please check the bus number.")
+            }
+            
+            // Get the first matching bus
+            val busDoc = busesSnapshot.documents.first()
+            val storedPassword = busDoc.getString("password") ?: ""
+            
+            // Verify password
+            if (storedPassword != password) {
+                Log.d("FirebaseManager", "Invalid password for bus: $busNumber")
+                return BusAuthResult.Error("Invalid password. Please try again.")
+            }
+            
+            // Password is correct, create BusInfo object
+            val busInfo = BusInfo(
+                busId = busDoc.id,
+                busNumber = busDoc.getLong("busNumber")?.toInt() ?: busNumber,
+                capacity = busDoc.getLong("capacity")?.toInt() ?: 0,
+                activeDriverId = busDoc.getString("activeDriverId") ?: "",
+                activeDriverName = busDoc.getString("activeDriverName") ?: "",
+                activeDriverPhone = busDoc.getString("activeDriverPhone") ?: ""
+            )
+            
+            Log.d("FirebaseManager", "Bus authentication successful: $busNumber")
+            BusAuthResult.Success(busInfo)
+            
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Bus authentication failed", e)
+            BusAuthResult.Error("Authentication failed: ${e.message}")
+        }
+    }
+    
+    /**
      * Convert Firebase exception to user-friendly error message
      */
     private fun getErrorMessage(exception: Exception): String {
@@ -659,6 +723,7 @@ object FirebaseManager {
     
     /**
      * Create a new student account (Admin function)
+     * Username is converted to email format (username@gmail.com) for Firebase Auth
      * @param studentData Student information
      * @param password Temporary password for student
      * @return Result with success/error message
@@ -668,10 +733,13 @@ object FirebaseManager {
         password: String
     ): StudentResult {
         return try {
-            Log.d("FirebaseManager", "Creating student account for: ${studentData.email}")
+            Log.d("FirebaseManager", "Creating student account for username: ${studentData.username}")
+            
+            // Convert username to email format for Firebase Auth
+            val email = "${studentData.username.trim()}@gmail.com"
             
             // Step 1: Create Firebase Auth account
-            val authResult = auth.createUserWithEmailAndPassword(studentData.email, password).await()
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val studentUid = authResult.user?.uid ?: return StudentResult.Error("Failed to create account")
             
             Log.d("FirebaseManager", "Student Auth UID created: $studentUid")
@@ -679,7 +747,8 @@ object FirebaseManager {
             // Step 2: Create student document in Firestore using UID as document ID
             val studentDocument = hashMapOf(
                 "name" to studentData.name,
-                "email" to studentData.email,
+                "username" to studentData.username,
+                "email" to email,
                 "busId" to studentData.busId,
                 "stop" to studentData.stop,
                 "createdAt" to System.currentTimeMillis()
@@ -697,42 +766,47 @@ object FirebaseManager {
     }
     
     /**
-     * Authenticate student with email and password
-     * @param email Student email
+     * Authenticate student with username and password
+     * Username is converted to email format (username@gmail.com) for Firebase Auth
+     * @param username Student username (will be converted to email)
      * @param password Student password
      * @return StudentAuthResult with student info or error
      */
-    suspend fun authenticateStudent(email: String, password: String): StudentAuthResult {
+    suspend fun authenticateStudent(username: String, password: String): StudentAuthResult {
         return try {
-            Log.d("FirebaseManager", "Authenticating student: $email")
+            Log.d("FirebaseManager", "Authenticating student with username: $username")
             
-            // Step 1: Sign in with Firebase Auth
+            // Convert username to email format for Firebase Auth
+            val email = "${username.trim()}@gmail.com"
+            
+            Log.d("FirebaseManager", "Using email for auth: $email")
+            
+            // Step 1: Sign in with Firebase Auth using generated email
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user ?: return StudentAuthResult.Error("Authentication failed")
             
             Log.d("FirebaseManager", "Student authenticated, UID: ${user.uid}")
             
-            // Step 2: Fetch student document from Firestore using UID
+            // Step 2: Fetch student data from Firestore
             val studentDoc = firestore.collection("students").document(user.uid).get().await()
             
             if (!studentDoc.exists()) {
                 auth.signOut()
-                Log.w("FirebaseManager", "Student document not found for UID: ${user.uid}")
-                return StudentAuthResult.Error("Student profile not found")
+                return StudentAuthResult.Error("Student account not found")
             }
             
-            // Step 3: Parse student data
             val studentInfo = StudentInfo(
                 uid = user.uid,
                 name = studentDoc.getString("name") ?: "Student",
-                email = studentDoc.getString("email") ?: email,
+                username = username.trim(),
+                email = email,
                 busId = studentDoc.getString("busId") ?: "",
                 stop = studentDoc.getString("stop") ?: ""
             )
             
             Log.d("FirebaseManager", "Student info loaded: ${studentInfo.name}")
             
-            // Step 4: Fetch assigned bus information
+            // Step 3: Fetch assigned bus information
             val busInfo = if (studentInfo.busId.isNotEmpty()) {
                 getBusInfo(studentInfo.busId)
             } else {
@@ -762,6 +836,7 @@ object FirebaseManager {
                 StudentInfo(
                     uid = currentUser.uid,
                     name = studentDoc.getString("name") ?: "Student",
+                    username = studentDoc.getString("username") ?: "",
                     email = studentDoc.getString("email") ?: "",
                     busId = studentDoc.getString("busId") ?: "",
                     stop = studentDoc.getString("stop") ?: ""
@@ -818,6 +893,7 @@ object FirebaseManager {
                     StudentInfo(
                         uid = doc.id,
                         name = doc.getString("name") ?: "",
+                        username = doc.getString("username") ?: "",
                         email = doc.getString("email") ?: "",
                         busId = doc.getString("busId") ?: "",
                         stop = doc.getString("stop") ?: ""
@@ -868,12 +944,14 @@ object FirebaseManager {
     /**
      * Update student information (Admin function)
      * @param studentInfo Updated student information
+     * @param newPassword Optional new password for the student
      * @return Result with success/error message
      */
-    suspend fun updateStudentInfo(studentInfo: StudentInfo): StudentResult {
+    suspend fun updateStudentInfo(studentInfo: StudentInfo, newPassword: String? = null): StudentResult {
         return try {
             val updateData = hashMapOf<String, Any>(
                 "name" to studentInfo.name,
+                "username" to studentInfo.username,
                 "busId" to studentInfo.busId,
                 "stop" to studentInfo.stop
             )
@@ -883,12 +961,48 @@ object FirebaseManager {
                 .update(updateData)
                 .await()
             
+            // If password change is requested, update it
+            if (!newPassword.isNullOrBlank() && newPassword.length >= 6) {
+                val passwordResult = resetStudentPassword(studentInfo.email, newPassword)
+                if (passwordResult is StudentResult.Error) {
+                    return StudentResult.Error("Student info updated but password change failed: ${passwordResult.message}")
+                }
+            }
+            
             Log.d("FirebaseManager", "Student info updated: ${studentInfo.uid}")
             
             StudentResult.Success("Student information updated successfully", studentInfo.uid)
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Update student failed", e)
             StudentResult.Error("Failed to update student: ${e.message}")
+        }
+    }
+    
+    /**
+     * Reset student password (Admin function)
+     * Note: This requires the student to be signed in or use Firebase Admin SDK
+     * For production, implement this via Cloud Functions with Admin SDK
+     * @param email Student email
+     * @param newPassword New password
+     * @return Result with success/error message
+     */
+    suspend fun resetStudentPassword(email: String, newPassword: String): StudentResult {
+        return try {
+            // Validate password strength
+            if (newPassword.length < 6) {
+                return StudentResult.Error("Password must be at least 6 characters")
+            }
+            
+            // For now, send password reset email as a workaround
+            // In production, use Firebase Admin SDK via Cloud Functions
+            try {
+                auth.sendPasswordResetEmail(email).await()
+                StudentResult.Success("Password reset email sent to student", "")
+            } catch (emailError: Exception) {
+                StudentResult.Error("Password reset failed: ${emailError.message}")
+            }
+        } catch (e: Exception) {
+            StudentResult.Error("Password reset failed: ${e.message}")
         }
     }
 }
@@ -907,6 +1021,7 @@ sealed class AuthResult {
 data class AdminInfo(
     val uid: String,
     val email: String,
+    val username: String,
     val name: String,
     val role: String
 )
@@ -916,7 +1031,7 @@ data class AdminInfo(
  */
 data class DriverData(
     val name: String,
-    val email: String,
+    val username: String,
     val phone: String,
     val assignedBusId: String
 )
@@ -927,6 +1042,7 @@ data class DriverData(
 data class DriverInfo(
     val uid: String,
     val name: String,
+    val username: String,
     val email: String,
     val phone: String,
     val photoUrl: String,
@@ -978,6 +1094,14 @@ sealed class BusResult {
     data class Error(val message: String) : BusResult()
 }
 
+/**
+ * Bus authentication result sealed class
+ */
+sealed class BusAuthResult {
+    data class Success(val busInfo: BusInfo) : BusAuthResult()
+    data class Error(val message: String) : BusAuthResult()
+}
+
 // ==================== STUDENT MANAGEMENT ====================
 
 /**
@@ -985,7 +1109,7 @@ sealed class BusResult {
  */
 data class StudentData(
     val name: String,
-    val email: String,
+    val username: String,
     val busId: String,
     val stop: String
 )
@@ -996,6 +1120,7 @@ data class StudentData(
 data class StudentInfo(
     val uid: String,
     val name: String,
+    val username: String,
     val email: String,
     val busId: String,
     val stop: String

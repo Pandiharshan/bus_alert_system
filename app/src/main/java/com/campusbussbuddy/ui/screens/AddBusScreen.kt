@@ -2,6 +2,7 @@ package com.campusbussbuddy.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -11,8 +12,12 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -27,6 +32,8 @@ fun AddBusScreen(
 ) {
     var busNumber by remember { mutableStateOf("") }
     var capacity by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
@@ -105,6 +112,53 @@ fun AddBusScreen(
                     singleLine = true
                 )
                 
+                // Password Field
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it },
+                    label = { Text("Bus Password") },
+                    placeholder = { Text("Enter bus password") },
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(12.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color(0xFF7DD3C0),
+                        unfocusedBorderColor = Color(0xFFE0E0E0),
+                        focusedContainerColor = Color.White,
+                        unfocusedContainerColor = Color.White
+                    ),
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_visibility_off),
+                            contentDescription = "Password",
+                            tint = Color(0xFF7DD3C0),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    },
+                    trailingIcon = {
+                        Box(
+                            modifier = Modifier
+                                .size(40.dp)
+                                .clip(RoundedCornerShape(8.dp))
+                                .background(
+                                    if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
+                                    else Color(0xFFF5F5F5)
+                                )
+                                .clickable { isPasswordVisible = !isPasswordVisible },
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_check),
+                                contentDescription = if (isPasswordVisible) "Hide password" else "Show password",
+                                tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
+                                modifier = Modifier.size(18.dp)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None 
+                    else PasswordVisualTransformation(),
+                    singleLine = true
+                )
+                
                 // Error Message
                 if (errorMessage != null) {
                     Card(
@@ -154,6 +208,9 @@ fun AddBusScreen(
                             capacity.isEmpty() -> {
                                 errorMessage = "Please enter capacity"
                             }
+                            password.isEmpty() -> {
+                                errorMessage = "Please enter bus password"
+                            }
                             capacity.toIntOrNull() == null -> {
                                 errorMessage = "Capacity must be a valid number"
                             }
@@ -169,7 +226,8 @@ fun AddBusScreen(
                                         // Create bus using FirebaseManager
                                         val result = FirebaseManager.createBus(
                                             busNumber = busNumber.toInt(),
-                                            capacity = capacity.toInt()
+                                            capacity = capacity.toInt(),
+                                            password = password
                                         )
                                         
                                         when (result) {
@@ -177,22 +235,18 @@ fun AddBusScreen(
                                                 Log.d("AddBusScreen", "Bus added successfully")
                                                 successMessage = "Bus added successfully!"
                                                 
-                                                // Clear form
-                                                busNumber = ""
-                                                capacity = ""
-                                                
                                                 // Navigate back after delay
-                                                kotlinx.coroutines.delay(1500)
+                                                kotlinx.coroutines.delay(1000)
                                                 onBusAdded()
                                             }
                                             is com.campusbussbuddy.firebase.BusResult.Error -> {
                                                 errorMessage = result.message
+                                                isLoading = false
                                             }
                                         }
                                     } catch (e: Exception) {
                                         Log.e("AddBusScreen", "Failed to add bus", e)
                                         errorMessage = "Failed to add bus: ${e.message}"
-                                    } finally {
                                         isLoading = false
                                     }
                                 }

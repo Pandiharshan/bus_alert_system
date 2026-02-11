@@ -14,6 +14,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -35,7 +36,7 @@ fun StudentLoginScreen(
     onBackClick: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -126,9 +127,9 @@ fun StudentLoginScreen(
                             .padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Email Field
+                        // Username Field
                         Text(
-                            text = "Email",
+                            text = "Username",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black,
@@ -138,21 +139,21 @@ fun StudentLoginScreen(
                         )
                         
                         OutlinedTextField(
-                            value = email,
+                            value = username,
                             onValueChange = { 
-                                email = it
+                                username = it
                                 errorMessage = null
                             },
                             placeholder = {
                                 Text(
-                                    text = "Enter your email",
+                                    text = "Enter username",
                                     color = Color(0xFFAAAAAA)
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Email",
+                                    contentDescription = "Username",
                                     tint = Color(0xFF888888)
                                 )
                             },
@@ -167,8 +168,7 @@ fun StudentLoginScreen(
                                 unfocusedContainerColor = Color(0xFFFAFAFA)
                             ),
                             singleLine = true,
-                            enabled = !isLoading,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email)
+                            enabled = !isLoading
                         )
                         
                         Spacer(modifier = Modifier.height(24.dp))
@@ -204,16 +204,22 @@ fun StudentLoginScreen(
                                 )
                             },
                             trailingIcon = {
-                                IconButton(
-                                    onClick = { isPasswordVisible = !isPasswordVisible }
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
+                                            else Color(0xFFF5F5F5)
+                                        )
+                                        .clickable { isPasswordVisible = !isPasswordVisible },
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(
-                                            id = if (isPasswordVisible) R.drawable.ic_visibility 
-                                            else R.drawable.ic_visibility_off
-                                        ),
+                                        painter = painterResource(id = R.drawable.ic_check),
                                         contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                                        tint = Color(0xFF888888)
+                                        tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             },
@@ -267,7 +273,7 @@ fun StudentLoginScreen(
                                 )
                                 .clip(RoundedCornerShape(28.dp))
                                 .clickable(
-                                    enabled = !isLoading && email.isNotBlank() && password.isNotBlank(),
+                                    enabled = !isLoading && username.isNotBlank() && password.isNotBlank(),
                                     interactionSource = remember { MutableInteractionSource() },
                                     indication = rememberRipple(
                                         color = Color.White.copy(alpha = 0.3f),
@@ -278,7 +284,7 @@ fun StudentLoginScreen(
                                         isLoading = true
                                         errorMessage = null
                                         
-                                        when (val result = FirebaseManager.authenticateStudent(email.trim(), password)) {
+                                        when (val result = FirebaseManager.authenticateStudent(username.trim(), password)) {
                                             is StudentAuthResult.Success -> {
                                                 isLoading = false
                                                 onLoginSuccess()

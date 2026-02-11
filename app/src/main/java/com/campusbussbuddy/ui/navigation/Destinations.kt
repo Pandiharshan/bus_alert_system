@@ -5,6 +5,8 @@ object Destinations {
     const val STUDENT_LOGIN = "student_login"
     const val DRIVER_AUTHENTICATION = "driver_authentication"
     const val DRIVER_HOME = "driver_home"
+    const val BUS_ASSIGNMENT_LOGIN = "bus_assignment_login"
+    const val BUS_OPERATIONS_HUB = "bus_operations_hub"
     const val STUDENT_PORTAL_HOME = "student_portal_home"
     const val ADMIN_LOGIN = "admin_login"
     const val ADMIN_HOME = "admin_home"

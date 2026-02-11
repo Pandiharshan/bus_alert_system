@@ -73,7 +73,7 @@ fun DriverDatabaseScreen(
         } else {
             drivers.filter { driver ->
                 driver.name.contains(searchQuery, ignoreCase = true) ||
-                driver.email.contains(searchQuery, ignoreCase = true) ||
+                driver.username.contains(searchQuery, ignoreCase = true) ||
                 driver.phone.contains(searchQuery, ignoreCase = true)
             }
         }
@@ -148,6 +148,7 @@ fun DriverDatabaseScreen(
                 onDismiss = {
                     showEditDialog = false
                     selectedDriver = null
+                    errorMessage = null
                 },
                 onSave = { updatedDriver, newPassword ->
                     scope.launch {
@@ -158,11 +159,13 @@ fun DriverDatabaseScreen(
                             drivers = FirebaseManager.getAllDrivers()
                             showEditDialog = false
                             selectedDriver = null
+                            errorMessage = null
                         } else if (result is DriverResult.Error) {
                             errorMessage = result.message
                         }
                     }
-                }
+                },
+                errorMessage = errorMessage
             )
         }
         
@@ -216,7 +219,7 @@ private fun SearchBar(
         modifier = modifier.fillMaxWidth(),
         placeholder = {
             Text(
-                text = "Search by name, email, or phone...",
+                text = "Search by name, username, or phone...",
                 color = Color(0xFFAAAAAA),
                 fontSize = 14.sp
             )
@@ -431,7 +434,7 @@ private fun DriverCard(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = driver.email,
+                    text = "@${driver.username}",
                     fontSize = 13.sp,
                     fontWeight = FontWeight.Normal,
                     color = Color(0xFF666666)

@@ -37,10 +37,11 @@ import com.campusbussbuddy.firebase.DriverInfo
 fun EditDriverDialog(
     driver: DriverInfo,
     onDismiss: () -> Unit,
-    onSave: (DriverInfo, String?) -> Unit
+    onSave: (DriverInfo, String?) -> Unit,
+    errorMessage: String? = null
 ) {
     var name by remember { mutableStateOf(driver.name) }
-    var email by remember { mutableStateOf(driver.email) }
+    var username by remember { mutableStateOf(driver.username) }
     var phone by remember { mutableStateOf(driver.phone) }
     var assignedBusId by remember { mutableStateOf(driver.assignedBusId) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
@@ -48,6 +49,9 @@ fun EditDriverDialog(
     var newPassword by remember { mutableStateOf("") }
     var showPassword by remember { mutableStateOf(false) }
     var showPasswordChangeConfirm by remember { mutableStateOf(false) }
+    
+    // Auto-generate email from username
+    val generatedEmail = "${username.trim()}@gmail.com"
     
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -199,14 +203,61 @@ fun EditDriverDialog(
                     Spacer(modifier = Modifier.height(16.dp))
                     
                     EditFormField(
-                        label = "Email",
-                        value = email,
-                        onValueChange = { email = it },
-                        placeholder = "driver@example.com",
+                        label = "Username",
+                        value = username,
+                        onValueChange = { username = it },
+                        placeholder = "Enter unique username (e.g., pandi)",
                         icon = R.drawable.ic_person,
-                        keyboardType = KeyboardType.Email,
-                        enabled = false // Email cannot be changed
+                        enabled = false
                     )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Email Field (Auto-generated, shown for reference)
+                    Column {
+                        Text(
+                            text = "Email",
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = Color(0xFF888888),
+                            modifier = Modifier.padding(bottom = 6.dp)
+                        )
+                        
+                        OutlinedTextField(
+                            value = generatedEmail,
+                            onValueChange = { },
+                            placeholder = {
+                                Text(
+                                    text = "Auto-generated from username",
+                                    color = Color(0xFFAAAAAA),
+                                    fontSize = 14.sp
+                                )
+                            },
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_person),
+                                    contentDescription = "Email",
+                                    tint = Color(0xFFCCCCCC),
+                                    modifier = Modifier.size(18.dp)
+                                )
+                            },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(52.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = OutlinedTextFieldDefaults.colors(
+                                focusedBorderColor = Color(0xFFE0E0E0),
+                                unfocusedBorderColor = Color(0xFFE0E0E0),
+                                disabledBorderColor = Color(0xFFE0E0E0),
+                                focusedContainerColor = Color(0xFFF5F5F5),
+                                unfocusedContainerColor = Color(0xFFF5F5F5),
+                                disabledContainerColor = Color(0xFFF5F5F5),
+                                disabledTextColor = Color(0xFF888888)
+                            ),
+                            singleLine = true,
+                            enabled = false
+                        )
+                    }
                     
                     Spacer(modifier = Modifier.height(16.dp))
                     
@@ -234,7 +285,7 @@ fun EditDriverDialog(
                     // Password Change Section
                     Column {
                         Text(
-                            text = "Change Password (Optional)",
+                            text = "Reset Password (Optional)",
                             fontSize = 13.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black,
@@ -246,7 +297,7 @@ fun EditDriverDialog(
                             onValueChange = { newPassword = it },
                             placeholder = {
                                 Text(
-                                    text = "Enter new password (leave blank to keep current)",
+                                    text = "Enter any value to trigger password reset email",
                                     color = Color(0xFFAAAAAA),
                                     fontSize = 14.sp
                                 )
@@ -288,17 +339,49 @@ fun EditDriverDialog(
                             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
                         )
                         
-                        if (newPassword.isNotEmpty() && newPassword.length < 6) {
+                        if (newPassword.isNotEmpty()) {
                             Spacer(modifier = Modifier.height(4.dp))
                             Text(
-                                text = "Password must be at least 6 characters",
+                                text = "Driver will receive a password reset email",
                                 fontSize = 11.sp,
-                                color = Color(0xFFD32F2F)
+                                color = Color(0xFF7DD3C0)
                             )
                         }
                     }
                     
                     Spacer(modifier = Modifier.height(8.dp))
+                    
+                    // Error Message
+                    if (errorMessage != null) {
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .background(
+                                    Color(0xFFF8D7DA),
+                                    RoundedCornerShape(8.dp)
+                                )
+                                .padding(12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_emergency),
+                                contentDescription = "Error",
+                                tint = Color(0xFF721C24),
+                                modifier = Modifier.size(16.dp)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(8.dp))
+                            
+                            Text(
+                                text = errorMessage,
+                                fontSize = 11.sp,
+                                color = Color(0xFF721C24),
+                                lineHeight = 16.sp
+                            )
+                        }
+                        
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
                     
                     // Info Note
                     Row(
@@ -321,7 +404,7 @@ fun EditDriverDialog(
                         Spacer(modifier = Modifier.width(8.dp))
                         
                         Text(
-                            text = "Email cannot be changed. You can reset the driver's password here.",
+                            text = "Username cannot be changed after account creation. Email is auto-generated from username. Password reset will send an email to the driver.",
                             fontSize = 11.sp,
                             color = Color(0xFF856404),
                             lineHeight = 16.sp
@@ -351,12 +434,13 @@ fun EditDriverDialog(
                     
                     Button(
                         onClick = {
-                            // If password is being changed, show confirmation
-                            if (newPassword.isNotEmpty() && newPassword.length >= 6) {
+                            // If password reset is requested, show confirmation
+                            if (newPassword.isNotEmpty()) {
                                 showPasswordChangeConfirm = true
                             } else {
                                 val updatedDriver = driver.copy(
                                     name = name.trim(),
+                                    username = username.trim(),
                                     phone = phone.trim(),
                                     assignedBusId = assignedBusId.trim()
                                 )
@@ -368,8 +452,7 @@ fun EditDriverDialog(
                         colors = ButtonDefaults.buttonColors(
                             containerColor = Color(0xFF7DD3C0)
                         ),
-                        enabled = name.isNotBlank() && phone.isNotBlank() && 
-                                  (newPassword.isEmpty() || newPassword.length >= 6)
+                        enabled = name.isNotBlank() && username.isNotBlank() && phone.isNotBlank()
                     ) {
                         Text("Save Changes")
                     }
@@ -383,13 +466,13 @@ fun EditDriverDialog(
                 onDismissRequest = { showPasswordChangeConfirm = false },
                 title = {
                     Text(
-                        text = "Change Password?",
+                        text = "Send Password Reset?",
                         fontWeight = FontWeight.Bold
                     )
                 },
                 text = {
                     Text(
-                        text = "Are you sure you want to change the password for ${driver.name}? The driver will need to use the new password to log in.",
+                        text = "A password reset email will be sent to ${driver.name}. They will receive an email to set their new password. Do you want to proceed?",
                         fontSize = 14.sp
                     )
                 },
@@ -399,6 +482,7 @@ fun EditDriverDialog(
                             showPasswordChangeConfirm = false
                             val updatedDriver = driver.copy(
                                 name = name.trim(),
+                                username = username.trim(),
                                 phone = phone.trim(),
                                 assignedBusId = assignedBusId.trim()
                             )
@@ -406,7 +490,7 @@ fun EditDriverDialog(
                         }
                     ) {
                         Text(
-                            text = "Change Password",
+                            text = "Send Reset Email",
                             color = Color(0xFF7DD3C0),
                             fontWeight = FontWeight.SemiBold
                         )

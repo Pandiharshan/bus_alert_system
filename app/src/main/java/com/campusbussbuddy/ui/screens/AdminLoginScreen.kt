@@ -13,6 +13,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -35,7 +36,7 @@ fun AdminLoginScreen(
     onBackClick: () -> Unit,
     onLoginSuccess: () -> Unit
 ) {
-    var adminEmail by remember { mutableStateOf("") }
+    var adminUsername by remember { mutableStateOf("") }
     var adminPassword by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
@@ -46,7 +47,7 @@ fun AdminLoginScreen(
     
     // Handle login
     fun handleLogin() {
-        if (adminEmail.isBlank() || adminPassword.isBlank()) {
+        if (adminUsername.isBlank() || adminPassword.isBlank()) {
             errorMessage = "Please fill in all fields"
             return
         }
@@ -55,7 +56,7 @@ fun AdminLoginScreen(
         errorMessage = ""
         
         scope.launch {
-            val result = FirebaseManager.authenticateAdmin(adminEmail, adminPassword)
+            val result = FirebaseManager.authenticateAdmin(adminUsername, adminPassword)
             
             when (result) {
                 is AuthResult.Success -> {
@@ -154,9 +155,9 @@ fun AdminLoginScreen(
                             .padding(32.dp),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        // Admin Email Field
+                        // Admin Username Field
                         Text(
-                            text = "Admin Email",
+                            text = "Username",
                             fontSize = 14.sp,
                             fontWeight = FontWeight.Medium,
                             color = Color.Black,
@@ -166,21 +167,21 @@ fun AdminLoginScreen(
                         )
                         
                         OutlinedTextField(
-                            value = adminEmail,
+                            value = adminUsername,
                             onValueChange = { 
-                                adminEmail = it
+                                adminUsername = it
                                 errorMessage = ""
                             },
                             placeholder = {
                                 Text(
-                                    text = "Enter admin email",
+                                    text = "Enter username",
                                     color = Color(0xFFAAAAAA)
                                 )
                             },
                             leadingIcon = {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Admin Email",
+                                    contentDescription = "Username",
                                     tint = Color(0xFF888888)
                                 )
                             },
@@ -196,7 +197,6 @@ fun AdminLoginScreen(
                                 errorBorderColor = Color(0xFFE57373)
                             ),
                             singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Email),
                             enabled = !isLoading,
                             isError = errorMessage.isNotEmpty()
                         )
@@ -234,17 +234,22 @@ fun AdminLoginScreen(
                                 )
                             },
                             trailingIcon = {
-                                IconButton(
-                                    onClick = { isPasswordVisible = !isPasswordVisible },
-                                    enabled = !isLoading
+                                Box(
+                                    modifier = Modifier
+                                        .size(40.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
+                                            else Color(0xFFF5F5F5)
+                                        )
+                                        .clickable { isPasswordVisible = !isPasswordVisible },
+                                    contentAlignment = Alignment.Center
                                 ) {
                                     Icon(
-                                        painter = painterResource(
-                                            id = if (isPasswordVisible) R.drawable.ic_visibility 
-                                            else R.drawable.ic_visibility_off
-                                        ),
+                                        painter = painterResource(id = R.drawable.ic_check),
                                         contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                                        tint = Color(0xFF888888)
+                                        tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
+                                        modifier = Modifier.size(18.dp)
                                     )
                                 }
                             },

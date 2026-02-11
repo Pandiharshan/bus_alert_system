@@ -42,7 +42,7 @@ fun AddDriverScreen(
     onDriverAdded: () -> Unit
 ) {
     var name by remember { mutableStateOf("") }
-    var email by remember { mutableStateOf("") }
+    var username by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
     var phone by remember { mutableStateOf("") }
     var assignedBusId by remember { mutableStateOf("") }
@@ -174,18 +174,17 @@ fun AddDriverScreen(
                         
                         Spacer(modifier = Modifier.height(16.dp))
                         
-                        // Email Field
+                        // Username Field
                         FormField(
-                            label = "Email",
-                            value = email,
+                            label = "Username",
+                            value = username,
                             onValueChange = { 
-                                email = it
+                                username = it
                                 errorMessage = null
                             },
-                            placeholder = "driver@example.com",
+                            placeholder = "Enter unique username (e.g., pandi)",
                             icon = R.drawable.ic_person,
-                            enabled = !isLoading,
-                            keyboardType = KeyboardType.Email
+                            enabled = !isLoading
                         )
                         
                         Spacer(modifier = Modifier.height(16.dp))
@@ -281,7 +280,7 @@ fun AddDriverScreen(
                                 )
                                 .clip(RoundedCornerShape(28.dp))
                                 .clickable(
-                                    enabled = !isLoading && name.isNotBlank() && email.isNotBlank() 
+                                    enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
                                             && password.isNotBlank() && phone.isNotBlank() 
                                             && assignedBusId.isNotBlank(),
                                     interactionSource = remember { MutableInteractionSource() },
@@ -297,7 +296,7 @@ fun AddDriverScreen(
                                         
                                         val driverData = DriverData(
                                             name = name.trim(),
-                                            email = email.trim(),
+                                            username = username.trim(),
                                             phone = phone.trim(),
                                             assignedBusId = assignedBusId.trim()
                                         )
@@ -310,15 +309,8 @@ fun AddDriverScreen(
                                             is DriverResult.Success -> {
                                                 isLoading = false
                                                 successMessage = "Driver account created successfully!"
-                                                // Clear form
-                                                name = ""
-                                                email = ""
-                                                password = ""
-                                                phone = ""
-                                                assignedBusId = ""
-                                                photoUri = null
                                                 // Navigate back after delay
-                                                kotlinx.coroutines.delay(1500)
+                                                kotlinx.coroutines.delay(1000)
                                                 onDriverAdded()
                                             }
                                             is DriverResult.Error -> {
@@ -453,14 +445,22 @@ private fun PasswordField(
                 )
             },
             trailingIcon = {
-                IconButton(onClick = onVisibilityToggle) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(
+                            if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
+                            else Color(0xFFF5F5F5)
+                        )
+                        .clickable { onVisibilityToggle() },
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
-                        painter = painterResource(
-                            id = if (isPasswordVisible) R.drawable.ic_visibility 
-                            else R.drawable.ic_visibility_off
-                        ),
+                        painter = painterResource(id = R.drawable.ic_check),
                         contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                        tint = Color(0xFF888888)
+                        tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
+                        modifier = Modifier.size(18.dp)
                     )
                 }
             },
