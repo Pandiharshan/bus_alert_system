@@ -1,7 +1,9 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -23,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,11 +82,10 @@ fun AdminHomeScreen(
             isLoading = false
         }
     }
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             contentPadding = PaddingValues(bottom = 24.dp)
@@ -162,6 +164,7 @@ fun AdminHomeScreen(
             }
         }
     }
+    }
 }
 
 @Composable
@@ -178,7 +181,11 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
             ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(
+            2.dp,
+            Color.White.copy(alpha = 0.55f)
         )
     ) {
         Row(
@@ -315,7 +322,11 @@ private fun StatCard(
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(
+            2.dp,
+            Color.White.copy(alpha = 0.55f)
         )
     ) {
         Column(
@@ -370,7 +381,11 @@ private fun RealTimeOverviewCard(
             ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(
+            2.dp,
+            Color.White.copy(alpha = 0.55f)
         )
     ) {
         Column(
@@ -567,7 +582,11 @@ private fun ActionTile(
             ) { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(
+            2.dp,
+            Color.White.copy(alpha = 0.55f)
         )
     ) {
         Column(

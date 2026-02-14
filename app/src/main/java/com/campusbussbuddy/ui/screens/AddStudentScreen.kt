@@ -1,6 +1,7 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -28,6 +29,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.StudentData
 import com.campusbussbuddy.firebase.StudentResult
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -48,11 +50,10 @@ fun AddStudentScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -95,8 +96,9 @@ fun AddStudentScreen(
                         ),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    )
+                        containerColor = Color.White.copy(alpha = 0.28f)
+                    ),
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -296,6 +298,7 @@ fun AddStudentScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
     }
 }
 

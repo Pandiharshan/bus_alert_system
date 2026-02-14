@@ -1,4 +1,4 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import android.net.Uri
 import android.util.Log
@@ -6,6 +6,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -38,6 +39,7 @@ import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverInfo
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -79,11 +81,10 @@ fun DriverDatabaseScreen(
         }
     }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -204,6 +205,7 @@ fun DriverDatabaseScreen(
                 }
             )
         }
+    }
     }
 }
 
@@ -338,8 +340,9 @@ private fun DriverCard(
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
-        )
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
     ) {
         Row(
             modifier = Modifier
@@ -633,7 +636,7 @@ private fun DeleteConfirmationDialog(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "• Driver profile from database\n• Driver photo from storage\n• Bus assignment\n• Authentication account",
+                    text = "â€¢ Driver profile from database\nâ€¢ Driver photo from storage\nâ€¢ Bus assignment\nâ€¢ Authentication account",
                     fontSize = 12.sp,
                     color = Color(0xFF888888),
                     lineHeight = 18.sp

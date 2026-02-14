@@ -1,9 +1,10 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -34,6 +35,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -62,11 +64,10 @@ fun AddDriverScreen(
         photoUri = uri
     }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -151,8 +152,9 @@ fun AddDriverScreen(
                         ),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.95f)
-                    )
+                        containerColor = Color.White.copy(alpha = 0.28f)
+                    ),
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -354,6 +356,7 @@ fun AddDriverScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
+    }
     }
 }
 

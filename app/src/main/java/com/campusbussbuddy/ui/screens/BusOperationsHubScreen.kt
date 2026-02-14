@@ -1,6 +1,7 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -19,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 
 @Composable
 fun BusOperationsHubScreen(
@@ -31,11 +33,10 @@ fun BusOperationsHubScreen(
     var currentRoute by remember { mutableStateOf("Route 12B - Morning Shift") }
     var isGpsReady by remember { mutableStateOf(true) }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -108,12 +109,18 @@ fun BusOperationsHubScreen(
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .height(120.dp),
+                        .height(120.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.06f),
+                            spotColor = Color.Black.copy(alpha = 0.06f)
+                        ),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = Color.White.copy(alpha = 0.28f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -148,12 +155,18 @@ fun BusOperationsHubScreen(
                 Card(
                     modifier = Modifier
                         .weight(1f)
-                        .height(120.dp),
+                        .height(120.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.06f),
+                            spotColor = Color.Black.copy(alpha = 0.06f)
+                        ),
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = Color.White.copy(alpha = 0.28f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -283,12 +296,19 @@ fun BusOperationsHubScreen(
             
             // Current Route Info
             Card(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .shadow(
+                        elevation = 4.dp,
+                        shape = RoundedCornerShape(16.dp),
+                        ambientColor = Color.Black.copy(alpha = 0.06f),
+                        spotColor = Color.Black.copy(alpha = 0.06f)
+                    ),
                 shape = RoundedCornerShape(16.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White
+                    containerColor = Color.White.copy(alpha = 0.28f)
                 ),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
             ) {
                 Row(
                     modifier = Modifier
@@ -332,12 +352,18 @@ fun BusOperationsHubScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(120.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.06f),
+                            spotColor = Color.Black.copy(alpha = 0.06f)
+                        )
                         .clickable { /* TODO: Navigate to members list */ },
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = Color.White.copy(alpha = 0.28f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -381,12 +407,18 @@ fun BusOperationsHubScreen(
                     modifier = Modifier
                         .weight(1f)
                         .height(120.dp)
+                        .shadow(
+                            elevation = 4.dp,
+                            shape = RoundedCornerShape(20.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.06f),
+                            spotColor = Color.Black.copy(alpha = 0.06f)
+                        )
                         .clickable { /* TODO: Navigate to bus profile */ },
                     shape = RoundedCornerShape(20.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White
+                        containerColor = Color.White.copy(alpha = 0.28f)
                     ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -432,6 +464,7 @@ fun BusOperationsHubScreen(
             BottomNavigationBar(onLogoutClick = onLogoutClick)
         }
     }
+    }
 }
 
 @Composable
@@ -441,12 +474,18 @@ private fun BottomNavigationBar(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .height(70.dp),
+            .height(70.dp)
+            .shadow(
+                elevation = 8.dp,
+                shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
+                ambientColor = Color.Black.copy(alpha = 0.1f),
+                spotColor = Color.Black.copy(alpha = 0.1f)
+            ),
         shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
+            containerColor = Color.White.copy(alpha = 0.28f)
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp)
+        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
     ) {
         Row(
             modifier = Modifier

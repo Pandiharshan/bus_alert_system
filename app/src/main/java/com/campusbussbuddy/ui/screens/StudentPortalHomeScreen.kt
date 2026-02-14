@@ -1,7 +1,8 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -25,6 +26,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.StudentInfo
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -53,11 +55,10 @@ fun StudentPortalHomeScreen(
         }
     }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         if (isLoading) {
             // Loading State
             CircularProgressIndicator(
@@ -105,6 +106,7 @@ fun StudentPortalHomeScreen(
         BottomNavigationBar(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
+    }
     }
 }
 
@@ -207,7 +209,7 @@ private fun WelcomeSection(studentInfo: StudentInfo?, busInfo: BusInfo?) {
             Spacer(modifier = Modifier.width(8.dp))
             
             Text(
-                text = if (busInfo != null) "Bus ${busInfo.busNumber} • ${studentInfo?.stop ?: "Your Stop"}" 
+                text = if (busInfo != null) "Bus ${busInfo.busNumber} â€¢ ${studentInfo?.stop ?: "Your Stop"}" 
                        else "No bus assigned",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,

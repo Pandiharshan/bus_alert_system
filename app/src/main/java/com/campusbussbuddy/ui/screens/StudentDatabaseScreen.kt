@@ -1,7 +1,8 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import android.util.Log
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -28,6 +29,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.StudentInfo
 import com.campusbussbuddy.firebase.StudentResult
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,11 +72,10 @@ fun StudentDatabaseScreen(
         }
     }
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Color(0xFFF8F9FA))
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -195,6 +196,7 @@ fun StudentDatabaseScreen(
                 }
             )
         }
+    }
     }
 }
 
@@ -327,8 +329,9 @@ private fun StudentCard(
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.95f)
-        )
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
     ) {
         Row(
             modifier = Modifier
@@ -823,7 +826,7 @@ private fun DeleteConfirmationDialog(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "• Student profile from database\n• Bus assignment\n• Authentication account",
+                    text = "â€¢ Student profile from database\nâ€¢ Bus assignment\nâ€¢ Authentication account",
                     fontSize = 12.sp,
                     color = Color(0xFF888888),
                     lineHeight = 18.sp

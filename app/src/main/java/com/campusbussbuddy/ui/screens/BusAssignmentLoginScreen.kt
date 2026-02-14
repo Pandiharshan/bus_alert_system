@@ -1,7 +1,8 @@
-package com.campusbussbuddy.ui.screens
+﻿package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
@@ -31,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusAuthResult
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.campusbussbuddy.ui.theme.AppBackgroundContainer
 import kotlinx.coroutines.launch
 
 @Composable
@@ -47,18 +49,10 @@ fun BusAssignmentLoginScreen(
     val focusManager = LocalFocusManager.current
     val scope = rememberCoroutineScope()
     
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(
-                Brush.verticalGradient(
-                    colors = listOf(
-                        Color(0xFFF5F7FA),
-                        Color(0xFFE8EDF2)
-                    )
-                )
-            )
-    ) {
+    AppBackgroundContainer {
+        Box(
+            modifier = Modifier.fillMaxSize()
+        ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -136,8 +130,9 @@ fun BusAssignmentLoginScreen(
                     ),
                 shape = RoundedCornerShape(32.dp),
                 colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                )
+                    containerColor = Color.White.copy(alpha = 0.28f)
+                ),
+                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
             ) {
                 Column(
                     modifier = Modifier
@@ -402,5 +397,6 @@ fun BusAssignmentLoginScreen(
             
             Spacer(modifier = Modifier.height(16.dp))
         }
+    }
     }
 }

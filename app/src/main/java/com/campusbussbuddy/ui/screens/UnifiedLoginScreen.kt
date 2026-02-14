@@ -1,0 +1,804 @@
+﻿ package com.campusbussbuddy.ui.screens
+
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.animation.*
+import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ripple.rememberRipple
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
+import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.*
+import kotlinx.coroutines.launch
+
+enum class LoginRole {
+    STUDENT, DRIVER, ADMIN
+}
+
+@Composable
+fun UnifiedLoginScreen(
+    onStudentLoginSuccess: () -> Unit,
+    onDriverLoginSuccess: () -> Unit,
+    onAdminLoginSuccess: () -> Unit
+) {
+    var selectedRole by remember { mutableStateOf(LoginRole.STUDENT) }
+    var showPrivacyDialog by remember { mutableStateOf(false) }
+    var showSupportDialog by remember { mutableStateOf(false) }
+    var showAppInfoDialog by remember { mutableStateOf(false) }
+    
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    colors = listOf(
+                        Color(0xFFC8E6C9), // Brighter light green
+                        Color(0xFFE8F5E9), // Very light green
+                        Color(0xFFF1F8E9)  // Pale yellow-green
+                    )
+                )
+            )
+    ) {
+        IconButton(
+            onClick = { showAppInfoDialog = true },
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .padding(16.dp)
+        ) {
+            Text(
+                text = "?",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = Color.White,
+                modifier = Modifier
+                    .size(32.dp)
+                    .background(Color.Black, CircleShape)
+                    .wrapContentSize(Alignment.Center)
+            )
+        }
+        
+        MainContent(
+            selectedRole = selectedRole,
+            onRoleChange = { selectedRole = it },
+            onStudentLoginSuccess = onStudentLoginSuccess,
+            onDriverLoginSuccess = onDriverLoginSuccess,
+            onAdminLoginSuccess = onAdminLoginSuccess,
+            onPrivacyPolicyClick = { showPrivacyDialog = true },
+            onSupportClick = { showSupportDialog = true },
+            onAppInfoClick = { showAppInfoDialog = true },
+            modifier = if (showPrivacyDialog || showSupportDialog || showAppInfoDialog) Modifier.blur(4.dp) else Modifier
+        )
+        
+        if (showPrivacyDialog) {
+            PrivacyPolicyDialog(onDismiss = { showPrivacyDialog = false })
+        }
+        
+        if (showSupportDialog) {
+            SupportDialog(onDismiss = { showSupportDialog = false })
+        }
+        
+        if (showAppInfoDialog) {
+            AppInfoDialog(onDismiss = { showAppInfoDialog = false })
+        }
+    }
+}
+
+@Composable
+private fun MainContent(
+    selectedRole: LoginRole,
+    onRoleChange: (LoginRole) -> Unit,
+    onStudentLoginSuccess: () -> Unit,
+    onDriverLoginSuccess: () -> Unit,
+    onAdminLoginSuccess: () -> Unit,
+    onPrivacyPolicyClick: () -> Unit,
+    onSupportClick: () -> Unit,
+    onAppInfoClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(modifier = modifier.fillMaxSize()) {
+        DynamicLoginCard(
+            selectedRole = selectedRole,
+            onRoleChange = onRoleChange,
+            onStudentLoginSuccess = onStudentLoginSuccess,
+            onDriverLoginSuccess = onDriverLoginSuccess,
+            onAdminLoginSuccess = onAdminLoginSuccess,
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(24.dp)
+                .align(Alignment.Center)
+        )
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .align(Alignment.BottomCenter)
+                .padding(24.dp),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "PRIVACY POLICY",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF999999),
+                letterSpacing = 1.2.sp,
+                modifier = Modifier.clickable { onPrivacyPolicyClick() }
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(text = "â€¢", fontSize = 10.sp, color = Color(0xFF999999))
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = "SUPPORT",
+                fontSize = 10.sp,
+                fontWeight = FontWeight.W600,
+                color = Color(0xFF999999),
+                letterSpacing = 1.2.sp,
+                modifier = Modifier.clickable { onSupportClick() }
+            )
+        }
+    }
+}
+
+
+@Composable
+private fun DynamicLoginCard(
+    selectedRole: LoginRole,
+    onRoleChange: (LoginRole) -> Unit,
+    onStudentLoginSuccess: () -> Unit,
+    onDriverLoginSuccess: () -> Unit,
+    onAdminLoginSuccess: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var username by remember { mutableStateOf("") }
+    var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+    
+    val scope = rememberCoroutineScope()
+    
+    LaunchedEffect(selectedRole) {
+        username = ""
+        password = ""
+        isPasswordVisible = false
+        errorMessage = null
+    }
+    
+    val roleData = remember(selectedRole) {
+        when (selectedRole) {
+            LoginRole.STUDENT -> RoleData(
+                icon = R.drawable.studentlogin,
+                iconBackground = Color(0xFF2C2C2C), // Dark black
+                title = "Student Login",
+                subtitle = "Manage your campus travels",
+                usernameLabel = "Student ID or Email",
+                buttonText = "Sign In"
+            )
+            LoginRole.DRIVER -> RoleData(
+                icon = R.drawable.driver_login,
+                iconBackground = Color(0xFF1A1A1A), // Very dark black
+                title = "Driver Login",
+                subtitle = "Access your bus operations",
+                usernameLabel = "Driver Username",
+                buttonText = "Sign In"
+            )
+            LoginRole.ADMIN -> RoleData(
+                icon = R.drawable.admin,
+                iconBackground = Color(0xFF0D0D0D), // Almost black
+                title = "Admin Login",
+                subtitle = "Manage the system",
+                usernameLabel = "Admin Username",
+                buttonText = "Access Dashboard"
+            )
+        }
+    }
+    
+    Box(modifier = modifier.fillMaxWidth().padding(horizontal = 24.dp)) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(32.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
+                )
+                .background(Color.White.copy(alpha = 0.28f), RoundedCornerShape(32.dp)) // Reduced to 28% for more blur visibility
+                .border(2.dp, Color.White.copy(alpha = 0.55f), RoundedCornerShape(32.dp)) // Brighter border
+        ) {
+            Column(
+                modifier = Modifier.fillMaxWidth().padding(24.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                AnimatedContent(
+                    targetState = roleData,
+                    transitionSpec = {
+                        fadeIn(animationSpec = tween(300)) + scaleIn(initialScale = 0.8f, animationSpec = tween(300)) togetherWith 
+                        fadeOut(animationSpec = tween(200)) + scaleOut(targetScale = 0.8f, animationSpec = tween(200))
+                    },
+                    label = "role_icon"
+                ) { data ->
+                    Box(
+                        modifier = Modifier.size(80.dp).background(Color(0xFF3A3A3A), CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Box(
+                            modifier = Modifier.size(56.dp).background(data.iconBackground, CircleShape).clip(CircleShape),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                painter = painterResource(id = data.icon),
+                                contentDescription = data.title,
+                                modifier = Modifier
+                                    .size(56.dp)
+                                    .aspectRatio(1f)      // ðŸ”¥ force perfect square crop
+                                    .clip(CircleShape),   // ðŸ”¥ clean circle
+                                contentScale = ContentScale.Crop,
+                                alignment = BiasAlignment(0f, -0.35f) // ðŸ‘ˆ move focus slightly up to center face
+                            )
+                        }
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(20.dp))
+                
+                AnimatedContent(
+                    targetState = roleData,
+                    transitionSpec = {
+                        fadeIn(animationSpec = tween(300)) togetherWith fadeOut(animationSpec = tween(200))
+                    },
+                    label = "role_text"
+                ) { data ->
+                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                        Text(
+                            text = data.title,
+                            fontSize = 28.sp,
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF1A1A1A),
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.5.sp
+                        )
+                        Spacer(modifier = Modifier.height(6.dp))
+                        Text(
+                            text = data.subtitle,
+                            fontSize = 14.sp,
+                            fontWeight = FontWeight.W400,
+                            color = Color(0xFF4A4A4A), // Light black
+                            textAlign = TextAlign.Center,
+                            letterSpacing = 0.3.sp
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                OutlinedTextField(
+                    value = username,
+                    onValueChange = { username = it; errorMessage = null },
+                    placeholder = {
+                        Text(
+                            text = roleData.usernameLabel,
+                            color = Color(0xFF999999),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.W400,
+                            letterSpacing = 0.2.sp
+                        )
+                    },
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.4f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.25f),
+                        focusedTextColor = Color(0xFF1A1A1A),
+                        unfocusedTextColor = Color(0xFF1A1A1A),
+                        cursorColor = Color(0xFF2196F3)
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W500,
+                        letterSpacing = 0.3.sp
+                    ),
+                    singleLine = true,
+                    enabled = !isLoading
+                )
+                
+                Spacer(modifier = Modifier.height(12.dp))
+                
+                OutlinedTextField(
+                    value = password,
+                    onValueChange = { password = it; errorMessage = null },
+                    placeholder = {
+                        Text(
+                            text = "Password",
+                            color = Color(0xFF999999),
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.W400,
+                            letterSpacing = 0.2.sp
+                        )
+                    },
+                    trailingIcon = {
+                        IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                            Icon(
+                                painter = painterResource(
+                                    id = if (isPasswordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off
+                                ),
+                                contentDescription = if (isPasswordVisible) "Hide" else "Show",
+                                tint = Color(0xFF888888),
+                                modifier = Modifier.size(22.dp)
+                            )
+                        }
+                    },
+                    visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                    modifier = Modifier.fillMaxWidth().height(56.dp),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = OutlinedTextFieldDefaults.colors(
+                        focusedBorderColor = Color.White.copy(alpha = 0.5f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.4f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.25f),
+                        focusedTextColor = Color(0xFF1A1A1A),
+                        unfocusedTextColor = Color(0xFF1A1A1A),
+                        cursorColor = Color(0xFF2196F3)
+                    ),
+                    textStyle = androidx.compose.ui.text.TextStyle(
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.W500,
+                        letterSpacing = 0.3.sp
+                    ),
+                    singleLine = true,
+                    enabled = !isLoading
+                )
+                
+                if (selectedRole == LoginRole.STUDENT) {
+                    Spacer(modifier = Modifier.height(10.dp))
+                    Text(
+                        text = "Forgot Password?",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.W500,
+                        color = Color(0xFF2C2C2C), // Dark black
+                        letterSpacing = 0.2.sp,
+                        modifier = Modifier.align(Alignment.End).clickable { }
+                    )
+                }
+                
+                if (errorMessage != null) {
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = errorMessage!!,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.W400,
+                        color = Color(0xFFE53935),
+                        textAlign = TextAlign.Center,
+                        letterSpacing = 0.2.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(20.dp))
+                
+                Button(
+                    onClick = {
+                        if (username.isBlank() || password.isBlank()) {
+                            errorMessage = "Please fill in all fields"
+                            return@Button
+                        }
+                        
+                        scope.launch {
+                            isLoading = true
+                            errorMessage = null
+                            
+                            when (selectedRole) {
+                                LoginRole.STUDENT -> {
+                                    when (val result = FirebaseManager.authenticateStudent(username.trim(), password)) {
+                                        is StudentAuthResult.Success -> {
+                                            isLoading = false
+                                            onStudentLoginSuccess()
+                                        }
+                                        is StudentAuthResult.Error -> {
+                                            isLoading = false
+                                            errorMessage = result.message
+                                        }
+                                    }
+                                }
+                                LoginRole.DRIVER -> {
+                                    when (val result = FirebaseManager.authenticateDriver(username.trim(), password)) {
+                                        is DriverAuthResult.Success -> {
+                                            isLoading = false
+                                            onDriverLoginSuccess()
+                                        }
+                                        is DriverAuthResult.Error -> {
+                                            isLoading = false
+                                            errorMessage = result.message
+                                        }
+                                    }
+                                }
+                                LoginRole.ADMIN -> {
+                                    when (val result = FirebaseManager.authenticateAdmin(username.trim(), password)) {
+                                        is AuthResult.Success -> {
+                                            isLoading = false
+                                            onAdminLoginSuccess()
+                                        }
+                                        is AuthResult.Error -> {
+                                            isLoading = false
+                                            errorMessage = result.message
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp)
+                        .shadow(
+                            elevation = 8.dp,
+                            shape = RoundedCornerShape(28.dp),
+                            ambientColor = Color.Black.copy(alpha = 0.1f),
+                            spotColor = Color.Black.copy(alpha = 0.1f)
+                        )
+                        .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(28.dp))
+                        .border(1.5.dp, Color.White.copy(alpha = 0.45f), RoundedCornerShape(28.dp)),
+                    shape = RoundedCornerShape(28.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent
+                    ),
+                    elevation = ButtonDefaults.buttonElevation(
+                        defaultElevation = 0.dp,
+                        pressedElevation = 0.dp
+                    ),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color(0xFF1A1A1A),
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Sign In",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.W600,
+                            color = Color(0xFF1A1A1A), // Dark text like screenshot
+                            letterSpacing = 0.5.sp
+                        )
+                        Spacer(modifier = Modifier.width(8.dp))
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_chevron_right),
+                            contentDescription = "Arrow",
+                            tint = Color(0xFF1A1A1A), // Dark icon
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    Divider(modifier = Modifier.fillMaxWidth(), color = Color(0xFFE0E0E0))
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Text(
+                        text = "SWITCH ROLE",
+                        fontSize = 11.sp,
+                        fontWeight = FontWeight.W600,
+                        color = Color(0xFF999999),
+                        letterSpacing = 1.2.sp
+                    )
+                    Spacer(modifier = Modifier.height(12.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceEvenly
+                    ) {
+                        RoleIcon(
+                            icon = R.drawable.ic_directions_bus_vector,
+                            isSelected = selectedRole == LoginRole.DRIVER,
+                            onClick = { onRoleChange(LoginRole.DRIVER) }
+                        )
+                        RoleIcon(
+                            icon = R.drawable.studentlogin,
+                            isSelected = selectedRole == LoginRole.STUDENT,
+                            onClick = { onRoleChange(LoginRole.STUDENT) },
+                            isImage = true
+                        )
+                        RoleIcon(
+                            icon = R.drawable.ic_person,
+                            isSelected = selectedRole == LoginRole.ADMIN,
+                            onClick = { onRoleChange(LoginRole.ADMIN) }
+                        )
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun RoleIcon(
+    icon: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    isImage: Boolean = false
+) {
+    val scale by animateFloatAsState(
+        targetValue = if (isSelected) 1.15f else 1f,
+        animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow),
+        label = "scale"
+    )
+    
+    Box(
+        modifier = Modifier
+            .size(48.dp)
+            .scale(scale)
+            .shadow(
+                elevation = if (isSelected) 8.dp else 0.dp, 
+                shape = CircleShape,
+                ambientColor = Color(0xFF2196F3).copy(alpha = 0.3f),
+                spotColor = Color(0xFF2196F3).copy(alpha = 0.3f)
+            )
+            .background(
+                if (isSelected) Color.White.copy(alpha = 0.4f) else Color.White.copy(alpha = 0.15f),
+                CircleShape
+            )
+            .border(
+                width = if (isSelected) 2.dp else 1.dp,
+                color = if (isSelected) Color.White.copy(alpha = 0.7f) else Color.White.copy(alpha = 0.3f),
+                shape = CircleShape
+            )
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = rememberRipple(bounded = true, color = Color.White.copy(alpha = 0.3f))
+            ) { onClick() },
+        contentAlignment = Alignment.Center
+    ) {
+        if (isImage) {
+            Image(
+                painter = painterResource(id = icon),
+                contentDescription = "Role",
+                modifier = Modifier.size(24.dp),
+                contentScale = ContentScale.Fit
+            )
+        } else {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = "Role",
+                tint = if (isSelected) Color(0xFF1A1A1A) else Color(0xFF5A5A5A), // Dark black when selected, light black when not
+                modifier = Modifier.size(24.dp)
+            )
+        }
+    }
+}
+
+private data class RoleData(
+    val icon: Int,
+    val iconBackground: Color,
+    val title: String,
+    val subtitle: String,
+    val usernameLabel: String,
+    val buttonText: String
+)
+
+
+@Composable
+private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val animatedAlpha by animateFloatAsState(targetValue = if (visible) 1f else 0f, animationSpec = tween(300), label = "alpha")
+    val animatedScale by animateFloatAsState(targetValue = if (visible) 1f else 0.8f, animationSpec = tween(300), label = "scale")
+    
+    Dialog(
+        onDismissRequest = { visible = false; onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f * animatedAlpha))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { visible = false; onDismiss() },
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(32.dp).scale(animatedScale).alpha(animatedAlpha)
+                    .shadow(elevation = 16.dp, shape = RoundedCornerShape(24.dp), ambientColor = Color.Black.copy(alpha = 0.2f), spotColor = Color.Black.copy(alpha = 0.2f))
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f))
+            ) {
+                Column(modifier = Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Privacy Policy", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "This app is a student-developed project designed to help colleges manage bus tracking and attendance efficiently, and all data used is for educational and demonstration purposes only.",
+                        fontSize = 16.sp, fontWeight = FontWeight.Normal, color = Color(0xFF444444), textAlign = TextAlign.Center, lineHeight = 24.sp
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                            .shadow(elevation = 4.dp, shape = RoundedCornerShape(28.dp), ambientColor = Color.Black.copy(alpha = 0.1f), spotColor = Color.Black.copy(alpha = 0.1f))
+                            .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(28.dp))
+                            .border(1.5.dp, Color.White.copy(alpha = 0.45f), RoundedCornerShape(28.dp))
+                            .clip(RoundedCornerShape(28.dp))
+                            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = rememberRipple(color = Color.White.copy(alpha = 0.3f), bounded = true)) { visible = false; onDismiss() }
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Got it", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A1A1A))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun SupportDialog(onDismiss: () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    val context = LocalContext.current
+    LaunchedEffect(Unit) { visible = true }
+    val animatedAlpha by animateFloatAsState(targetValue = if (visible) 1f else 0f, animationSpec = tween(300), label = "alpha")
+    val animatedScale by animateFloatAsState(targetValue = if (visible) 1f else 0.8f, animationSpec = tween(300), label = "scale")
+    
+    Dialog(
+        onDismissRequest = { visible = false; onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f * animatedAlpha))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { visible = false; onDismiss() },
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(32.dp).scale(animatedScale).alpha(animatedAlpha)
+                    .shadow(elevation = 16.dp, shape = RoundedCornerShape(24.dp), ambientColor = Color.Black.copy(alpha = 0.2f), spotColor = Color.Black.copy(alpha = 0.2f))
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.28f)),
+                border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+            ) {
+                Column(modifier = Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("Support & Contact", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Column(modifier = Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                        ContactItem(R.drawable.ic_share, "GitHub", "View source code") {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://github.com/Pandiharshan/bus_alert_system")))
+                        }
+                        ContactItem(R.drawable.ic_person, "LinkedIn", "Connect professionally") {
+                            context.startActivity(Intent(Intent.ACTION_VIEW, Uri.parse("https://www.linkedin.com/in/pandi-harshan-k-13962b2a5")))
+                        }
+                        ContactItem(R.drawable.ic_chat, "Email", "pandiharshanofficial@gmail.com") {
+                            context.startActivity(Intent(Intent.ACTION_SENDTO).apply {
+                                data = Uri.parse("mailto:pandiharshanofficial@gmail.com")
+                                putExtra(Intent.EXTRA_SUBJECT, "Campus Buddy App Support")
+                            })
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                            .shadow(elevation = 4.dp, shape = RoundedCornerShape(28.dp), ambientColor = Color.Black.copy(alpha = 0.1f), spotColor = Color.Black.copy(alpha = 0.1f))
+                            .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(28.dp))
+                            .border(1.5.dp, Color.White.copy(alpha = 0.45f), RoundedCornerShape(28.dp))
+                            .clip(RoundedCornerShape(28.dp))
+                            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = rememberRipple(color = Color.White.copy(alpha = 0.3f), bounded = true)) { visible = false; onDismiss() }
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Close", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color(0xFF1A1A1A))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ContactItem(iconRes: Int, title: String, subtitle: String, onClick: () -> Unit) {
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(16.dp), ambientColor = Color.Black.copy(alpha = 0.08f), spotColor = Color.Black.copy(alpha = 0.08f))
+            .background(Color.White.copy(alpha = 0.28f), RoundedCornerShape(16.dp))
+            .border(1.5.dp, Color.White.copy(alpha = 0.45f), RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(16.dp))
+            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = rememberRipple(color = Color(0xFF7DD3C0).copy(alpha = 0.2f), bounded = true)) { onClick() }
+            .padding(16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier.size(40.dp).background(Color(0xFF7DD3C0).copy(alpha = 0.2f), CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = title,
+                tint = Color(0xFF7DD3C0),
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(16.dp))
+        Column(modifier = Modifier.weight(1f)) {
+            Text(title, fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = Color.Black)
+            Text(subtitle, fontSize = 14.sp, fontWeight = FontWeight.Normal, color = Color(0xFF666666))
+        }
+        Icon(painterResource(id = R.drawable.ic_chevron_right), "Open", tint = Color(0xFF888888), modifier = Modifier.size(20.dp))
+    }
+}
+
+@Composable
+private fun AppInfoDialog(onDismiss: () -> Unit) {
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val animatedAlpha by animateFloatAsState(targetValue = if (visible) 1f else 0f, animationSpec = tween(300), label = "alpha")
+    val animatedScale by animateFloatAsState(targetValue = if (visible) 1f else 0.8f, animationSpec = tween(300), label = "scale")
+    
+    Dialog(
+        onDismissRequest = { visible = false; onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier.fillMaxSize().background(Color.Black.copy(alpha = 0.4f * animatedAlpha))
+                .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { visible = false; onDismiss() },
+            contentAlignment = Alignment.Center
+        ) {
+            Card(
+                modifier = Modifier.fillMaxWidth().padding(32.dp).scale(animatedScale).alpha(animatedAlpha)
+                    .shadow(elevation = 16.dp, shape = RoundedCornerShape(24.dp), ambientColor = Color.Black.copy(alpha = 0.2f), spotColor = Color.Black.copy(alpha = 0.2f))
+                    .clickable(interactionSource = remember { MutableInteractionSource() }, indication = null) { },
+                shape = RoundedCornerShape(24.dp),
+                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.95f))
+            ) {
+                Column(modifier = Modifier.fillMaxWidth().padding(32.dp), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text("About Campus Buddy", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
+                    Spacer(modifier = Modifier.height(24.dp))
+                    Text(
+                        "This smart bus attendance and tracking system is a student-developed project designed to help colleges digitally manage bus routes, real-time tracking, and student attendance using QR-based check-ins and live location updates.\n\nThe app simplifies daily transportation operations, improves student safety, and provides instant visibility into bus movements and attendance status.\n\nKey Features:\nâ€¢ Smart bus tracking with GPS\nâ€¢ QR-based attendance system\nâ€¢ Student absence planning\nâ€¢ Real-time stop management\nâ€¢ Driver and student role management\nâ€¢ Designed for college transportation efficiency",
+                        fontSize = 14.sp, fontWeight = FontWeight.Normal, color = Color(0xFF444444), textAlign = TextAlign.Start, lineHeight = 20.sp, modifier = Modifier.fillMaxWidth()
+                    )
+                    Spacer(modifier = Modifier.height(32.dp))
+                    Row(
+                        modifier = Modifier.fillMaxWidth().height(56.dp)
+                            .shadow(elevation = 4.dp, shape = RoundedCornerShape(28.dp), ambientColor = Color.Black.copy(alpha = 0.1f), spotColor = Color.Black.copy(alpha = 0.1f))
+                            .background(Color(0xFF7DD3C0).copy(alpha = 0.9f), RoundedCornerShape(28.dp)).clip(RoundedCornerShape(28.dp))
+                            .clickable(interactionSource = remember { MutableInteractionSource() }, indication = rememberRipple(color = Color.White.copy(alpha = 0.3f), bounded = true)) { visible = false; onDismiss() }
+                            .padding(horizontal = 24.dp),
+                        horizontalArrangement = Arrangement.Center, verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Text("Close", fontSize = 16.sp, fontWeight = FontWeight.Medium, color = Color.Black)
+                    }
+                }
+            }
+        }
+    }
+}
