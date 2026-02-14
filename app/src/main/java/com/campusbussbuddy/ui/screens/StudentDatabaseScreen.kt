@@ -477,11 +477,18 @@ private fun EditStudentDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
+                ),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+                containerColor = Color.White.copy(alpha = 0.28f)
+            ),
+            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -826,7 +833,7 @@ private fun DeleteConfirmationDialog(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "â€¢ Student profile from database\nâ€¢ Bus assignment\nâ€¢ Authentication account",
+                    text = "• Student profile from database\n• Bus assignment\n• Authentication account",
                     fontSize = 12.sp,
                     color = Color(0xFF888888),
                     lineHeight = 18.sp

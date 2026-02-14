@@ -332,11 +332,18 @@ private fun EditBusDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
+                ),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+                containerColor = Color.White.copy(alpha = 0.28f)
+            ),
+            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
         ) {
             Column(
                 modifier = Modifier.padding(24.dp)
@@ -425,11 +432,18 @@ private fun DeleteConfirmationDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(16.dp)
+                .shadow(
+                    elevation = 16.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = Color.Black.copy(alpha = 0.08f),
+                    spotColor = Color.Black.copy(alpha = 0.08f)
+                ),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+                containerColor = Color.White.copy(alpha = 0.28f)
+            ),
+            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),

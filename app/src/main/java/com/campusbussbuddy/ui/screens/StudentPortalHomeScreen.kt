@@ -209,7 +209,7 @@ private fun WelcomeSection(studentInfo: StudentInfo?, busInfo: BusInfo?) {
             Spacer(modifier = Modifier.width(8.dp))
             
             Text(
-                text = if (busInfo != null) "Bus ${busInfo.busNumber} â€¢ ${studentInfo?.stop ?: "Your Stop"}" 
+                text = if (busInfo != null) "Bus ${busInfo.busNumber} • ${studentInfo?.stop ?: "Your Stop"}" 
                        else "No bus assigned",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
@@ -233,8 +233,9 @@ private fun BusStatusCard(busInfo: BusInfo?) {
             ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
     ) {
         Row(
             modifier = Modifier
@@ -308,8 +309,9 @@ private fun DriverInfoCard(busInfo: BusInfo?) {
                 ),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White
-            )
+                containerColor = Color.White.copy(alpha = 0.28f)
+            ),
+            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
         ) {
             Column(
                 modifier = Modifier
@@ -452,8 +454,9 @@ private fun ActionCard(
             ) { /* Handle action */ },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White
-        )
+            containerColor = Color.White.copy(alpha = 0.28f)
+        ),
+        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
     ) {
         Column(
             modifier = Modifier

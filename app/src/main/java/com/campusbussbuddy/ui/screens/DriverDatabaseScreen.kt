@@ -636,7 +636,7 @@ private fun DeleteConfirmationDialog(
                 Spacer(modifier = Modifier.height(4.dp))
                 
                 Text(
-                    text = "â€¢ Driver profile from database\nâ€¢ Driver photo from storage\nâ€¢ Bus assignment\nâ€¢ Authentication account",
+                    text = "• Driver profile from database\n• Driver photo from storage\n• Bus assignment\n• Authentication account",
                     fontSize = 12.sp,
                     color = Color(0xFF888888),
                     lineHeight = 18.sp

@@ -157,7 +157,7 @@ private fun MainContent(
                 modifier = Modifier.clickable { onPrivacyPolicyClick() }
             )
             Spacer(modifier = Modifier.width(16.dp))
-            Text(text = "â€¢", fontSize = 10.sp, color = Color(0xFF999999))
+            Text(text = "•", fontSize = 10.sp, color = Color(0xFF999999))
             Spacer(modifier = Modifier.width(16.dp))
             Text(
                 text = "SUPPORT",
@@ -783,7 +783,7 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                     Text("About Campus Buddy", fontSize = 24.sp, fontWeight = FontWeight.Bold, color = Color.Black, textAlign = TextAlign.Center)
                     Spacer(modifier = Modifier.height(24.dp))
                     Text(
-                        "This smart bus attendance and tracking system is a student-developed project designed to help colleges digitally manage bus routes, real-time tracking, and student attendance using QR-based check-ins and live location updates.\n\nThe app simplifies daily transportation operations, improves student safety, and provides instant visibility into bus movements and attendance status.\n\nKey Features:\nâ€¢ Smart bus tracking with GPS\nâ€¢ QR-based attendance system\nâ€¢ Student absence planning\nâ€¢ Real-time stop management\nâ€¢ Driver and student role management\nâ€¢ Designed for college transportation efficiency",
+                        "This smart bus attendance and tracking system is a student-developed project designed to help colleges digitally manage bus routes, real-time tracking, and student attendance using QR-based check-ins and live location updates.\n\nThe app simplifies daily transportation operations, improves student safety, and provides instant visibility into bus movements and attendance status.\n\nKey Features:\n• Smart bus tracking with GPS\n• QR-based attendance system\n• Student absence planning\n• Real-time stop management\n• Driver and student role management\n• Designed for college transportation efficiency",
                         fontSize = 14.sp, fontWeight = FontWeight.Normal, color = Color(0xFF444444), textAlign = TextAlign.Start, lineHeight = 20.sp, modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(modifier = Modifier.height(32.dp))
