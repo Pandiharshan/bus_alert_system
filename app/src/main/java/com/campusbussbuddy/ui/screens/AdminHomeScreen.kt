@@ -174,18 +174,18 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .shadow(
-                elevation = 8.dp,
+                elevation = 6.dp,
                 shape = RoundedCornerShape(24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                ambientColor = Color.Black.copy(alpha = 0.06f),
+                spotColor = Color.Black.copy(alpha = 0.06f)
             ),
         shape = RoundedCornerShape(24.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color.White.copy(alpha = 0.22f)
         ),
         border = BorderStroke(
-            2.dp,
-            Color.White.copy(alpha = 0.55f)
+            1.5.dp,
+            Color.White.copy(alpha = 0.15f)
         )
     ) {
         Row(
@@ -214,26 +214,26 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
                 modifier = Modifier.weight(1f),
                 horizontalArrangement = Arrangement.Center
             ) {
-                // Admin Profile Image - Using admin.png
+                // Admin Profile Image - Clean circular container without overlay
                 Box(
                     modifier = Modifier
-                        .size(48.dp)
+                        .size(72.dp)
                         .clip(CircleShape)
-                        .background(Color(0xFFF0F0F0))
+                        .background(Color.Transparent)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.admin),
                         contentDescription = "Admin Profile",
                         modifier = Modifier
-                            .fillMaxSize()
-                            .padding(8.dp),
+                            .size(64.dp)
+                            .align(Alignment.Center),
                         tint = Color.Unspecified
                     )
                 }
                 
                 Spacer(modifier = Modifier.width(12.dp))
                 
-                // Admin Name - Reduced size
+                // Admin Name
                 Text(
                     text = "Pandiharshan",
                     fontSize = 18.sp,
@@ -315,18 +315,18 @@ private fun StatCard(
         modifier = modifier
             .height(100.dp)
             .shadow(
-                elevation = 4.dp,
+                elevation = 3.dp,
                 shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                ambientColor = Color.Black.copy(alpha = 0.04f),
+                spotColor = Color.Black.copy(alpha = 0.04f)
             ),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color.White.copy(alpha = 0.22f)
         ),
         border = BorderStroke(
-            2.dp,
-            Color.White.copy(alpha = 0.55f)
+            1.5.dp,
+            Color.White.copy(alpha = 0.15f)
         )
     ) {
         Column(
@@ -374,18 +374,18 @@ private fun RealTimeOverviewCard(
             .fillMaxWidth()
             .padding(horizontal = 20.dp)
             .shadow(
-                elevation = 6.dp,
+                elevation = 4.dp,
                 shape = RoundedCornerShape(20.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
+                ambientColor = Color.Black.copy(alpha = 0.06f),
+                spotColor = Color.Black.copy(alpha = 0.06f)
             ),
         shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color.White.copy(alpha = 0.22f)
         ),
         border = BorderStroke(
-            2.dp,
-            Color.White.copy(alpha = 0.55f)
+            1.5.dp,
+            Color.White.copy(alpha = 0.15f)
         )
     ) {
         Column(
@@ -568,10 +568,10 @@ private fun ActionTile(
         modifier = modifier
             .height(110.dp)
             .shadow(
-                elevation = 4.dp,
+                elevation = 3.dp,
                 shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                ambientColor = Color.Black.copy(alpha = 0.04f),
+                spotColor = Color.Black.copy(alpha = 0.04f)
             )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -582,11 +582,11 @@ private fun ActionTile(
             ) { onClick() },
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color.White.copy(alpha = 0.22f)
         ),
         border = BorderStroke(
-            2.dp,
-            Color.White.copy(alpha = 0.55f)
+            1.5.dp,
+            Color.White.copy(alpha = 0.15f)
         )
     ) {
         Column(

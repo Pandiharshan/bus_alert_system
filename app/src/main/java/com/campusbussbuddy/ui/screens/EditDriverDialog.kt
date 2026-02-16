@@ -71,16 +71,16 @@ fun EditDriverDialog(
                 .fillMaxWidth()
                 .fillMaxHeight(0.9f)
                 .shadow(
-                    elevation = 16.dp,
+                    elevation = 12.dp,
                     shape = RoundedCornerShape(24.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
+                    ambientColor = Color.Black.copy(alpha = 0.06f),
+                    spotColor = Color.Black.copy(alpha = 0.06f)
                 ),
             shape = RoundedCornerShape(24.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.28f)
+                containerColor = Color.White.copy(alpha = 0.30f)
             ),
-            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
         ) {
             Column(
                 modifier = Modifier

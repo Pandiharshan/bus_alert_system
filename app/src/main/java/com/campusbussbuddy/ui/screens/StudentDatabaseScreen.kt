@@ -479,19 +479,19 @@ private fun EditStudentDialog(
                 .fillMaxWidth()
                 .padding(16.dp)
                 .shadow(
-                    elevation = 16.dp,
+                    elevation = 12.dp,
                     shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
+                    ambientColor = Color.Black.copy(alpha = 0.06f),
+                    spotColor = Color.Black.copy(alpha = 0.06f)
                 ),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.28f)
+                containerColor = Color.White.copy(alpha = 0.30f)
             ),
-            border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
         ) {
             Column(
-                modifier = Modifier.padding(24.dp)
+                modifier = Modifier.padding(20.dp)
             ) {
                 Text(
                     text = "Edit Student",

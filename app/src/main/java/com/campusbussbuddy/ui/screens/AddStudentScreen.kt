@@ -89,16 +89,16 @@ fun AddStudentScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(
-                            elevation = 8.dp,
+                            elevation = 6.dp,
                             shape = RoundedCornerShape(24.dp),
-                            ambientColor = Color.Black.copy(alpha = 0.1f),
-                            spotColor = Color.Black.copy(alpha = 0.1f)
+                            ambientColor = Color.Black.copy(alpha = 0.06f),
+                            spotColor = Color.Black.copy(alpha = 0.06f)
                         ),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.28f)
+                        containerColor = Color.White.copy(alpha = 0.22f)
                     ),
-                    border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+                    border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
                 ) {
                     Column(
                         modifier = Modifier
@@ -327,7 +327,7 @@ private fun StudentFormField(
             placeholder = {
                 Text(
                     text = placeholder,
-                    color = Color(0xFFAAAAAA)
+                    color = Color(0xFF7A7A7A)
                 )
             },
             leadingIcon = {
@@ -344,8 +344,11 @@ private fun StudentFormField(
             colors = OutlinedTextFieldDefaults.colors(
                 focusedBorderColor = Color(0xFF7DD3C0),
                 unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color(0xFFFAFAFA)
+                focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
+                focusedTextColor = Color(0xFF2E2E2E),
+                unfocusedTextColor = Color(0xFF2E2E2E),
+                disabledTextColor = Color(0xFF2E2E2E)
             ),
             singleLine = true,
             enabled = enabled,

@@ -235,8 +235,8 @@ private fun DynamicLoginCard(
                     ambientColor = Color.Black.copy(alpha = 0.08f),
                     spotColor = Color.Black.copy(alpha = 0.08f)
                 )
-                .background(Color.White.copy(alpha = 0.28f), RoundedCornerShape(32.dp)) // Reduced to 28% for more blur visibility
-                .border(2.dp, Color.White.copy(alpha = 0.55f), RoundedCornerShape(32.dp)) // Brighter border
+                .background(Color.White.copy(alpha = 0.22f), RoundedCornerShape(32.dp)) // Reduced for better readability
+                .border(1.5.dp, Color.White.copy(alpha = 0.15f), RoundedCornerShape(32.dp)) // Subtle border
         ) {
             Column(
                 modifier = Modifier.fillMaxWidth().padding(24.dp),
@@ -251,24 +251,22 @@ private fun DynamicLoginCard(
                     label = "role_icon"
                 ) { data ->
                     Box(
-                        modifier = Modifier.size(80.dp).background(Color(0xFF3A3A3A), CircleShape),
+                        modifier = Modifier
+                            .size(88.dp)
+                            .clip(CircleShape)
+                            .background(Color.Transparent),
                         contentAlignment = Alignment.Center
                     ) {
-                        Box(
-                            modifier = Modifier.size(56.dp).background(data.iconBackground, CircleShape).clip(CircleShape),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Image(
+                        Image(
                                 painter = painterResource(id = data.icon),
                                 contentDescription = data.title,
                                 modifier = Modifier
-                                    .size(56.dp)
+                                    .size(76.dp)
                                     .aspectRatio(1f)      // ðŸ”¥ force perfect square crop
                                     .clip(CircleShape),   // ðŸ”¥ clean circle
                                 contentScale = ContentScale.Crop,
                                 alignment = BiasAlignment(0f, -0.35f) // ðŸ‘ˆ move focus slightly up to center face
                             )
-                        }
                     }
                 }
                 
@@ -310,7 +308,7 @@ private fun DynamicLoginCard(
                     placeholder = {
                         Text(
                             text = roleData.usernameLabel,
-                            color = Color(0xFF999999),
+                            color = Color(0xFF7A7A7A),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.W400,
                             letterSpacing = 0.2.sp
@@ -319,13 +317,13 @@ private fun DynamicLoginCard(
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White.copy(alpha = 0.5f),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                        focusedContainerColor = Color.White.copy(alpha = 0.4f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.25f),
-                        focusedTextColor = Color(0xFF1A1A1A),
-                        unfocusedTextColor = Color(0xFF1A1A1A),
-                        cursorColor = Color(0xFF2196F3)
+                        focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.65f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.65f),
+                        focusedTextColor = Color(0xFF2E2E2E),
+                        unfocusedTextColor = Color(0xFF2E2E2E),
+                        cursorColor = Color(0xFF7DD3C0)
                     ),
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 15.sp,
@@ -344,7 +342,7 @@ private fun DynamicLoginCard(
                     placeholder = {
                         Text(
                             text = "Password",
-                            color = Color(0xFF999999),
+                            color = Color(0xFF7A7A7A),
                             fontSize = 15.sp,
                             fontWeight = FontWeight.W400,
                             letterSpacing = 0.2.sp
@@ -367,13 +365,13 @@ private fun DynamicLoginCard(
                     modifier = Modifier.fillMaxWidth().height(56.dp),
                     shape = RoundedCornerShape(28.dp),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color.White.copy(alpha = 0.5f),
-                        unfocusedBorderColor = Color.White.copy(alpha = 0.3f),
-                        focusedContainerColor = Color.White.copy(alpha = 0.4f),
-                        unfocusedContainerColor = Color.White.copy(alpha = 0.25f),
-                        focusedTextColor = Color(0xFF1A1A1A),
-                        unfocusedTextColor = Color(0xFF1A1A1A),
-                        cursorColor = Color(0xFF2196F3)
+                        focusedBorderColor = Color.White.copy(alpha = 0.6f),
+                        unfocusedBorderColor = Color.White.copy(alpha = 0.4f),
+                        focusedContainerColor = Color.White.copy(alpha = 0.65f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.65f),
+                        focusedTextColor = Color(0xFF2E2E2E),
+                        unfocusedTextColor = Color(0xFF2E2E2E),
+                        cursorColor = Color(0xFF7DD3C0)
                     ),
                     textStyle = androidx.compose.ui.text.TextStyle(
                         fontSize = 15.sp,

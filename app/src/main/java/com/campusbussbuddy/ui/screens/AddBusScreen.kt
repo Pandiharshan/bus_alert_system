@@ -66,15 +66,17 @@ fun AddBusScreen(
                 OutlinedTextField(
                     value = busNumber,
                     onValueChange = { busNumber = it },
-                    label = { Text("Bus Number") },
-                    placeholder = { Text("Enter bus number") },
+                    label = { Text("Bus Number", color = Color(0xFF2E2E2E)) },
+                    placeholder = { Text("Enter bus number", color = Color(0xFF7A7A7A)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF7DD3C0),
                         unfocusedBorderColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedTextColor = Color(0xFF2E2E2E),
+                        unfocusedTextColor = Color(0xFF2E2E2E)
                     ),
                     leadingIcon = {
                         Icon(
@@ -91,15 +93,17 @@ fun AddBusScreen(
                 OutlinedTextField(
                     value = capacity,
                     onValueChange = { capacity = it },
-                    label = { Text("Capacity") },
-                    placeholder = { Text("Enter bus capacity") },
+                    label = { Text("Capacity", color = Color(0xFF2E2E2E)) },
+                    placeholder = { Text("Enter bus capacity", color = Color(0xFF7A7A7A)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF7DD3C0),
                         unfocusedBorderColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedTextColor = Color(0xFF2E2E2E),
+                        unfocusedTextColor = Color(0xFF2E2E2E)
                     ),
                     leadingIcon = {
                         Icon(
@@ -116,15 +120,17 @@ fun AddBusScreen(
                 OutlinedTextField(
                     value = password,
                     onValueChange = { password = it },
-                    label = { Text("Bus Password") },
-                    placeholder = { Text("Enter bus password") },
+                    label = { Text("Bus Password", color = Color(0xFF2E2E2E)) },
+                    placeholder = { Text("Enter bus password", color = Color(0xFF7A7A7A)) },
                     modifier = Modifier.fillMaxWidth(),
                     shape = RoundedCornerShape(12.dp),
                     colors = OutlinedTextFieldDefaults.colors(
                         focusedBorderColor = Color(0xFF7DD3C0),
                         unfocusedBorderColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color.White,
-                        unfocusedContainerColor = Color.White
+                        focusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
+                        focusedTextColor = Color(0xFF2E2E2E),
+                        unfocusedTextColor = Color(0xFF2E2E2E)
                     ),
                     leadingIcon = {
                         Icon(
