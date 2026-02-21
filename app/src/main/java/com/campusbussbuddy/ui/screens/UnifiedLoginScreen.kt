@@ -110,10 +110,8 @@ fun UnifiedLoginScreen(
 }
 
 // ─── Main Content ─────────────────────────────────────────────────────────────
-// Header pill overlaps the card top edge — exactly like target image.
-// HTML: `absolute top-8 left-1/2 -translate-x-1/2` sits at screen top-8,
-// card starts below with space-y-8 from header inside flex column.
-// In Compose: use Box so pill is drawn OVER the card at top-center.
+// ONLY CHANGE: pill drawn on top of card (overlaps card top edge, centered)
+// Everything else (bottom pills, scroll) untouched.
 @Composable
 private fun MainContent(
     selectedRole: LoginRole,
@@ -132,17 +130,15 @@ private fun MainContent(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // top-8 = 32dp from screen top before the pill
-        Spacer(modifier = Modifier.height(32.dp))
+        Spacer(modifier = Modifier.height(32.dp))   // top-8 = 32dp
 
-        // ── Header pill + Card stacked via Box so pill overlaps card ──────────
-        // Pill height ≈ 36dp. We want pill center at card top edge.
-        // So pill needs to be raised by half its height = 18dp above card.
+        // ── Pill + Card layered: pill sits on top of card at top-center ───────
         Box(
-            modifier            = Modifier.fillMaxWidth(),
-            contentAlignment    = Alignment.TopCenter
+            modifier         = Modifier.fillMaxWidth(),
+            contentAlignment = Alignment.TopCenter
         ) {
-            // Card starts 18dp below (half-pill-height) so pill center = card top
+            // Card is offset 18dp down (half pill height ~36dp)
+            // so pill center aligns exactly with card top edge
             Box(modifier = Modifier.padding(top = 18.dp)) {
                 DynamicLoginCard(
                     selectedRole          = selectedRole,
@@ -153,13 +149,13 @@ private fun MainContent(
                 )
             }
 
-            // Pill drawn LAST = on top of card, perfectly centered
+            // Pill rendered LAST = drawn on top of card, perfectly centered
             AppLabelPill(onAppInfoClick)
         }
 
         Spacer(modifier = Modifier.height(24.dp))
 
-        // ── Bottom Nav Pills ──────────────────────────────────────────────────
+        // ── Bottom Nav Pills — UNTOUCHED ──────────────────────────────────────
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment     = Alignment.CenterVertically
@@ -521,10 +517,9 @@ private fun DynamicLoginCard(
             ) {
                 // HTML order: student, driver, admin
                 RoleIcon(
-                    icon       = R.drawable.studentlogin,
+                    icon       = R.drawable.ic_student,                // student icon (XML)
                     isSelected = selectedRole == LoginRole.STUDENT,
-                    onClick    = { onRoleChange(LoginRole.STUDENT) },
-                    isImage    = true
+                    onClick    = { onRoleChange(LoginRole.STUDENT) }
                 )
                 RoleIcon(
                     icon       = R.drawable.ic_directions_bus_vector,
@@ -532,7 +527,7 @@ private fun DynamicLoginCard(
                     onClick    = { onRoleChange(LoginRole.DRIVER) }
                 )
                 RoleIcon(
-                    icon       = R.drawable.ic_person,                 // admin icon
+                    icon       = R.drawable.ic_admin_panel,            // admin panel icon (XML)
                     isSelected = selectedRole == LoginRole.ADMIN,
                     onClick    = { onRoleChange(LoginRole.ADMIN) }
                 )
