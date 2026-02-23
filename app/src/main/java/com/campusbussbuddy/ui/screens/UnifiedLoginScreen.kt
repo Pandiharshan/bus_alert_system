@@ -254,11 +254,11 @@ private fun DynamicLoginCard(
     val roleData = remember(selectedRole) {
         when (selectedRole) {
             LoginRole.STUDENT -> RoleData(
-                icon          = R.drawable.studentlogin,
+                icon          = R.drawable.ic_student,
                 title         = "Student Login",
                 subtitle      = "",  // removed caption
                 usernameLabel = "Username",
-                isImage       = true
+                isImage       = false  // use as icon, not image
             )
             LoginRole.DRIVER  -> RoleData(
                 icon          = R.drawable.driver_login,
@@ -268,11 +268,11 @@ private fun DynamicLoginCard(
                 isImage       = true
             )
             LoginRole.ADMIN   -> RoleData(
-                icon          = R.drawable.admin,
+                icon          = R.drawable.admin_panel,
                 title         = "Admin Login",
                 subtitle      = "",  // removed caption
                 usernameLabel = "Admin Username",
-                isImage       = true
+                isImage       = false  // use as icon, not image
             )
         }
     }

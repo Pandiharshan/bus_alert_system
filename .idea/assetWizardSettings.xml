@@ -80,7 +80,7 @@
                                               <map>
                                                 <entry key="color" value="000000" />
                                                 <entry key="imagePath" value="C:\full stack\BusAlertSystem\app\src\main\res\drawable\app.png" />
-                                                <entry key="scalingPercent" value="118" />
+                                                <entry key="scalingPercent" value="72" />
                                               </map>
                                             </option>
                                           </PersistentState>
@@ -297,8 +297,8 @@
                         <option name="values">
                           <map>
                             <entry key="assetSourceType" value="FILE" />
-                            <entry key="outputName" value="admin_panel" />
-                            <entry key="sourceFile" value="C:\full stack\BusAlertSystem\app\src\main\res\drawable\admin_panel.svg" />
+                            <entry key="outputName" value="admin_profile" />
+                            <entry key="sourceFile" value="C:\full stack\BusAlertSystem\app\src\main\res\drawable\admin_profile.svg" />
                           </map>
                         </option>
                       </PersistentState>

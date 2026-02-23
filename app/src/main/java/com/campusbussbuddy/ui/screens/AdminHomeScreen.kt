@@ -222,7 +222,7 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
                         .background(Color.Transparent)
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.admin),
+                        painter = painterResource(id = R.drawable.admin_panel),
                         contentDescription = "Admin Profile",
                         modifier = Modifier
                             .size(64.dp)
