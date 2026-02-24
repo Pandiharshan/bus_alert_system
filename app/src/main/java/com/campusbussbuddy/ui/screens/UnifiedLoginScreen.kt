@@ -28,6 +28,7 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import com.campusbussbuddy.ui.theme.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -48,26 +49,7 @@ enum class LoginRole {
     STUDENT, DRIVER, ADMIN
 }
 
-// ─── Design Tokens (Exact HTML Sage Glass UI) ────────────────────────────────
-private val BgTop        = Color(0xFF6BBFB0)                       // light teal-green (top)
-private val BgBottom     = Color(0xFF3A8A85)                       // deeper teal (bottom)
-private val TealOverlay  = Color(0xFF2d6464).copy(alpha = 0.40f)   // teal overlay 40%
-private val CardBg       = Color(0xFFFFFFFF).copy(alpha = 0.22f)   // glass-card rgba(255,255,255,0.22)
-private val CardBorder   = Color(0xFFFFFFFF).copy(alpha = 0.30f)   // white/30
-private val FieldBg      = Color(0xFFFFFFFF).copy(alpha = 0.60f)   // glass-input rgba(255,255,255,0.6)
-private val FieldBorder  = Color(0xFFFFFFFF).copy(alpha = 0.40f)   // white/40
-private val FieldText    = Color(0xFF111111)                        // primary-text #111111
-private val FieldHint    = Color(0xFF444444).copy(alpha = 0.70f)   // secondary-text 70%
-private val FieldIcon    = Color(0xFF444444)                        // secondary-text for icons
-private val BtnGreen     = Color(0xFF22C55E).copy(alpha = 0.85f)   // sage-green rgba(34,197,94,0.85)
-private val BtnGlow      = Color(0xFF22C55E).copy(alpha = 0.40f)   // button glow shadow
-private val BtnText      = Color(0xFFFFFFFF)
-private val TitleColor   = Color(0xFF111111)                        // primary-text #111111
-private val SubtitleColor= Color(0xFF444444)                        // secondary-text #444444
-private val DividerColor = Color(0xFFFFFFFF).copy(alpha = 0.40f)   // white/40
-private val SwitchLabel  = Color(0xFF444444).copy(alpha = 0.60f)   // secondary-text 60% opacity
-private val ForgotColor  = Color(0xFF2d6464)                        // brand-teal #2d6464
-private val BrandTeal    = Color(0xFF2d6464)                        // brand-teal #2d6464
+// Using Glassmorphism Design Tokens from theme
 
 @Composable
 fun UnifiedLoginScreen(
@@ -80,17 +62,8 @@ fun UnifiedLoginScreen(
     var showSupportDialog by remember { mutableStateOf(false) }
     var showAppInfoDialog by remember { mutableStateOf(false) }
 
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .background(Brush.verticalGradient(colors = listOf(BgTop, BgBottom)))
-    ) {
-        // Campus overlay (rgba(45,100,100,0.4))
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(TealOverlay)
-        )
+    GlassBackground {
+        // No overlay needed - background gradient is perfect
 
         MainContent(
             selectedRole          = selectedRole,
@@ -178,8 +151,8 @@ private fun AppLabelPill(onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .shadow(elevation = 0.dp, shape = RoundedCornerShape(50))
-            .background(Color.White.copy(alpha = 0.10f), RoundedCornerShape(50))  // bg-white/10
-            .border(1.dp, Color.White.copy(alpha = 0.30f), RoundedCornerShape(50)) // border-white/30
+            .background(HeaderPillBg, RoundedCornerShape(50))  // rgba(255,255,255,0.55)
+            .border(1.dp, HeaderPillBorder, RoundedCornerShape(50)) // rgba(255,255,255,0.7)
             .clip(RoundedCornerShape(50))
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
@@ -199,7 +172,7 @@ private fun AppLabelPill(onClick: () -> Unit) {
             text          = "Campus Bus Buddy",
             fontSize      = 14.sp,
             fontWeight    = FontWeight.Bold,         // font-bold
-            color         = TitleColor,              // primary-text #111111
+            color         = TitleColor,              // primary-text #0F172A
             letterSpacing = (-0.3).sp               // tracking-tight
         )
     }
@@ -392,26 +365,45 @@ private fun DynamicLoginCard(
             Spacer(modifier = Modifier.height(28.dp))
 
             // ── Username Field ────────────────────────────────────────────────
-            GlassInputField(
+            GlassTextField(
                 value          = username,
                 onValueChange  = { username = it; errorMessage = null },
                 placeholder    = roleData.usernameLabel,
-                leadingIconRes = R.drawable.ic_person,
+                leadingIcon     = {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_person),
+                        contentDescription = null,
+                        tint    = InputIconTint,
+                        modifier = Modifier.size(20.dp)
+                    )
+                },
                 enabled        = !isLoading
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
             // ── Password Field (NO leading icon, only trailing visibility toggle) ─
-            GlassInputField(
+            GlassTextField(
                 value                = password,
                 onValueChange        = { password = it; errorMessage = null },
                 placeholder          = "Password",
-                leadingIconRes       = null,  // removed leading icon
-                trailingIconRes      = if (isPasswordVisible) R.drawable.ic_visibility else R.drawable.ic_visibility_off,
-                onTrailingIconClick  = { isPasswordVisible = !isPasswordVisible },
+                trailingIcon         = {
+                    IconButton(
+                        onClick = { isPasswordVisible = !isPasswordVisible }
+                    ) {
+                        Icon(
+                            painter = painterResource(
+                                id = if (isPasswordVisible) R.drawable.ic_visibility 
+                                else R.drawable.ic_visibility_off
+                            ),
+                            contentDescription = null,
+                            tint = InputIconTint,
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+                },
                 visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
-                keyboardType         = KeyboardType.Password,
+                keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password),
                 enabled              = !isLoading
             )
 
@@ -430,11 +422,11 @@ private fun DynamicLoginCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── Sign In Button — glass-button-sage, NO chevron arrow ──────────
-            Button(
+            GlassButton(
                 onClick = {
                     if (username.isBlank() || password.isBlank()) {
                         errorMessage = "Please fill in all fields"
-                        return@Button
+                        return@GlassButton
                     }
                     scope.launch {
                         isLoading = true
@@ -455,30 +447,13 @@ private fun DynamicLoginCard(
                         }
                     }
                 },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(54.dp)                                       // h-14 = 56dp
-                    .shadow(
-                        elevation    = 0.dp,
-                        shape        = RoundedCornerShape(27.dp),
-                        ambientColor = BtnGlow,
-                        spotColor    = BtnGlow
-                    ),
-                shape    = RoundedCornerShape(27.dp),
-                colors   = ButtonDefaults.buttonColors(
-                    containerColor         = BtnGreen,                   // rgba(34,197,94,0.85)
-                    disabledContainerColor = BtnGreen.copy(alpha = 0.50f)
-                ),
-                elevation = ButtonDefaults.buttonElevation(
-                    defaultElevation = 0.dp,
-                    pressedElevation = 0.dp
-                ),
+                modifier = Modifier.fillMaxWidth(),
                 enabled = !isLoading
             ) {
                 if (isLoading) {
                     CircularProgressIndicator(
                         modifier    = Modifier.size(20.dp),
-                        color       = Color.White,
+                        color       = TextButton,
                         strokeWidth = 2.dp
                     )
                 } else {
@@ -487,7 +462,7 @@ private fun DynamicLoginCard(
                         text       = "Sign In",
                         fontSize   = 17.sp,
                         fontWeight = FontWeight.Bold,
-                        color      = BtnText
+                        color      = TextButton
                     )
                 }
             }
@@ -628,18 +603,16 @@ private fun RoleIcon(
             .shadow(
                 elevation    = if (isSelected) 4.dp else 1.dp,
                 shape        = CircleShape,
-                ambientColor = if (isSelected) BrandTeal.copy(alpha = 0.15f) else Color.Transparent,
-                spotColor    = if (isSelected) BrandTeal.copy(alpha = 0.15f) else Color.Transparent
+                ambientColor = if (isSelected) SelectedIconTint.copy(alpha = 0.15f) else Color.Transparent,
+                spotColor    = if (isSelected) SelectedIconTint.copy(alpha = 0.15f) else Color.Transparent
             )
             .background(
-                // active: bg-brand-teal/10 | inactive: glass-card
-                if (isSelected) BrandTeal.copy(alpha = 0.10f) else CardBg,
+                GlassCardFill,
                 CircleShape
             )
             .border(
-                width = if (isSelected) 1.5.dp else 1.dp,
-                color = if (isSelected) BrandTeal.copy(alpha = 0.60f)   // border-brand-teal/60
-                        else Color.White.copy(alpha = 0.30f),            // border-white/30
+                width = 1.5.dp,
+                color = if (isSelected) SelectedIconTint.copy(alpha = 0.6f) else AvatarBorder,
                 shape = CircleShape
             )
             .clip(CircleShape)
@@ -660,7 +633,7 @@ private fun RoleIcon(
             Icon(
                 painter           = painterResource(id = icon),
                 contentDescription = null,
-                tint              = if (isSelected) BrandTeal else SubtitleColor,  // brand-teal active / secondary-text inactive
+                tint              = if (isSelected) SelectedIconTint else IconTint,
                 modifier          = Modifier.size(24.dp)
             )
         }

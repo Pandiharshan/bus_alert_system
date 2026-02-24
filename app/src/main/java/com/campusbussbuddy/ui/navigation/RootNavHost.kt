@@ -129,6 +129,13 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onBackClick = {
+                    // Navigate back to login screen
+                    FirebaseManager.signOut()
+                    navController.navigate(Destinations.LOGIN_SELECTION) {
+                        popUpTo(0) { inclusive = true }
+                    }
                 }
             )
         }

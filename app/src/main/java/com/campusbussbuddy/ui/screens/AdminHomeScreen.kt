@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,15 +26,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
+
+// Using Glassmorphism Design Tokens from theme
 
 @Composable
 fun AdminHomeScreen(
     onManageDriversClick: () -> Unit = {},
     onManageBusesClick: () -> Unit = {},
     onManageStudentsClick: () -> Unit = {},
-    onLogoutClick: () -> Unit = {}
+    onLogoutClick: () -> Unit = {},
+    onBackClick: () -> Unit = {}
 ) {
     var totalStudents by remember { mutableStateOf(0) }
     var totalDrivers by remember { mutableStateOf(0) }
@@ -82,179 +86,149 @@ fun AdminHomeScreen(
             isLoading = false
         }
     }
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-        LazyColumn(
-            modifier = Modifier.fillMaxSize(),
-            contentPadding = PaddingValues(bottom = 24.dp)
-        ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+    
+    GlassBackground {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Top Bar with Back Button and Title
+            AdminTopBar(onBackClick = onBackClick)
             
-            item {
-                // Admin Profile Card with Logout
-                AdminProfileCard(onLogoutClick = onLogoutClick)
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Dashboard Stats with real data
-                if (isLoading) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(200.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(color = Color(0xFF7DD3C0))
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(bottom = 24.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
+                
+                item {
+                    // Admin Profile Card with Logout
+                    AdminProfileCard(onLogoutClick = onLogoutClick)
+                }
+                
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+                
+                item {
+                    // Dashboard Stats with real data
+                    if (isLoading) {
+                        Box(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(200.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            CircularProgressIndicator(color = Color(0xFF7DD3C0))
+                        }
+                    } else {
+                        DashboardStatsGrid(
+                            totalBuses = totalBuses,
+                            totalStudents = totalStudents,
+                            totalDrivers = totalDrivers
+                        )
                     }
-                } else {
-                    DashboardStatsGrid(
-                        totalBuses = totalBuses,
-                        totalStudents = totalStudents,
-                        totalDrivers = totalDrivers
+                }
+                
+                item {
+                    Spacer(modifier = Modifier.height(40.dp))
+                }
+                
+                item {
+                    // Main Action Tiles
+                    MainActionTiles(
+                        onManageDriversClick = onManageDriversClick,
+                        onManageBusesClick = onManageBusesClick,
+                        onManageStudentsClick = onManageStudentsClick
                     )
                 }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Real-Time Overview with live data
-                RealTimeOverviewCard(
-                    activeTrips = activeTrips,
-                    busesRunning = busesRunning,
-                    studentsOnboard = studentsOnboard
-                )
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
-            }
-            
-            item {
-                // Main Action Tiles
-                Text(
-                    text = "System Management",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black,
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 8.dp)
-                )
-            }
-            
-            item {
-                MainActionTiles(
-                    onManageDriversClick = onManageDriversClick,
-                    onManageBusesClick = onManageBusesClick,
-                    onManageStudentsClick = onManageStudentsClick
-                )
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(24.dp))
+                
+                item {
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
             }
         }
     }
+}
+
+@Composable
+private fun AdminTopBar(onBackClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        // Back button
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_back),
+                contentDescription = "Back",
+                tint = TextPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        
+        // Title centered
+        Text(
+            text = "ADMIN PORTAL",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            letterSpacing = 1.5.sp,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
 @Composable
 private fun AdminProfileCard(onLogoutClick: () -> Unit) {
-    Card(
+    Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .shadow(
-                elevation = 6.dp,
-                shape = RoundedCornerShape(24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
-            ),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.22f)
-        ),
-        border = BorderStroke(
-            1.5.dp,
-            Color.White.copy(alpha = 0.15f)
-        )
+            .padding(horizontal = OuterPadding),  // 📏 Outer Padding: 18dp
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Row(
+        // 👤 Avatar Size: 120dp - Match unified login screen style
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+                .size(AvatarSize)
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape,
+                    ambientColor = Color.Black.copy(alpha = 0.1f),
+                    spotColor = Color.Black.copy(alpha = 0.1f)
+                )
+                .border(
+                    width = 2.dp,
+                    color = AvatarBorder,
+                    shape = CircleShape
+                )
+                .background(GlassCardFill, CircleShape),
+            contentAlignment = Alignment.Center
         ) {
-            // Logout Button (Left)
-            IconButton(
-                onClick = onLogoutClick,
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_arrow_back_ios_new),
-                    contentDescription = "Logout",
-                    tint = Color(0xFF666666),
-                    modifier = Modifier.size(18.dp)
-                )
-            }
-            
-            // Center Content: Profile Image + Name
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.weight(1f),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                // Admin Profile Image - Clean circular container without overlay
-                Box(
-                    modifier = Modifier
-                        .size(72.dp)
-                        .clip(CircleShape)
-                        .background(Color.Transparent)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.admin_panel),
-                        contentDescription = "Admin Profile",
-                        modifier = Modifier
-                            .size(64.dp)
-                            .align(Alignment.Center),
-                        tint = Color.Unspecified
-                    )
-                }
-                
-                Spacer(modifier = Modifier.width(12.dp))
-                
-                // Admin Name
-                Text(
-                    text = "Pandiharshan",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-            }
-            
-            // Settings Icon (Right)
-            IconButton(
-                onClick = { /* Handle settings */ },
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_settings),
-                    contentDescription = "Settings",
-                    tint = Color(0xFF666666),
-                    modifier = Modifier.size(22.dp)
-                )
-            }
+            Icon(
+                painter = painterResource(id = R.drawable.ic_admin_panel),
+                contentDescription = "Admin Profile",
+                modifier = Modifier.size(64.dp),
+                tint = BrandTeal  // Match unified login screen icon color
+            )
         }
+        
+        Spacer(modifier = Modifier.height(16.dp))  // 📏 Spacing: 16dp
+        
+        // 🔤 Primary Title: #111111 (Bold)
+        Text(
+            text = "Pandiharshan",
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            letterSpacing = 0.5.sp
+        )
     }
 }
 
@@ -264,43 +238,32 @@ private fun DashboardStatsGrid(
     totalStudents: Int,
     totalDrivers: Int
 ) {
-    Column(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp)
+            .padding(horizontal = OuterPadding),
+        horizontalArrangement = Arrangement.spacedBy(InputGap)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            StatCard(
-                value = totalBuses.toString(),
-                label = "Total Buses",
-                icon = R.drawable.ic_directions_bus_vector,
-                modifier = Modifier.weight(1f)
-            )
-            
-            StatCard(
-                value = totalStudents.toString(),
-                label = "Total Students",
-                icon = R.drawable.ic_person,
-                modifier = Modifier.weight(1f)
-            )
-        }
+        StatCard(
+            value = totalStudents.toString(),
+            label = "STUDENTS",
+            icon = R.drawable.ic_person,
+            modifier = Modifier.weight(1f)
+        )
         
-        Spacer(modifier = Modifier.height(12.dp))
+        StatCard(
+            value = totalDrivers.toString(),
+            label = "DRIVERS",
+            icon = R.drawable.ic_group,
+            modifier = Modifier.weight(1f)
+        )
         
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            StatCard(
-                value = totalDrivers.toString(),
-                label = "Total Drivers",
-                icon = R.drawable.ic_group,
-                modifier = Modifier.width(180.dp)
-            )
-        }
+        StatCard(
+            value = totalBuses.toString(),
+            label = "BUSES",
+            icon = R.drawable.ic_directions_bus_vector,
+            modifier = Modifier.weight(1f)
+        )
     }
 }
 
@@ -313,50 +276,51 @@ private fun StatCard(
 ) {
     Card(
         modifier = modifier
-            .height(100.dp)
             .shadow(
-                elevation = 3.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.04f),
-                spotColor = Color.Black.copy(alpha = 0.04f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(28.dp),  // 🧊 Corner Radius: 28dp
+                ambientColor = Color.Black.copy(alpha = 0.08f),
+                spotColor = Color.Black.copy(alpha = 0.08f)
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.22f)
+            containerColor = GlassCardFill  // 🧊 Card Fill: #FFFFFF @ 22%
         ),
         border = BorderStroke(
-            1.5.dp,
-            Color.White.copy(alpha = 0.15f)
+            1.dp,  // 🧊 Border Width: 1dp
+            GlassCardBorder  // 🧊 Border: #FFFFFF @ 25%
         )
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .fillMaxWidth()
+                .padding(16.dp),  // 📏 Card Inner Padding
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = label,
-                tint = Color(0xFF7DD3C0),
+                tint = BrandTeal,  // 👤 Icon Tint
                 modifier = Modifier.size(24.dp)
             )
             
-            Column {
-                Text(
-                    text = value,
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Text(
-                    text = label,
-                    fontSize = 11.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF888888)
-                )
-            }
+            Spacer(modifier = Modifier.height(8.dp))  // 📏 Spacing: 8dp
+            
+            Text(
+                text = value,
+                fontSize = 20.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary  // 🔤 Primary Titles: #111111
+            )
+            
+            Text(
+                text = label,
+                fontSize = 10.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextSecondary.copy(alpha = 0.70f),  // 🔤 Secondary Text: #444444
+                letterSpacing = 0.5.sp
+            )
         }
     }
 }
@@ -502,104 +466,73 @@ private fun MainActionTiles(
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 20.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+            .padding(horizontal = OuterPadding),
+        verticalArrangement = Arrangement.spacedBy(InputGap)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ActionTile(
-                icon = R.drawable.ic_directions_bus_vector,
-                title = "Manage\nBuses",
-                modifier = Modifier.weight(1f),
-                onClick = onManageBusesClick
-            )
-            
-            ActionTile(
-                icon = R.drawable.ic_group,
-                title = "Manage\nDrivers",
-                modifier = Modifier.weight(1f),
-                onClick = onManageDriversClick
-            )
-        }
+        ActionButton(
+            icon = R.drawable.ic_person,
+            title = "Driver Management",
+            onClick = onManageDriversClick
+        )
         
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            ActionTile(
-                icon = R.drawable.ic_person,
-                title = "Manage\nStudents",
-                modifier = Modifier.weight(1f),
-                onClick = onManageStudentsClick
-            )
-            
-            ActionTile(
-                icon = R.drawable.ic_calendar_month,
-                title = "Attendance\nOverview",
-                modifier = Modifier.weight(1f),
-                onClick = { /* Handle attendance */ }
-            )
-        }
+        ActionButton(
+            icon = R.drawable.ic_group,
+            title = "Student Management",
+            onClick = onManageStudentsClick
+        )
         
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            ActionTile(
-                icon = R.drawable.ic_map,
-                title = "Live Trips\nMonitor",
-                modifier = Modifier.width(180.dp),
-                onClick = { /* Handle live trips */ }
-            )
-        }
+        ActionButton(
+            icon = R.drawable.ic_directions_bus_vector,
+            title = "Bus Management",
+            onClick = onManageBusesClick
+        )
     }
 }
 
 @Composable
-private fun ActionTile(
+private fun ActionButton(
     icon: Int,
     title: String,
-    modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
     Card(
-        modifier = modifier
-            .height(110.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(80.dp)  // 📏 Management Card Height: 80dp
             .shadow(
-                elevation = 3.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.04f),
-                spotColor = Color.Black.copy(alpha = 0.04f)
+                elevation = 8.dp,
+                shape = RoundedCornerShape(28.dp),  // 🧊 Corner Radius: 28dp
+                ambientColor = Color.Black.copy(alpha = 0.08f),
+                spotColor = Color.Black.copy(alpha = 0.08f)
             )
             .clickable(
                 interactionSource = remember { MutableInteractionSource() },
                 indication = rememberRipple(
-                    color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
+                    color = BrandTeal.copy(alpha = 0.2f),
                     bounded = true
                 )
             ) { onClick() },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.22f)
+            containerColor = GlassCardFill  // 🧊 Card Fill: #FFFFFF @ 22%
         ),
         border = BorderStroke(
-            1.5.dp,
-            Color.White.copy(alpha = 0.15f)
+            1.5.dp,  // 🧊 Border Width: 1.5dp
+            GlassCardBorder  // 🧊 Border: #FFFFFF @ 25%
         )
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.SpaceBetween
+                .padding(horizontal = 24.dp),  // 📏 Card Inner Padding: 24dp
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(16.dp)  // 📏 Input Gap: 16dp
         ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .background(
-                        Color(0xFF7DD3C0).copy(alpha = 0.15f),
+                        BrandTeal.copy(alpha = 0.10f),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -607,17 +540,17 @@ private fun ActionTile(
                 Icon(
                     painter = painterResource(id = icon),
                     contentDescription = title,
-                    tint = Color(0xFF7DD3C0),
+                    tint = BrandTeal,  // 👤 Icon Tint
                     modifier = Modifier.size(20.dp)
                 )
             }
             
             Text(
                 text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium,
-                color = Color.Black,
-                lineHeight = 18.sp
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextPrimary,  // 🔤 Primary Titles: #111111
+                letterSpacing = 0.5.sp
             )
         }
     }

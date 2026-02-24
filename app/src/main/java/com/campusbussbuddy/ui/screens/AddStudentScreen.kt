@@ -29,7 +29,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.StudentData
 import com.campusbussbuddy.firebase.StudentResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -50,12 +50,11 @@ fun AddStudentScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+    GlassBackground {
         Column(
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(OuterPadding)
         ) {
             // Top Bar
             AddStudentTopBar(onBackClick = onBackClick)
@@ -72,38 +71,24 @@ fun AddStudentScreen(
                     text = "Add New Student",
                     fontSize = 24.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color.Black
+                    color = TextPrimary
                 )
                 
                 Text(
                     text = "Create a new student account",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFF666666)
+                    color = TextHint
                 )
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 // Form Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(24.dp),
-                            ambientColor = Color.Black.copy(alpha = 0.06f),
-                            spotColor = Color.Black.copy(alpha = 0.06f)
-                        ),
-                    shape = RoundedCornerShape(24.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.22f)
-                    ),
-                    border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
+                GlassCard(
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(24.dp)
+                        modifier = Modifier.fillMaxWidth()
                     ) {
                         // Name Field
                         StudentFormField(
@@ -208,77 +193,54 @@ fun AddStudentScreen(
                         Spacer(modifier = Modifier.height(32.dp))
                         
                         // Create Student Button
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .shadow(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(28.dp),
-                                    ambientColor = Color.Black.copy(alpha = 0.1f),
-                                    spotColor = Color.Black.copy(alpha = 0.1f)
-                                )
-                                .background(
-                                    if (isLoading) Color(0xFF7DD3C0).copy(alpha = 0.5f)
-                                    else Color(0xFF7DD3C0).copy(alpha = 0.9f),
-                                    RoundedCornerShape(28.dp)
-                                )
-                                .clip(RoundedCornerShape(28.dp))
-                                .clickable(
-                                    enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
-                                            && password.isNotBlank() 
-                                            && busId.isNotBlank() && stop.isNotBlank(),
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = rememberRipple(
-                                        color = Color.White.copy(alpha = 0.3f),
-                                        bounded = true
+                        GlassButton(
+                            onClick = {
+                                scope.launch {
+                                    isLoading = true
+                                    errorMessage = null
+                                    successMessage = null
+                                    
+                                    val studentData = StudentData(
+                                        name = name.trim(),
+                                        username = username.trim(),
+                                        busId = busId.trim(),
+                                        stop = stop.trim()
                                     )
-                                ) {
-                                    scope.launch {
-                                        isLoading = true
-                                        errorMessage = null
-                                        successMessage = null
-                                        
-                                        val studentData = StudentData(
-                                            name = name.trim(),
-                                            username = username.trim(),
-                                            busId = busId.trim(),
-                                            stop = stop.trim()
-                                        )
-                                        
-                                        when (val result = FirebaseManager.createStudentAccount(
-                                            studentData = studentData,
-                                            password = password
-                                        )) {
-                                            is StudentResult.Success -> {
-                                                isLoading = false
-                                                successMessage = "Student account created successfully!"
-                                                // Navigate back after delay
-                                                kotlinx.coroutines.delay(1000)
-                                                onStudentAdded()
-                                            }
-                                            is StudentResult.Error -> {
-                                                isLoading = false
-                                                errorMessage = result.message
-                                            }
+                                    
+                                    when (val result = FirebaseManager.createStudentAccount(
+                                        studentData = studentData,
+                                        password = password
+                                    )) {
+                                        is StudentResult.Success -> {
+                                            isLoading = false
+                                            successMessage = "Student account created successfully!"
+                                            // Navigate back after delay
+                                            kotlinx.coroutines.delay(1000)
+                                            onStudentAdded()
+                                        }
+                                        is StudentResult.Error -> {
+                                            isLoading = false
+                                            errorMessage = result.message
                                         }
                                     }
                                 }
-                                .padding(horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
+                            },
+                            modifier = Modifier.fillMaxWidth(),
+                            enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
+                                    && password.isNotBlank() 
+                                    && busId.isNotBlank() && stop.isNotBlank()
                         ) {
                             if (isLoading) {
                                 CircularProgressIndicator(
                                     modifier = Modifier.size(20.dp),
-                                    color = Color.Black,
+                                    color = TextButton,
                                     strokeWidth = 2.dp
                                 )
                             } else {
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_add),
                                     contentDescription = "Add",
-                                    tint = Color.Black,
+                                    tint = TextButton,
                                     modifier = Modifier.size(20.dp)
                                 )
                                 
@@ -288,7 +250,7 @@ fun AddStudentScreen(
                                     text = "Create Student Account",
                                     fontSize = 16.sp,
                                     fontWeight = FontWeight.Medium,
-                                    color = Color.Black
+                                    color = TextButton
                                 )
                             }
                         }
@@ -298,7 +260,6 @@ fun AddStudentScreen(
                 Spacer(modifier = Modifier.height(24.dp))
             }
         }
-    }
     }
 }
 
@@ -317,39 +278,22 @@ private fun StudentFormField(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black,
+            color = TextPrimary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         
-        OutlinedTextField(
+        GlassTextField(
             value = value,
             onValueChange = onValueChange,
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    color = Color(0xFF7A7A7A)
-                )
-            },
+            placeholder = placeholder,
             leadingIcon = {
                 Icon(
                     painter = painterResource(id = icon),
                     contentDescription = label,
-                    tint = Color(0xFF888888)
+                    tint = InputIconTint
                 )
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF7DD3C0),
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
-                focusedTextColor = Color(0xFF2E2E2E),
-                unfocusedTextColor = Color(0xFF2E2E2E),
-                disabledTextColor = Color(0xFF2E2E2E)
-            ),
+            modifier = Modifier.fillMaxWidth(),
             singleLine = true,
             enabled = enabled,
             keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
@@ -372,7 +316,7 @@ private fun StudentPasswordField(
             text = label,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = Color.Black,
+            color = TextPrimary,
             modifier = Modifier.padding(bottom = 8.dp)
         )
         
@@ -448,7 +392,7 @@ private fun AddStudentTopBar(
             Icon(
                 painter = painterResource(id = R.drawable.ic_arrow_back_vector),
                 contentDescription = "Back",
-                tint = Color.Black,
+                tint = TextPrimary,
                 modifier = Modifier.size(24.dp)
             )
         }
@@ -459,7 +403,7 @@ private fun AddStudentTopBar(
             text = "Add Student",
             fontSize = 20.sp,
             fontWeight = FontWeight.SemiBold,
-            color = Color.Black,
+            color = TextPrimary,
             modifier = Modifier.weight(1f)
         )
     }
