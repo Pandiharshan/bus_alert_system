@@ -30,7 +30,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.DriverInfo
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -60,40 +60,22 @@ fun DriverHomeScreen(
         }
     }
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-        if (isLoading) {
-            // Loading State
-            CircularProgressIndicator(
-                modifier = Modifier.align(Alignment.Center),
-                color = Color(0xFF7DD3C0)
-            )
-        } else {
-            Column(
-                modifier = Modifier.fillMaxSize()
-            ) {
-                // Logout Button (Top-Left)
-                Row(
+    GlassBackground {
+        Column(modifier = Modifier.fillMaxSize()) {
+            // Top Bar with Back Button and Title
+            DriverTopBar(onBackClick = onLogoutClick)
+            
+            if (isLoading) {
+                // Loading State
+                Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    horizontalArrangement = Arrangement.Start
+                        .fillMaxSize()
+                        .weight(1f),
+                    contentAlignment = Alignment.Center
                 ) {
-                    IconButton(
-                        onClick = onLogoutClick,
-                        modifier = Modifier.size(40.dp)
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_arrow_back),
-                            contentDescription = "Logout",
-                            tint = Color(0xFF888888),
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
+                    CircularProgressIndicator(color = BrandTeal)
                 }
-                
+            } else {
                 // Main Content
                 Column(
                     modifier = Modifier
@@ -101,7 +83,7 @@ fun DriverHomeScreen(
                         .weight(1f)
                         .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    verticalArrangement = Arrangement.Center
+                    verticalArrangement = Arrangement.Top
                 ) {
                     Spacer(modifier = Modifier.height(40.dp))
                     
@@ -118,6 +100,40 @@ fun DriverHomeScreen(
             }
         }
     }
+}
+
+@Composable
+private fun DriverTopBar(onBackClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 16.dp),
+        contentAlignment = Alignment.CenterStart
+    ) {
+        // Back button
+        IconButton(
+            onClick = onBackClick,
+            modifier = Modifier.align(Alignment.CenterStart)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_arrow_back),
+                contentDescription = "Back",
+                tint = TextPrimary,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        
+        // Title centered
+        Text(
+            text = "DRIVER PORTAL",
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Bold,
+            color = TextPrimary,
+            letterSpacing = 1.5.sp,
+            modifier = Modifier.align(Alignment.Center)
+        )
     }
 }
 
@@ -131,21 +147,28 @@ private fun DriverProfileSection(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Driver Profile Image with proper loading and error states
+        // Driver Profile Image with glass effect - Match AdminHomeScreen style
         Box(
             modifier = Modifier
-                .size(120.dp)
-                .clip(CircleShape)
-                .background(Color(0xFF2E4A5A))
-                .border(3.dp, Color.White.copy(alpha = 0.3f), CircleShape),
+                .size(AvatarSize)  // 120dp
+                .shadow(
+                    elevation = 8.dp,
+                    shape = CircleShape,
+                    ambientColor = Color.Black.copy(alpha = 0.1f),
+                    spotColor = Color.Black.copy(alpha = 0.1f)
+                )
+                .border(
+                    width = 2.dp,
+                    color = AvatarBorder,  // White with 30% alpha
+                    shape = CircleShape
+                )
+                .background(GlassCardFill, CircleShape),  // Glass card fill
             contentAlignment = Alignment.Center
         ) {
             val photoUrl = driverInfo?.photoUrl?.trim() ?: ""
             
             Log.d("DriverProfileSection", "Rendering photo section")
             Log.d("DriverProfileSection", "Photo URL: '$photoUrl'")
-            Log.d("DriverProfileSection", "Is empty: ${photoUrl.isEmpty()}")
-            Log.d("DriverProfileSection", "Is blank: ${photoUrl.isBlank()}")
             
             if (photoUrl.isNotEmpty() && photoUrl.isNotBlank()) {
                 SubcomposeAsyncImage(
@@ -168,23 +191,21 @@ private fun DriverProfileSection(
                         )
                         .build(),
                     contentDescription = "Driver Profile Photo",
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().clip(CircleShape),
                     contentScale = ContentScale.Crop,
                     loading = {
-                        // Show loading indicator while image loads
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
                         ) {
                             CircularProgressIndicator(
                                 modifier = Modifier.size(30.dp),
-                                color = Color.White,
+                                color = BrandTeal,
                                 strokeWidth = 2.dp
                             )
                         }
                     },
                     error = {
-                        // Show default icon if image fails to load
                         Box(
                             modifier = Modifier.fillMaxSize(),
                             contentAlignment = Alignment.Center
@@ -193,19 +214,18 @@ private fun DriverProfileSection(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = "Default Profile",
                                 modifier = Modifier.size(60.dp),
-                                tint = Color.White
+                                tint = BrandTeal  // Match unified login icon color
                             )
                         }
                     }
                 )
             } else {
                 Log.d("DriverProfileSection", "Showing default icon - no photo URL")
-                // Show default icon if no photo URL
                 Icon(
                     painter = painterResource(id = R.drawable.ic_person),
                     contentDescription = "Default Profile",
                     modifier = Modifier.size(60.dp),
-                    tint = Color.White
+                    tint = BrandTeal  // Match unified login icon color
                 )
             }
         }
@@ -217,19 +237,19 @@ private fun DriverProfileSection(
             text = driverInfo?.name ?: "Driver",
             fontSize = 28.sp,
             fontWeight = FontWeight.Bold,
-            color = Color.Black,
+            color = TextPrimary,  // Match theme color
             textAlign = TextAlign.Center
         )
         
         Spacer(modifier = Modifier.height(12.dp))
         
-        // Bus Number Only (Clean UI - No Employee ID, No Caption)
+        // Bus Number with glass card style
         if (busInfo != null) {
             Text(
                 text = "Bus ${busInfo.busNumber}",
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF7DD3C0)
+                color = BrandTeal  // Match theme color
             )
         }
     }
@@ -237,71 +257,29 @@ private fun DriverProfileSection(
 
 @Composable
 private fun BusLoginButton(onClick: () -> Unit = {}) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(32.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    color = Color(0xFF7DD3C0).copy(alpha = 0.2f),
-                    bounded = true
-                )
-            ) { onClick() },
-        shape = RoundedCornerShape(32.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
-        ),
-        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+    GlassButton(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.Center,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            Color(0xFF7DD3C0).copy(alpha = 0.15f),
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                        contentDescription = "Bus",
-                        tint = Color(0xFF7DD3C0),
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
-                
-                Spacer(modifier = Modifier.width(16.dp))
-                
-                Text(
-                    text = "Bus Login",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
-                )
-            }
-            
             Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_right),
-                contentDescription = "Arrow",
-                tint = Color(0xFF888888),
+                painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                contentDescription = "Bus",
+                tint = TextButton,
                 modifier = Modifier.size(20.dp)
+            )
+            
+            Spacer(modifier = Modifier.width(12.dp))
+            
+            Text(
+                text = "Bus Login",
+                fontSize = 17.sp,
+                fontWeight = FontWeight.Bold,
+                color = TextButton
             )
         }
     }

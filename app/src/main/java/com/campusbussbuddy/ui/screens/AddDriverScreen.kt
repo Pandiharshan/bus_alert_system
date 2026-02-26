@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -35,7 +36,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.GlassBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -64,10 +65,8 @@ fun AddDriverScreen(
         photoUri = uri
     }
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+    // Use same background as UnifiedLoginScreen
+    GlassBackground {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
@@ -79,277 +78,221 @@ fun AddDriverScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(24.dp)
+                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Title
-                Text(
-                    text = "Add New Driver",
-                    fontSize = 24.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
+                
+                // Photo Upload Section - centered circular
+                Box(
+                    modifier = Modifier
+                        .size(140.dp)
+                        .clip(CircleShape)
+                        .background(Color.White.copy(alpha = 0.3f))
+                        .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape)
+                        .clickable { photoPickerLauncher.launch("image/*") },
+                    contentAlignment = Alignment.Center
+                ) {
+                    if (photoUri != null) {
+                        AsyncImage(
+                            model = photoUri,
+                            contentDescription = "Driver Photo",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop
+                        )
+                    } else {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_person),
+                            contentDescription = "Add Photo",
+                            modifier = Modifier.size(60.dp),
+                            tint = Color(0xFF6B9090)
+                        )
+                    }
+                }
+                
+                Spacer(modifier = Modifier.height(12.dp))
                 
                 Text(
-                    text = "Create a new driver account",
+                    text = if (photoUri != null) "Tap to change photo" else "Tap to add photo",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFF666666)
+                    color = Color(0xFF5A7070)
                 )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                // Photo Upload Section
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalAlignment = Alignment.CenterHorizontally
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(100.dp)
-                            .clip(CircleShape)
-                            .background(Color(0xFFF0F0F0))
-                            .clickable { photoPickerLauncher.launch("image/*") },
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (photoUri != null) {
-                            AsyncImage(
-                                model = photoUri,
-                                contentDescription = "Driver Photo",
-                                modifier = Modifier.fillMaxSize(),
-                                contentScale = ContentScale.Crop
-                            )
-                        } else {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_person),
-                                contentDescription = "Add Photo",
-                                modifier = Modifier.size(50.dp),
-                                tint = Color(0xFF7DD3C0)
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = if (photoUri != null) "Tap to change photo" else "Tap to add photo (optional)",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                }
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
-                // Form Card
+                // Form Card with glass effect
                 Card(
                     modifier = Modifier
                         .fillMaxWidth()
                         .shadow(
-                            elevation = 6.dp,
-                            shape = RoundedCornerShape(24.dp),
-                            ambientColor = Color.Black.copy(alpha = 0.06f),
-                            spotColor = Color.Black.copy(alpha = 0.06f)
+                            elevation = 0.dp,
+                            shape = RoundedCornerShape(28.dp)
                         ),
-                    shape = RoundedCornerShape(24.dp),
+                    shape = RoundedCornerShape(28.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.22f)
+                        containerColor = Color.White.copy(alpha = 0.25f)
                     ),
-                    border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
+                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(24.dp)
+                            .padding(20.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        // Name Field
+                        // Full Name Field
                         FormField(
-                            label = "Full Name",
                             value = name,
                             onValueChange = { 
                                 name = it
                                 errorMessage = null
                             },
-                            placeholder = "Enter driver's full name",
+                            placeholder = "Full Name",
                             icon = R.drawable.ic_person,
                             enabled = !isLoading
                         )
                         
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
                         // Username Field
                         FormField(
-                            label = "Username",
                             value = username,
                             onValueChange = { 
                                 username = it
                                 errorMessage = null
                             },
-                            placeholder = "Enter unique username (e.g., pandi)",
+                            placeholder = "Username",
                             icon = R.drawable.ic_person,
                             enabled = !isLoading
                         )
                         
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
                         // Password Field
                         PasswordField(
-                            label = "Password",
                             value = password,
                             onValueChange = { 
                                 password = it
                                 errorMessage = null
                             },
-                            placeholder = "Create a secure password",
+                            placeholder = "Password",
                             isPasswordVisible = isPasswordVisible,
                             onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
                             enabled = !isLoading
                         )
                         
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
                         // Phone Field
                         FormField(
-                            label = "Phone Number",
                             value = phone,
                             onValueChange = { 
                                 phone = it
                                 errorMessage = null
                             },
-                            placeholder = "+1234567890",
+                            placeholder = "Phone Number",
                             icon = R.drawable.ic_call,
                             enabled = !isLoading,
                             keyboardType = KeyboardType.Phone
                         )
                         
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
                         // Assigned Bus ID Field
                         FormField(
-                            label = "Assigned Bus ID",
                             value = assignedBusId,
                             onValueChange = { 
                                 assignedBusId = it
                                 errorMessage = null
                             },
-                            placeholder = "e.g., bus_01",
+                            placeholder = "Bus ID (e.g., B-101)",
                             icon = R.drawable.ic_directions_bus_vector,
                             enabled = !isLoading
                         )
-                        
-                        // Error Message
-                        if (errorMessage != null) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = errorMessage!!,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = Color(0xFFD32F2F),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                    }
+                }
+                
+                // Error Message
+                if (errorMessage != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = errorMessage!!,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFFD32F2F),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                
+                // Success Message
+                if (successMessage != null) {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = successMessage!!,
+                        fontSize = 13.sp,
+                        fontWeight = FontWeight.Normal,
+                        color = Color(0xFF4CAF50),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                // Create Driver Button - bright green
+                Button(
+                    onClick = {
+                        if (name.isBlank() || username.isBlank() || password.isBlank() || 
+                            phone.isBlank() || assignedBusId.isBlank()) {
+                            errorMessage = "Please fill in all fields"
+                            return@Button
                         }
-                        
-                        // Success Message
-                        if (successMessage != null) {
-                            Spacer(modifier = Modifier.height(16.dp))
-                            Text(
-                                text = successMessage!!,
-                                fontSize = 13.sp,
-                                fontWeight = FontWeight.Normal,
-                                color = Color(0xFF4CAF50),
-                                textAlign = TextAlign.Center,
-                                modifier = Modifier.fillMaxWidth()
+                        scope.launch {
+                            isLoading = true
+                            errorMessage = null
+                            successMessage = null
+                            
+                            val driverData = DriverData(
+                                name = name.trim(),
+                                username = username.trim(),
+                                phone = phone.trim(),
+                                assignedBusId = assignedBusId.trim()
                             )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(32.dp))
-                        
-                        // Create Driver Button
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(56.dp)
-                                .shadow(
-                                    elevation = 4.dp,
-                                    shape = RoundedCornerShape(28.dp),
-                                    ambientColor = Color.Black.copy(alpha = 0.1f),
-                                    spotColor = Color.Black.copy(alpha = 0.1f)
-                                )
-                                .background(
-                                    if (isLoading) Color(0xFF7DD3C0).copy(alpha = 0.5f)
-                                    else Color(0xFF7DD3C0).copy(alpha = 0.9f),
-                                    RoundedCornerShape(28.dp)
-                                )
-                                .clip(RoundedCornerShape(28.dp))
-                                .clickable(
-                                    enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
-                                            && password.isNotBlank() && phone.isNotBlank() 
-                                            && assignedBusId.isNotBlank(),
-                                    interactionSource = remember { MutableInteractionSource() },
-                                    indication = rememberRipple(
-                                        color = Color.White.copy(alpha = 0.3f),
-                                        bounded = true
-                                    )
-                                ) {
-                                    scope.launch {
-                                        isLoading = true
-                                        errorMessage = null
-                                        successMessage = null
-                                        
-                                        val driverData = DriverData(
-                                            name = name.trim(),
-                                            username = username.trim(),
-                                            phone = phone.trim(),
-                                            assignedBusId = assignedBusId.trim()
-                                        )
-                                        
-                                        when (val result = FirebaseManager.createDriverAccount(
-                                            driverData = driverData,
-                                            password = password,
-                                            photoUri = photoUri
-                                        )) {
-                                            is DriverResult.Success -> {
-                                                isLoading = false
-                                                successMessage = "Driver account created successfully!"
-                                                // Navigate back after delay
-                                                kotlinx.coroutines.delay(1000)
-                                                onDriverAdded()
-                                            }
-                                            is DriverResult.Error -> {
-                                                isLoading = false
-                                                errorMessage = result.message
-                                            }
-                                        }
-                                    }
+                            
+                            when (val result = FirebaseManager.createDriverAccount(
+                                driverData = driverData,
+                                password = password,
+                                photoUri = photoUri
+                            )) {
+                                is DriverResult.Success -> {
+                                    isLoading = false
+                                    successMessage = "Driver account created successfully!"
+                                    kotlinx.coroutines.delay(1000)
+                                    onDriverAdded()
                                 }
-                                .padding(horizontal = 24.dp),
-                            horizontalArrangement = Arrangement.Center,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            if (isLoading) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    color = Color.Black,
-                                    strokeWidth = 2.dp
-                                )
-                            } else {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_add),
-                                    contentDescription = "Add",
-                                    tint = Color.Black,
-                                    modifier = Modifier.size(20.dp)
-                                )
-                                
-                                Spacer(modifier = Modifier.width(8.dp))
-                                
-                                Text(
-                                    text = "Create Driver Account",
-                                    fontSize = 16.sp,
-                                    fontWeight = FontWeight.Medium,
-                                    color = Color.Black
-                                )
+                                is DriverResult.Error -> {
+                                    isLoading = false
+                                    errorMessage = result.message
+                                }
                             }
                         }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color(0xFF4CAF50),
+                        disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.5f)
+                    ),
+                    shape = RoundedCornerShape(28.dp),
+                    enabled = !isLoading
+                ) {
+                    if (isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(24.dp),
+                            color = Color.White,
+                            strokeWidth = 2.dp
+                        )
+                    } else {
+                        Text(
+                            text = "Create Driver",
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
+                        )
                     }
                 }
                 
@@ -357,12 +300,10 @@ fun AddDriverScreen(
             }
         }
     }
-    }
 }
 
 @Composable
 private fun FormField(
-    label: String,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -370,54 +311,50 @@ private fun FormField(
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    Column {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    color = Color(0xFF7A7A7A)
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = label,
-                    tint = Color(0xFF888888)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF7DD3C0),
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White.copy(alpha = 0.95f),
-                unfocusedContainerColor = Color.White.copy(alpha = 0.95f),
-                focusedTextColor = Color(0xFF2E2E2E),
-                unfocusedTextColor = Color(0xFF2E2E2E),
-                disabledTextColor = Color(0xFF2E2E2E)
-            ),
-            singleLine = true,
-            enabled = enabled,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-        )
-    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            Text(
+                text = placeholder,
+                color = Color(0xFF7A9B9B),
+                fontSize = 15.sp
+            )
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = placeholder,
+                tint = Color(0xFF6B9090),
+                modifier = Modifier.size(22.dp)
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(28.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            focusedContainerColor = Color.White.copy(alpha = 0.7f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+            focusedTextColor = Color(0xFF2E2E2E),
+            unfocusedTextColor = Color(0xFF2E2E2E),
+            disabledTextColor = Color(0xFF2E2E2E),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Normal
+        ),
+        singleLine = true,
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+    )
 }
 
 @Composable
 private fun PasswordField(
-    label: String,
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -425,68 +362,60 @@ private fun PasswordField(
     onVisibilityToggle: () -> Unit,
     enabled: Boolean = true
 ) {
-    Column {
-        Text(
-            text = label,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            color = Color.Black,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    color = Color(0xFFAAAAAA)
-                )
-            },
-            leadingIcon = {
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            Text(
+                text = placeholder,
+                color = Color(0xFF7A9B9B),
+                fontSize = 15.sp
+            )
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_visibility_off),
+                contentDescription = "Password",
+                tint = Color(0xFF6B9090),
+                modifier = Modifier.size(22.dp)
+            )
+        },
+        trailingIcon = {
+            IconButton(onClick = onVisibilityToggle) {
                 Icon(
-                    painter = painterResource(id = R.drawable.ic_visibility_off),
-                    contentDescription = "Password",
-                    tint = Color(0xFF888888)
+                    painter = painterResource(
+                        id = if (isPasswordVisible) R.drawable.ic_visibility 
+                        else R.drawable.ic_visibility_off
+                    ),
+                    contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
+                    tint = Color(0xFF6B9090),
+                    modifier = Modifier.size(22.dp)
                 )
-            },
-            trailingIcon = {
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .clip(RoundedCornerShape(8.dp))
-                        .background(
-                            if (isPasswordVisible) Color(0xFF7DD3C0).copy(alpha = 0.15f)
-                            else Color(0xFFF5F5F5)
-                        )
-                        .clickable { onVisibilityToggle() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_check),
-                        contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                        tint = if (isPasswordVisible) Color(0xFF7DD3C0) else Color(0xFF888888),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            },
-            visualTransformation = if (isPasswordVisible) VisualTransformation.None 
-            else PasswordVisualTransformation(),
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp),
-            shape = RoundedCornerShape(16.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF7DD3C0),
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color(0xFFFAFAFA)
-            ),
-            singleLine = true,
-            enabled = enabled
-        )
-    }
+            }
+        },
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None 
+        else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(56.dp),
+        shape = RoundedCornerShape(28.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            focusedContainerColor = Color.White.copy(alpha = 0.7f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
+            focusedTextColor = Color(0xFF2E2E2E),
+            unfocusedTextColor = Color(0xFF2E2E2E),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 15.sp,
+            fontWeight = FontWeight.Normal
+        ),
+        singleLine = true,
+        enabled = enabled
+    )
 }
 
 @Composable
@@ -496,7 +425,9 @@ private fun TopBar(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .height(64.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         IconButton(
@@ -504,10 +435,10 @@ private fun TopBar(
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back_vector),
+                painter = painterResource(id = R.drawable.ic_chevron_left),
                 contentDescription = "Back",
-                tint = Color.Black,
-                modifier = Modifier.size(24.dp)
+                tint = Color(0xFF2C3E3E),
+                modifier = Modifier.size(32.dp)
             )
         }
         
@@ -515,9 +446,9 @@ private fun TopBar(
         
         Text(
             text = "Add Driver",
-            fontSize = 20.sp,
-            fontWeight = FontWeight.SemiBold,
-            color = Color.Black,
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A),
             modifier = Modifier.weight(1f)
         )
     }

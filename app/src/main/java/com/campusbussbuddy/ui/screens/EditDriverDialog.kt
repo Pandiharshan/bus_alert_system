@@ -25,11 +25,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.text.input.PasswordVisualTransformation
-import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import coil.compose.SubcomposeAsyncImage
 import coil.request.ImageRequest
 import com.campusbussbuddy.R
@@ -48,12 +48,6 @@ fun EditDriverDialog(
     var assignedBusId by remember { mutableStateOf(driver.assignedBusId) }
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var currentPhotoUrl by remember { mutableStateOf(driver.photoUrl) }
-    var newPassword by remember { mutableStateOf("") }
-    var showPassword by remember { mutableStateOf(false) }
-    var showPasswordChangeConfirm by remember { mutableStateOf(false) }
-    
-    // Auto-generate email from username
-    val generatedEmail = "${username.trim()}@gmail.com"
     
     val context = LocalContext.current
     val scrollState = rememberScrollState()
@@ -65,32 +59,33 @@ fun EditDriverDialog(
         photoUri = uri
     }
     
-    Dialog(onDismissRequest = onDismiss) {
+    Dialog(
+        onDismissRequest = onDismiss,
+        properties = DialogProperties(usePlatformDefaultWidth = false)
+    ) {
         Card(
             modifier = Modifier
-                .fillMaxWidth()
-                .fillMaxHeight(0.9f)
+                .fillMaxWidth(0.92f)
+                .fillMaxHeight(0.85f)
                 .shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(24.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.06f),
-                    spotColor = Color.Black.copy(alpha = 0.06f)
+                    elevation = 0.dp,
+                    shape = RoundedCornerShape(28.dp)
                 ),
-            shape = RoundedCornerShape(24.dp),
+            shape = RoundedCornerShape(28.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.30f)
+                containerColor = Color.White.copy(alpha = 0.95f)
             ),
-            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
+            border = BorderStroke(0.dp, Color.Transparent)
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
+                modifier = Modifier.fillMaxSize()
             ) {
-                // Header
+                // Header with close button
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(20.dp),
+                        .background(Color(0xFFD9E8E6))
+                        .padding(horizontal = 20.dp, vertical = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -98,22 +93,21 @@ fun EditDriverDialog(
                         text = "Edit Driver",
                         fontSize = 20.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color.Black
+                        color = Color(0xFF1A1A1A)
                     )
                     
                     IconButton(
                         onClick = onDismiss,
-                        modifier = Modifier.size(32.dp)
+                        modifier = Modifier.size(36.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_remove),
                             contentDescription = "Close",
-                            tint = Color(0xFF666666)
+                            tint = Color(0xFF3A3A3A),
+                            modifier = Modifier.size(24.dp)
                         )
                     }
                 }
-                
-                Divider(color = Color(0xFFE0E0E0))
                 
                 // Content
                 Column(
@@ -126,10 +120,10 @@ fun EditDriverDialog(
                     // Photo Section
                     Box(
                         modifier = Modifier
-                            .size(100.dp)
+                            .size(120.dp)
                             .clip(CircleShape)
-                            .background(Color(0xFF2E4A5A))
-                            .border(3.dp, Color(0xFF7DD3C0).copy(alpha = 0.3f), CircleShape)
+                            .background(Color(0xFFB8D4D1))
+                            .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape)
                             .clickable { photoPickerLauncher.launch("image/*") },
                         contentAlignment = Alignment.Center
                     ) {
@@ -161,23 +155,18 @@ fun EditDriverDialog(
                                     ) {
                                         CircularProgressIndicator(
                                             modifier = Modifier.size(30.dp),
-                                            color = Color.White,
+                                            color = Color(0xFF5A9A8A),
                                             strokeWidth = 2.dp
                                         )
                                     }
                                 },
                                 error = {
-                                    Box(
-                                        modifier = Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
-                                    ) {
-                                        Icon(
-                                            painter = painterResource(id = R.drawable.ic_person),
-                                            contentDescription = "Default",
-                                            modifier = Modifier.size(50.dp),
-                                            tint = Color.White
-                                        )
-                                    }
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_person),
+                                        contentDescription = "Default",
+                                        modifier = Modifier.size(50.dp),
+                                        tint = Color(0xFF6B9090)
+                                    )
                                 }
                             )
                         } else {
@@ -185,344 +174,172 @@ fun EditDriverDialog(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = "Default",
                                 modifier = Modifier.size(50.dp),
-                                tint = Color.White
+                                tint = Color(0xFF6B9090)
                             )
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(12.dp))
                     
                     Text(
                         text = "Tap to change photo",
-                        fontSize = 12.sp,
-                        color = Color(0xFF888888)
+                        fontSize = 13.sp,
+                        color = Color(0xFF5A7070)
                     )
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Form Fields
-                    EditFormField(
-                        label = "Full Name",
-                        value = name,
-                        onValueChange = { name = it },
-                        placeholder = "Enter driver's full name",
-                        icon = R.drawable.ic_person
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    EditFormField(
-                        label = "Username",
-                        value = username,
-                        onValueChange = { username = it },
-                        placeholder = "Enter unique username (e.g., pandi)",
-                        icon = R.drawable.ic_person,
-                        enabled = false
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Email Field (Auto-generated, shown for reference)
-                    Column {
-                        Text(
-                            text = "Email",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF888888),
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-                        
-                        OutlinedTextField(
-                            value = generatedEmail,
-                            onValueChange = { },
-                            placeholder = {
-                                Text(
-                                    text = "Auto-generated from username",
-                                    color = Color(0xFFAAAAAA),
-                                    fontSize = 14.sp
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Email",
-                                    tint = Color(0xFFCCCCCC),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            },
+                    // Form Fields in glass card
+                    Card(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .shadow(
+                                elevation = 0.dp,
+                                shape = RoundedCornerShape(20.dp)
+                            ),
+                        shape = RoundedCornerShape(20.dp),
+                        colors = CardDefaults.cardColors(
+                            containerColor = Color(0xFFD9E8E6)
+                        ),
+                        border = BorderStroke(0.dp, Color.Transparent)
+                    ) {
+                        Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFFE0E0E0),
-                                unfocusedBorderColor = Color(0xFFE0E0E0),
-                                disabledBorderColor = Color(0xFFE0E0E0),
-                                focusedContainerColor = Color(0xFFF5F5F5),
-                                unfocusedContainerColor = Color(0xFFF5F5F5),
-                                disabledContainerColor = Color(0xFFF5F5F5),
-                                disabledTextColor = Color(0xFF888888)
-                            ),
-                            singleLine = true,
-                            enabled = false
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    EditFormField(
-                        label = "Phone Number",
-                        value = phone,
-                        onValueChange = { phone = it },
-                        placeholder = "+1234567890",
-                        icon = R.drawable.ic_call,
-                        keyboardType = KeyboardType.Phone
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    EditFormField(
-                        label = "Assigned Bus ID",
-                        value = assignedBusId,
-                        onValueChange = { assignedBusId = it },
-                        placeholder = "e.g., bus_01",
-                        icon = R.drawable.ic_directions_bus_vector
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Password Change Section
-                    Column {
-                        Text(
-                            text = "Reset Password (Optional)",
-                            fontSize = 13.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color.Black,
-                            modifier = Modifier.padding(bottom = 6.dp)
-                        )
-                        
-                        OutlinedTextField(
-                            value = newPassword,
-                            onValueChange = { newPassword = it },
-                            placeholder = {
-                                Text(
-                                    text = "Enter any value to trigger password reset email",
-                                    color = Color(0xFFAAAAAA),
-                                    fontSize = 14.sp
-                                )
-                            },
-                            leadingIcon = {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_visibility),
-                                    contentDescription = "Password",
-                                    tint = Color(0xFF888888),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            },
-                            trailingIcon = {
-                                IconButton(
-                                    onClick = { showPassword = !showPassword }
-                                ) {
-                                    Icon(
-                                        painter = painterResource(
-                                            id = if (showPassword) R.drawable.ic_visibility_off else R.drawable.ic_visibility
-                                        ),
-                                        contentDescription = if (showPassword) "Hide password" else "Show password",
-                                        tint = Color(0xFF888888),
-                                        modifier = Modifier.size(18.dp)
-                                    )
-                                }
-                            },
-                            visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(52.dp),
-                            shape = RoundedCornerShape(12.dp),
-                            colors = OutlinedTextFieldDefaults.colors(
-                                focusedBorderColor = Color(0xFF7DD3C0),
-                                unfocusedBorderColor = Color(0xFFE0E0E0),
-                                focusedContainerColor = Color.White,
-                                unfocusedContainerColor = Color(0xFFFAFAFA)
-                            ),
-                            singleLine = true,
-                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                        )
-                        
-                        if (newPassword.isNotEmpty()) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                            Text(
-                                text = "Driver will receive a password reset email",
-                                fontSize = 11.sp,
-                                color = Color(0xFF7DD3C0)
+                                .padding(16.dp),
+                            verticalArrangement = Arrangement.spacedBy(14.dp)
+                        ) {
+                            // Full Name
+                            EditField(
+                                value = name,
+                                onValueChange = { name = it },
+                                placeholder = "Full Name",
+                                icon = R.drawable.ic_person
+                            )
+                            
+                            // Username (disabled)
+                            EditField(
+                                value = username,
+                                onValueChange = { },
+                                placeholder = "Username",
+                                icon = R.drawable.ic_person,
+                                enabled = false
+                            )
+                            
+                            // Email (auto-generated, disabled)
+                            EditField(
+                                value = "${username.trim()}@gmail.com",
+                                onValueChange = { },
+                                placeholder = "Email",
+                                icon = R.drawable.ic_person,
+                                enabled = false
+                            )
+                            
+                            // Phone Number
+                            EditField(
+                                value = phone,
+                                onValueChange = { phone = it },
+                                placeholder = "Phone Number",
+                                icon = R.drawable.ic_call,
+                                keyboardType = KeyboardType.Phone
+                            )
+                            
+                            // Assigned Bus ID
+                            EditField(
+                                value = assignedBusId,
+                                onValueChange = { assignedBusId = it },
+                                placeholder = "Bus ID (e.g., B-101)",
+                                icon = R.drawable.ic_directions_bus_vector
                             )
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Info Note
+                    Text(
+                        text = "Note: Username and email cannot be changed after account creation.",
+                        fontSize = 12.sp,
+                        color = Color(0xFF5A7070),
+                        textAlign = TextAlign.Center,
+                        lineHeight = 16.sp
+                    )
                     
                     // Error Message
                     if (errorMessage != null) {
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .background(
-                                    Color(0xFFF8D7DA),
-                                    RoundedCornerShape(8.dp)
-                                )
-                                .padding(12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_emergency),
-                                contentDescription = "Error",
-                                tint = Color(0xFF721C24),
-                                modifier = Modifier.size(16.dp)
-                            )
-                            
-                            Spacer(modifier = Modifier.width(8.dp))
-                            
-                            Text(
-                                text = errorMessage,
-                                fontSize = 11.sp,
-                                color = Color(0xFF721C24),
-                                lineHeight = 16.sp
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                    }
-                    
-                    // Info Note
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFFFFF3CD),
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_notifications),
-                            contentDescription = "Info",
-                            tint = Color(0xFF856404),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
+                        Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Username cannot be changed after account creation. Email is auto-generated from username. Password reset will send an email to the driver.",
-                            fontSize = 11.sp,
-                            color = Color(0xFF856404),
-                            lineHeight = 16.sp
+                            text = errorMessage,
+                            fontSize = 13.sp,
+                            color = Color(0xFFD32F2F),
+                            textAlign = TextAlign.Center
                         )
                     }
                 }
-                
-                Divider(color = Color(0xFFE0E0E0))
                 
                 // Footer Buttons
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
+                        .background(Color(0xFFD9E8E6))
                         .padding(20.dp),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
+                    // Cancel Button
                     OutlinedButton(
                         onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
                         colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFF666666)
-                        )
+                            contentColor = Color(0xFF3A3A3A)
+                        ),
+                        border = BorderStroke(1.5.dp, Color(0xFF8AAFA8))
                     ) {
-                        Text("Cancel")
+                        Text(
+                            text = "Cancel",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     }
                     
+                    // Save Button
                     Button(
                         onClick = {
-                            // If password reset is requested, show confirmation
-                            if (newPassword.isNotEmpty()) {
-                                showPasswordChangeConfirm = true
-                            } else {
-                                val updatedDriver = driver.copy(
-                                    name = name.trim(),
-                                    username = username.trim(),
-                                    phone = phone.trim(),
-                                    assignedBusId = assignedBusId.trim()
-                                )
-                                onSave(updatedDriver, null)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7DD3C0)
-                        ),
-                        enabled = name.isNotBlank() && username.isNotBlank() && phone.isNotBlank()
-                    ) {
-                        Text("Save Changes")
-                    }
-                }
-            }
-        }
-        
-        // Password Change Confirmation Dialog
-        if (showPasswordChangeConfirm) {
-            AlertDialog(
-                onDismissRequest = { showPasswordChangeConfirm = false },
-                title = {
-                    Text(
-                        text = "Send Password Reset?",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                text = {
-                    Text(
-                        text = "A password reset email will be sent to ${driver.name}. They will receive an email to set their new password. Do you want to proceed?",
-                        fontSize = 14.sp
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showPasswordChangeConfirm = false
                             val updatedDriver = driver.copy(
                                 name = name.trim(),
                                 username = username.trim(),
                                 phone = phone.trim(),
                                 assignedBusId = assignedBusId.trim()
                             )
-                            onSave(updatedDriver, newPassword)
-                        }
+                            onSave(updatedDriver, null)
+                        },
+                        modifier = Modifier
+                            .weight(1f)
+                            .height(50.dp),
+                        shape = RoundedCornerShape(25.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = Color(0xFF4CAF50),
+                            disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.5f)
+                        ),
+                        enabled = name.isNotBlank() && phone.isNotBlank()
                     ) {
                         Text(
-                            text = "Send Reset Email",
-                            color = Color(0xFF7DD3C0),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showPasswordChangeConfirm = false }
-                    ) {
-                        Text(
-                            text = "Cancel",
-                            color = Color(0xFF666666)
+                            text = "Save Changes",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = Color.White
                         )
                     }
                 }
-            )
+            }
         }
     }
 }
 
 @Composable
-private fun EditFormField(
-    label: String,
+private fun EditField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
@@ -530,48 +347,46 @@ private fun EditFormField(
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    Column {
-        Text(
-            text = label,
-            fontSize = 13.sp,
-            fontWeight = FontWeight.Medium,
-            color = if (enabled) Color.Black else Color(0xFF888888),
-            modifier = Modifier.padding(bottom = 6.dp)
-        )
-        
-        OutlinedTextField(
-            value = value,
-            onValueChange = onValueChange,
-            placeholder = {
-                Text(
-                    text = placeholder,
-                    color = Color(0xFFAAAAAA),
-                    fontSize = 14.sp
-                )
-            },
-            leadingIcon = {
-                Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = label,
-                    tint = if (enabled) Color(0xFF888888) else Color(0xFFCCCCCC),
-                    modifier = Modifier.size(18.dp)
-                )
-            },
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(52.dp),
-            shape = RoundedCornerShape(12.dp),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor = Color(0xFF7DD3C0),
-                unfocusedBorderColor = Color(0xFFE0E0E0),
-                disabledBorderColor = Color(0xFFE0E0E0),
-                focusedContainerColor = Color.White,
-                unfocusedContainerColor = Color(0xFFFAFAFA),
-                disabledContainerColor = Color(0xFFF5F5F5)
-            ),
-            singleLine = true,
-            enabled = enabled,
-            keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-        )
-    }
+    OutlinedTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = {
+            Text(
+                text = placeholder,
+                color = Color(0xFF7A9B9B),
+                fontSize = 14.sp
+            )
+        },
+        leadingIcon = {
+            Icon(
+                painter = painterResource(id = icon),
+                contentDescription = placeholder,
+                tint = if (enabled) Color(0xFF6B9090) else Color(0xFF9AAFAF),
+                modifier = Modifier.size(20.dp)
+            )
+        },
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(52.dp),
+        shape = RoundedCornerShape(26.dp),
+        colors = OutlinedTextFieldDefaults.colors(
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
+            focusedContainerColor = Color.White.copy(alpha = 0.8f),
+            unfocusedContainerColor = Color.White.copy(alpha = 0.8f),
+            disabledContainerColor = Color.White.copy(alpha = 0.5f),
+            focusedTextColor = Color(0xFF2E2E2E),
+            unfocusedTextColor = Color(0xFF2E2E2E),
+            disabledTextColor = Color(0xFF7A7A7A),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Normal
+        ),
+        singleLine = true,
+        enabled = enabled,
+        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
+    )
 }

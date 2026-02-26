@@ -152,36 +152,39 @@ fun AdminHomeScreen(
 
 @Composable
 private fun AdminTopBar(onBackClick: () -> Unit) {
-    Box(
+    Row(
         modifier = Modifier
             .fillMaxWidth()
-            .height(56.dp)
+            .height(64.dp)
             .background(Color.Transparent)
-            .padding(horizontal = 16.dp),
-        contentAlignment = Alignment.CenterStart
+            .padding(horizontal = 20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        // Back button
+        // Back/Logout button on the left
         IconButton(
             onClick = onBackClick,
-            modifier = Modifier.align(Alignment.CenterStart)
+            modifier = Modifier.size(40.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back),
-                contentDescription = "Back",
-                tint = TextPrimary,
-                modifier = Modifier.size(24.dp)
+                painter = painterResource(id = R.drawable.ic_chevron_left),
+                contentDescription = "Logout",
+                tint = Color(0xFF2C3E3E),
+                modifier = Modifier.size(32.dp)
             )
         }
         
         // Title centered
         Text(
             text = "ADMIN PORTAL",
-            fontSize = 16.sp,
+            fontSize = 18.sp,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary,
-            letterSpacing = 1.5.sp,
-            modifier = Modifier.align(Alignment.Center)
+            color = Color(0xFF1A1A1A),
+            letterSpacing = 1.2.sp
         )
+        
+        // Empty space for balance (same size as back button)
+        Spacer(modifier = Modifier.size(40.dp))
     }
 }
 
@@ -190,13 +193,13 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = OuterPadding),  // 📏 Outer Padding: 18dp
+            .padding(horizontal = OuterPadding),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // 👤 Avatar Size: 120dp - Match unified login screen style
+        // Profile Icon Circle - properly sized and centered
         Box(
             modifier = Modifier
-                .size(AvatarSize)
+                .size(140.dp)  // Larger size for better visibility
                 .shadow(
                     elevation = 8.dp,
                     shape = CircleShape,
@@ -204,30 +207,30 @@ private fun AdminProfileCard(onLogoutClick: () -> Unit) {
                     spotColor = Color.Black.copy(alpha = 0.1f)
                 )
                 .border(
-                    width = 2.dp,
-                    color = AvatarBorder,
+                    width = 3.dp,
+                    color = Color.White.copy(alpha = 0.5f),
                     shape = CircleShape
                 )
-                .background(GlassCardFill, CircleShape),
+                .background(Color.White.copy(alpha = 0.25f), CircleShape),
             contentAlignment = Alignment.Center
         ) {
             Icon(
                 painter = painterResource(id = R.drawable.ic_admin_panel),
                 contentDescription = "Admin Profile",
-                modifier = Modifier.size(64.dp),
-                tint = BrandTeal  // Match unified login screen icon color
+                modifier = Modifier.size(70.dp),  // Icon size proportional to circle
+                tint = Color(0xFF5A9A8A)
             )
         }
         
-        Spacer(modifier = Modifier.height(16.dp))  // 📏 Spacing: 16dp
+        Spacer(modifier = Modifier.height(20.dp))
         
-        // 🔤 Primary Title: #111111 (Bold)
+        // Admin Name
         Text(
             text = "Pandiharshan",
-            fontSize = 24.sp,
+            fontSize = 26.sp,
             fontWeight = FontWeight.Bold,
-            color = TextPrimary,
-            letterSpacing = 0.5.sp
+            color = Color(0xFF1A1A1A),
+            letterSpacing = 0.3.sp
         )
     }
 }

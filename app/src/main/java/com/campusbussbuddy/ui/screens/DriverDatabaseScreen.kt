@@ -39,7 +39,7 @@ import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverInfo
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -81,63 +81,89 @@ fun DriverDatabaseScreen(
         }
     }
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top Bar
-            TopBar(
-                onBackClick = onBackClick,
-                onAddClick = onAddDriverClick,
-                driverCount = drivers.size
-            )
-            
-            // Search Bar
-            SearchBar(
-                searchQuery = searchQuery,
-                onSearchQueryChange = { searchQuery = it },
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
-            )
-            
-            if (isLoading) {
-                // Loading State
-                Box(
-                    modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator(
-                        color = Color(0xFF7DD3C0)
-                    )
-                }
-            } else if (filteredDrivers.isEmpty()) {
-                // Empty State
-                EmptyState(
-                    isSearching = searchQuery.isNotBlank(),
-                    onAddClick = onAddDriverClick
+    // Use same background as UnifiedLoginScreen
+    GlassBackground {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Top Bar
+                TopBar(
+                    onBackClick = onBackClick
                 )
-            } else {
-                // Drivers List
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    items(filteredDrivers) { driver ->
-                        DriverCard(
-                            driver = driver,
-                            onEditClick = {
-                                selectedDriver = driver
-                                showEditDialog = true
-                            },
-                            onDeleteClick = {
-                                selectedDriver = driver
-                                showDeleteDialog = true
-                            }
+                
+                // Search Bar
+                SearchBar(
+                    searchQuery = searchQuery,
+                    onSearchQueryChange = { searchQuery = it },
+                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                )
+                
+                if (isLoading) {
+                    // Loading State
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = Color(0xFF5A9A8A)
                         )
                     }
+                } else if (filteredDrivers.isEmpty()) {
+                    // Empty State
+                    EmptyState(
+                        isSearching = searchQuery.isNotBlank(),
+                        onAddClick = onAddDriverClick
+                    )
+                } else {
+                    // Drivers List
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 80.dp),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        items(filteredDrivers) { driver ->
+                            DriverCard(
+                                driver = driver,
+                                onEditClick = {
+                                    selectedDriver = driver
+                                    showEditDialog = true
+                                },
+                                onDeleteClick = {
+                                    selectedDriver = driver
+                                    showDeleteDialog = true
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+            
+            // Floating Add Button (bottom right) - with group/add person icon
+            FloatingActionButton(
+                onClick = onAddDriverClick,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(28.dp)
+                    .size(64.dp),
+                containerColor = Color(0xFF6B9A92),
+                contentColor = Color.White,
+                shape = CircleShape
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_group),
+                        contentDescription = "Add Driver",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add),
+                        contentDescription = "Add",
+                        modifier = Modifier.size(20.dp).offset(x = (-4).dp)
+                    )
                 }
             }
         }
@@ -206,7 +232,6 @@ fun DriverDatabaseScreen(
             )
         }
     }
-    }
 }
 
 @Composable
@@ -218,42 +243,39 @@ private fun SearchBar(
     OutlinedTextField(
         value = searchQuery,
         onValueChange = onSearchQueryChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
         placeholder = {
             Text(
-                text = "Search by name, username, or phone...",
-                color = Color(0xFFAAAAAA),
-                fontSize = 14.sp
+                text = "Search drivers...",
+                color = Color(0xFF7A9B9B),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
             )
         },
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_person),
                 contentDescription = "Search",
-                tint = Color(0xFF888888),
-                modifier = Modifier.size(20.dp)
+                tint = Color(0xFF6B9090),
+                modifier = Modifier.size(24.dp)
             )
         },
-        trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
-                IconButton(
-                    onClick = { onSearchQueryChange("") }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_remove),
-                        contentDescription = "Clear",
-                        tint = Color(0xFF888888),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF7DD3C0),
-            unfocusedBorderColor = Color(0xFFE0E0E0),
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            focusedContainerColor = Color(0xFFD9E8E6),
+            unfocusedContainerColor = Color(0xFFD9E8E6),
+            focusedTextColor = Color(0xFF2C3E3E),
+            unfocusedTextColor = Color(0xFF2C3E3E),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = Color(0xFF2C3E3E)
         ),
         singleLine = true
     )
@@ -276,7 +298,7 @@ private fun EmptyState(
                 painter = painterResource(id = R.drawable.ic_group),
                 contentDescription = if (isSearching) "No Results" else "No Drivers",
                 modifier = Modifier.size(80.dp),
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFF8AAFA8)
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -285,7 +307,7 @@ private fun EmptyState(
                 text = if (isSearching) "No Drivers Found" else "No Drivers Yet",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF666666)
+                color = Color(0xFF3A4F4F)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -294,7 +316,7 @@ private fun EmptyState(
                 text = if (isSearching) "Try a different search term" else "Add your first driver to get started",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFF888888),
+                color = Color(0xFF5A7070),
                 textAlign = TextAlign.Center
             )
             
@@ -304,17 +326,22 @@ private fun EmptyState(
                 Button(
                     onClick = onAddClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF7DD3C0)
+                        containerColor = Color(0xFF5A9A8A)
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.height(48.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = "Add",
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Driver")
+                    Text(
+                        text = "Add Driver",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -333,35 +360,30 @@ private fun DriverCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                elevation = 0.dp,
+                shape = RoundedCornerShape(20.dp)
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color(0xFFD9E8E6)
         ),
-        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+        border = BorderStroke(0.dp, Color.Transparent)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Driver Photo
+            // Driver Photo - circular with light teal background
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(70.dp)
                     .clip(CircleShape)
-                    .background(Color(0xFF2E4A5A))
-                    .border(2.dp, Color.White.copy(alpha = 0.3f), CircleShape),
+                    .background(Color(0xFFB8D4D1)),
                 contentAlignment = Alignment.Center
             ) {
                 val photoUrl = driver.photoUrl.trim()
-                
-                Log.d("DriverCard", "Driver: ${driver.name}, Photo URL: '$photoUrl'")
                 
                 if (photoUrl.isNotEmpty() && photoUrl.isNotBlank()) {
                     SubcomposeAsyncImage(
@@ -370,17 +392,6 @@ private fun DriverCard(
                             .crossfade(true)
                             .memoryCacheKey(photoUrl)
                             .diskCacheKey(photoUrl)
-                            .listener(
-                                onStart = {
-                                    Log.d("CoilImage", "Loading driver photo: ${driver.name}")
-                                },
-                                onSuccess = { _, _ ->
-                                    Log.d("CoilImage", "SUCCESS loading photo for: ${driver.name}")
-                                },
-                                onError = { _, result ->
-                                    Log.e("CoilImage", "FAILED loading photo for ${driver.name}: ${result.throwable.message}")
-                                }
-                            )
                             .build(),
                         contentDescription = "Driver Photo",
                         modifier = Modifier.fillMaxSize(),
@@ -391,145 +402,105 @@ private fun DriverCard(
                                 contentAlignment = Alignment.Center
                             ) {
                                 CircularProgressIndicator(
-                                    modifier = Modifier.size(20.dp),
-                                    color = Color.White,
+                                    modifier = Modifier.size(24.dp),
+                                    color = Color(0xFF5A9A8A),
                                     strokeWidth = 2.dp
                                 )
                             }
                         },
                         error = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_person),
-                                    contentDescription = "Default",
-                                    modifier = Modifier.size(30.dp),
-                                    tint = Color.White
-                                )
-                            }
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_person),
+                                contentDescription = "Default",
+                                modifier = Modifier.size(36.dp),
+                                tint = Color(0xFF6B9090)
+                            )
                         }
                     )
                 } else {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_person),
                         contentDescription = "Default",
-                        modifier = Modifier.size(30.dp),
-                        tint = Color.White
+                        modifier = Modifier.size(36.dp),
+                        tint = Color(0xFF6B9090)
                     )
                 }
             }
             
             Spacer(modifier = Modifier.width(16.dp))
             
-            // Driver Info
+            // Driver Info - name, username, phone, bus ID
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                // Name - bold, larger
                 Text(
                     text = driver.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A),
+                    letterSpacing = 0.sp
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 
+                // Username with @
                 Text(
                     text = "@${driver.username}",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFF666666)
+                    color = Color(0xFF4A5F5F)
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(1.dp))
                 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_call),
-                        contentDescription = "Phone",
-                        modifier = Modifier.size(12.dp),
-                        tint = Color(0xFF888888)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(4.dp))
-                    
-                    Text(
-                        text = driver.phone,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(12.dp))
-                    
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                        contentDescription = "Bus",
-                        modifier = Modifier.size(12.dp),
-                        tint = Color(0xFF7DD3C0)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(4.dp))
-                    
-                    Text(
-                        text = if (driver.assignedBusId.isNotEmpty()) driver.assignedBusId else "No bus",
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                    
-                    if (driver.isActive) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        Box(
-                            modifier = Modifier
-                                .size(6.dp)
-                                .background(Color(0xFF4CAF50), CircleShape)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(4.dp))
-                        
-                        Text(
-                            text = "Active",
-                            fontSize = 11.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF4CAF50)
-                        )
-                    }
-                }
+                // Phone number
+                Text(
+                    text = driver.phone,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color(0xFF4A5F5F)
+                )
+                
+                Spacer(modifier = Modifier.height(2.dp))
+                
+                // Bus ID - bold
+                Text(
+                    text = "Bus ID: ${if (driver.assignedBusId.isNotEmpty()) driver.assignedBusId else "Not assigned"}",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A)
+                )
             }
             
-            // Action Buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            // Action Buttons - stacked vertically on the right
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Edit Button
+                // Edit Button (settings icon)
                 IconButton(
                     onClick = onEditClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings),
                         contentDescription = "Edit Driver",
-                        tint = Color(0xFF7DD3C0),
-                        modifier = Modifier.size(18.dp)
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 
-                // Delete Button
+                // Delete Button (trash/remove icon)
                 IconButton(
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_remove),
                         contentDescription = "Delete Driver",
-                        tint = Color(0xFFD32F2F),
-                        modifier = Modifier.size(18.dp)
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
@@ -539,65 +510,38 @@ private fun DriverCard(
 
 @Composable
 private fun TopBar(
-    onBackClick: () -> Unit,
-    onAddClick: () -> Unit,
-    driverCount: Int
+    onBackClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .height(64.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Back button - using chevron left icon
         IconButton(
             onClick = onBackClick,
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back_vector),
+                painter = painterResource(id = R.drawable.ic_chevron_left),
                 contentDescription = "Back",
-                tint = Color.Black,
-                modifier = Modifier.size(24.dp)
+                tint = Color(0xFF2C3E3E),
+                modifier = Modifier.size(32.dp)
             )
         }
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = "Driver Database",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-            
-            Text(
-                text = "$driverCount ${if (driverCount == 1) "driver" else "drivers"}",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFF888888)
-            )
-        }
-        
-        // Add Driver Button
-        IconButton(
-            onClick = onAddClick,
-            modifier = Modifier
-                .size(40.dp)
-                .background(
-                    Color(0xFF7DD3C0).copy(alpha = 0.15f),
-                    CircleShape
-                )
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = "Add Driver",
-                tint = Color(0xFF7DD3C0),
-                modifier = Modifier.size(20.dp)
-            )
-        }
+        // Title
+        Text(
+            text = "Driver Management",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
+        )
     }
 }
 
