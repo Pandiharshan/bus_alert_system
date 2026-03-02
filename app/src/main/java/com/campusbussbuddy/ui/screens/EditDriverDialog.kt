@@ -341,7 +341,7 @@ fun EditDriverDialog(
                         enabled = name.isNotBlank() && phone.isNotBlank()
                     ) {
                         Text(
-                            text = "Save Changes",
+                            text = "Save",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold,
                             color = Color.White

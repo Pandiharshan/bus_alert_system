@@ -288,7 +288,7 @@ fun AddDriverScreen(
                         )
                     } else {
                         Text(
-                            text = "Create Driver",
+                            text = "Add Driver",
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Bold,
                             color = Color.White

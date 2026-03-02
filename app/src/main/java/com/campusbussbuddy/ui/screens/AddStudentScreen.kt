@@ -232,7 +232,7 @@ fun AddStudentScreen(
                         )
                     } else {
                         Text(
-                            text = "Create Student",
+                            text = "Add Student",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
                         )

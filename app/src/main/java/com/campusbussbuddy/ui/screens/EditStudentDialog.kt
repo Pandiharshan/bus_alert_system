@@ -250,7 +250,7 @@ fun EditStudentDialog(
                             enabled = name.isNotBlank() && busId.isNotBlank() && stop.isNotBlank()
                         ) {
                             Text(
-                                text = "Save Changes",
+                                text = "Save",
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White

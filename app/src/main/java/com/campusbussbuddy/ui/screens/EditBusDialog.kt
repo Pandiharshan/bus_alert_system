@@ -210,7 +210,7 @@ fun EditBusDialog(
                             enabled = busNumber.isNotBlank() && capacity.isNotBlank()
                         ) {
                             Text(
-                                text = "Save Changes",
+                                text = "Save",
                                 fontSize = 15.sp,
                                 fontWeight = FontWeight.SemiBold,
                                 color = Color.White

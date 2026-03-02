@@ -229,7 +229,7 @@ fun AddBusScreen(
                         )
                     } else {
                         Text(
-                            text = "Create Bus",
+                            text = "Add Bus",
                             fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
                         )
