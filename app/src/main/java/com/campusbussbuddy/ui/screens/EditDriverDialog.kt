@@ -63,20 +63,35 @@ fun EditDriverDialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(usePlatformDefaultWidth = false)
     ) {
-        Card(
+        // Full screen dialog with teal gradient background
+        Box(
             modifier = Modifier
-                .fillMaxWidth(0.92f)
-                .fillMaxHeight(0.85f)
-                .shadow(
-                    elevation = 0.dp,
-                    shape = RoundedCornerShape(28.dp)
+                .fillMaxSize()
+                .background(
+                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                        colors = listOf(
+                            Color(0xFFB8D4D1),
+                            Color(0xFF9EC5C0),
+                            Color(0xFF8AB8B3)
+                        )
+                    )
                 ),
-            shape = RoundedCornerShape(28.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.95f)
-            ),
-            border = BorderStroke(0.dp, Color.Transparent)
+            contentAlignment = Alignment.Center
         ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.92f)
+                    .fillMaxHeight(0.85f)
+                    .shadow(
+                        elevation = 0.dp,
+                        shape = RoundedCornerShape(28.dp)
+                    ),
+                shape = RoundedCornerShape(28.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = Color.White.copy(alpha = 0.95f)
+                ),
+                border = BorderStroke(0.dp, Color.Transparent)
+            ) {
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
@@ -299,7 +314,7 @@ fun EditDriverDialog(
                     ) {
                         Text(
                             text = "Cancel",
-                            fontSize = 16.sp,
+                            fontSize = 15.sp,
                             fontWeight = FontWeight.SemiBold
                         )
                     }
@@ -327,13 +342,14 @@ fun EditDriverDialog(
                     ) {
                         Text(
                             text = "Save Changes",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold,
                             color = Color.White
                         )
                     }
                 }
             }
+        }
         }
     }
 }

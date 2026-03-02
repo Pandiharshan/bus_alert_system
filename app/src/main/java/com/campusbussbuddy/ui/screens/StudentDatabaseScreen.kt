@@ -29,7 +29,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.StudentInfo
 import com.campusbussbuddy.firebase.StudentResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.GlassBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -72,18 +72,14 @@ fun StudentDatabaseScreen(
         }
     }
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
+    GlassBackground {
+        Box(modifier = Modifier.fillMaxSize()) {
         Column(
             modifier = Modifier.fillMaxSize()
         ) {
             // Top Bar
             TopBar(
-                onBackClick = onBackClick,
-                onAddClick = onAddStudentClick,
-                studentCount = students.size
+                onBackClick = onBackClick
             )
             
             // Search Bar
@@ -113,8 +109,8 @@ fun StudentDatabaseScreen(
                 // Students List
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(filteredStudents) { student ->
                         StudentCard(
@@ -196,6 +192,34 @@ fun StudentDatabaseScreen(
                 }
             )
         }
+            
+        // Floating Add Button (bottom right)
+        FloatingActionButton(
+            onClick = onAddStudentClick,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(28.dp)
+                .size(64.dp),
+            containerColor = Color(0xFF6B9A92),
+            contentColor = Color.White,
+            shape = CircleShape
+        ) {
+            Row(
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_group),
+                    contentDescription = "Add Student",
+                    modifier = Modifier.size(24.dp)
+                )
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add),
+                    contentDescription = "Add",
+                    modifier = Modifier.size(20.dp).offset(x = (-4).dp)
+                )
+            }
+        }
     }
     }
 }
@@ -209,42 +233,39 @@ private fun SearchBar(
     OutlinedTextField(
         value = searchQuery,
         onValueChange = onSearchQueryChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
         placeholder = {
             Text(
-                text = "Search by name, username, bus, or stop...",
-                color = Color(0xFFAAAAAA),
-                fontSize = 14.sp
+                text = "Search students...",
+                color = Color(0xFF7A9B9B),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
             )
         },
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_person),
                 contentDescription = "Search",
-                tint = Color(0xFF888888),
-                modifier = Modifier.size(20.dp)
+                tint = Color(0xFF6B9090),
+                modifier = Modifier.size(24.dp)
             )
         },
-        trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
-                IconButton(
-                    onClick = { onSearchQueryChange("") }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_remove),
-                        contentDescription = "Clear",
-                        tint = Color(0xFF888888),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF7DD3C0),
-            unfocusedBorderColor = Color(0xFFE0E0E0),
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            focusedContainerColor = Color(0xFFD9E8E6),
+            unfocusedContainerColor = Color(0xFFD9E8E6),
+            focusedTextColor = Color(0xFF2C3E3E),
+            unfocusedTextColor = Color(0xFF2C3E3E),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = Color(0xFF2C3E3E)
         ),
         singleLine = true
     )
@@ -264,10 +285,10 @@ private fun EmptyState(
             modifier = Modifier.padding(32.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_person),
+                painter = painterResource(id = R.drawable.ic_group),
                 contentDescription = if (isSearching) "No Results" else "No Students",
                 modifier = Modifier.size(80.dp),
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFF8AAFA8)
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -276,7 +297,7 @@ private fun EmptyState(
                 text = if (isSearching) "No Students Found" else "No Students Yet",
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF666666)
+                color = Color(0xFF3A4F4F)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -285,7 +306,7 @@ private fun EmptyState(
                 text = if (isSearching) "Try a different search term" else "Add your first student to get started",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFF888888),
+                color = Color(0xFF5A7070),
                 textAlign = TextAlign.Center
             )
             
@@ -295,17 +316,22 @@ private fun EmptyState(
                 Button(
                     onClick = onAddClick,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF7DD3C0)
+                        containerColor = Color(0xFF5A9A8A)
                     ),
-                    shape = RoundedCornerShape(12.dp)
+                    shape = RoundedCornerShape(24.dp),
+                    modifier = Modifier.height(48.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_add),
                         contentDescription = "Add",
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(20.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("Add Student")
+                    Text(
+                        text = "Add Student",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.SemiBold
+                    )
                 }
             }
         }
@@ -322,29 +348,27 @@ private fun StudentCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                elevation = 0.dp,
+                shape = RoundedCornerShape(20.dp)
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color(0xFFD9E8E6)
         ),
-        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+        border = BorderStroke(0.dp, Color.Transparent)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Student Icon
             Box(
                 modifier = Modifier
-                    .size(60.dp)
+                    .size(70.dp)
                     .background(
-                        Color(0xFF7DD3C0).copy(alpha = 0.15f),
+                        Color(0xFFB8D4D1),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -352,8 +376,8 @@ private fun StudentCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_person),
                     contentDescription = "Student",
-                    tint = Color(0xFF7DD3C0),
-                    modifier = Modifier.size(30.dp)
+                    tint = Color(0xFF6B9090),
+                    modifier = Modifier.size(36.dp)
                 )
             }
             
@@ -365,435 +389,71 @@ private fun StudentCard(
             ) {
                 Text(
                     text = student.name,
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A),
+                    letterSpacing = 0.sp
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 
                 Text(
                     text = "@${student.username}",
-                    fontSize = 13.sp,
+                    fontSize = 15.sp,
                     fontWeight = FontWeight.Normal,
-                    color = Color(0xFF666666)
+                    color = Color(0xFF4A5F5F)
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(1.dp))
                 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                        contentDescription = "Bus",
-                        modifier = Modifier.size(12.dp),
-                        tint = Color(0xFF7DD3C0)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(4.dp))
-                    
-                    Text(
-                        text = student.busId,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(12.dp))
-                    
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_pin_drop),
-                        contentDescription = "Stop",
-                        modifier = Modifier.size(12.dp),
-                        tint = Color(0xFF888888)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(4.dp))
-                    
-                    Text(
-                        text = student.stop,
-                        fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                }
+                Text(
+                    text = "Bus: ${student.busId}",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color(0xFF4A5F5F)
+                )
+                
+                Spacer(modifier = Modifier.height(2.dp))
+                
+                Text(
+                    text = "Stop: ${student.stop}",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A)
+                )
             }
             
-            // Action Buttons
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
+            // Action Buttons - stacked vertically on the right
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Edit Button
+                // Edit Button (settings icon)
                 IconButton(
                     onClick = onEditClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings),
                         contentDescription = "Edit Student",
-                        tint = Color(0xFF7DD3C0),
-                        modifier = Modifier.size(18.dp)
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 
-                // Delete Button
+                // Delete Button (trash/remove icon)
                 IconButton(
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_remove),
                         contentDescription = "Delete Student",
-                        tint = Color(0xFFD32F2F),
-                        modifier = Modifier.size(18.dp)
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
             }
-        }
-    }
-}
-
-
-@Composable
-private fun EditStudentDialog(
-    student: StudentInfo,
-    onDismiss: () -> Unit,
-    onSave: (StudentInfo, String?) -> Unit,
-    errorMessage: String? = null
-) {
-    var name by remember { mutableStateOf(student.name) }
-    var username by remember { mutableStateOf(student.username) }
-    var busId by remember { mutableStateOf(student.busId) }
-    var stop by remember { mutableStateOf(student.stop) }
-    var newPassword by remember { mutableStateOf("") }
-    var showPassword by remember { mutableStateOf(false) }
-    var showPasswordChangeConfirm by remember { mutableStateOf(false) }
-    
-    // Auto-generate email from username
-    val generatedEmail = "${username.trim()}@gmail.com"
-    
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.06f),
-                    spotColor = Color.Black.copy(alpha = 0.06f)
-                ),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.30f)
-            ),
-            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Text(
-                    text = "Edit Student",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(20.dp))
-                
-                OutlinedTextField(
-                    value = name,
-                    onValueChange = { name = it },
-                    label = { Text("Name") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedTextField(
-                    value = username,
-                    onValueChange = { username = it },
-                    label = { Text("Username") },
-                    placeholder = { Text("Enter unique username (e.g., pandi)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0),
-                        disabledBorderColor = Color(0xFFE0E0E0),
-                        disabledContainerColor = Color(0xFFF5F5F5),
-                        disabledTextColor = Color(0xFF888888)
-                    ),
-                    enabled = false
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedTextField(
-                    value = generatedEmail,
-                    onValueChange = { },
-                    label = { Text("Email") },
-                    placeholder = { Text("Auto-generated from username") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFFE0E0E0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0),
-                        disabledBorderColor = Color(0xFFE0E0E0),
-                        focusedContainerColor = Color(0xFFF5F5F5),
-                        unfocusedContainerColor = Color(0xFFF5F5F5),
-                        disabledContainerColor = Color(0xFFF5F5F5),
-                        disabledTextColor = Color(0xFF888888)
-                    ),
-                    enabled = false
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedTextField(
-                    value = busId,
-                    onValueChange = { busId = it },
-                    label = { Text("Bus ID") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedTextField(
-                    value = stop,
-                    onValueChange = { stop = it },
-                    label = { Text("Bus Stop") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                // Password Change Section
-                Column {
-                    Text(
-                        text = "Reset Password (Optional)",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = Color.Black,
-                        modifier = Modifier.padding(bottom = 6.dp)
-                    )
-                    
-                    OutlinedTextField(
-                        value = newPassword,
-                        onValueChange = { newPassword = it },
-                        placeholder = {
-                            Text(
-                                text = "Enter any value to trigger password reset email",
-                                color = Color(0xFFAAAAAA),
-                                fontSize = 14.sp
-                            )
-                        },
-                        trailingIcon = {
-                            IconButton(
-                                onClick = { showPassword = !showPassword }
-                            ) {
-                                Icon(
-                                    painter = painterResource(
-                                        id = if (showPassword) R.drawable.ic_visibility_off else R.drawable.ic_visibility
-                                    ),
-                                    contentDescription = if (showPassword) "Hide password" else "Show password",
-                                    tint = Color(0xFF888888),
-                                    modifier = Modifier.size(18.dp)
-                                )
-                            }
-                        },
-                        visualTransformation = if (showPassword) VisualTransformation.None else PasswordVisualTransformation(),
-                        modifier = Modifier.fillMaxWidth(),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = Color(0xFF7DD3C0),
-                            unfocusedBorderColor = Color(0xFFE0E0E0)
-                        ),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password)
-                    )
-                    
-                    if (newPassword.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = "Student will receive a password reset email",
-                            fontSize = 11.sp,
-                            color = Color(0xFF7DD3C0)
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                // Error Message
-                if (errorMessage != null) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(
-                                Color(0xFFF8D7DA),
-                                RoundedCornerShape(8.dp)
-                            )
-                            .padding(12.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_emergency),
-                            contentDescription = "Error",
-                            tint = Color(0xFF721C24),
-                            modifier = Modifier.size(16.dp)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        Text(
-                            text = errorMessage,
-                            fontSize = 11.sp,
-                            color = Color(0xFF721C24),
-                            lineHeight = 16.sp
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                }
-                
-                // Info Note
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            Color(0xFFFFF3CD),
-                            RoundedCornerShape(8.dp)
-                        )
-                        .padding(12.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_notifications),
-                        contentDescription = "Info",
-                        tint = Color(0xFF856404),
-                        modifier = Modifier.size(16.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    Text(
-                        text = "Username cannot be changed after account creation. Email is auto-generated from username. You can reset the student's password here.",
-                        fontSize = 11.sp,
-                        color = Color(0xFF856404),
-                        lineHeight = 16.sp
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFF666666)
-                        )
-                    ) {
-                        Text("Cancel")
-                    }
-                    
-                    Button(
-                        onClick = {
-                            // If password reset is requested, show confirmation
-                            if (newPassword.isNotEmpty()) {
-                                showPasswordChangeConfirm = true
-                            } else {
-                                val updatedStudent = student.copy(
-                                    name = name.trim(),
-                                    username = username.trim(),
-                                    busId = busId.trim(),
-                                    stop = stop.trim()
-                                )
-                                onSave(updatedStudent, null)
-                            }
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7DD3C0)
-                        ),
-                        enabled = name.isNotBlank() && username.isNotBlank() && 
-                                  busId.isNotBlank() && stop.isNotBlank()
-                    ) {
-                        Text("Save")
-                    }
-                }
-            }
-        }
-        
-        // Password Change Confirmation Dialog
-        if (showPasswordChangeConfirm) {
-            AlertDialog(
-                onDismissRequest = { showPasswordChangeConfirm = false },
-                title = {
-                    Text(
-                        text = "Send Password Reset?",
-                        fontWeight = FontWeight.Bold
-                    )
-                },
-                text = {
-                    Text(
-                        text = "A password reset email will be sent to ${student.name}. They will receive an email to set their new password. Do you want to proceed?",
-                        fontSize = 14.sp
-                    )
-                },
-                confirmButton = {
-                    TextButton(
-                        onClick = {
-                            showPasswordChangeConfirm = false
-                            val updatedStudent = student.copy(
-                                name = name.trim(),
-                                username = username.trim(),
-                                busId = busId.trim(),
-                                stop = stop.trim()
-                            )
-                            onSave(updatedStudent, newPassword)
-                        }
-                    ) {
-                        Text(
-                            text = "Send Reset Email",
-                            color = Color(0xFF7DD3C0),
-                            fontWeight = FontWeight.SemiBold
-                        )
-                    }
-                },
-                dismissButton = {
-                    TextButton(
-                        onClick = { showPasswordChangeConfirm = false }
-                    ) {
-                        Text(
-                            text = "Cancel",
-                            color = Color(0xFF666666)
-                        )
-                    }
-                }
-            )
         }
     }
 }
@@ -885,64 +545,37 @@ private fun DeleteConfirmationDialog(
 
 @Composable
 private fun TopBar(
-    onBackClick: () -> Unit,
-    onAddClick: () -> Unit,
-    studentCount: Int
+    onBackClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .height(64.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Back button - using chevron left icon
         IconButton(
             onClick = onBackClick,
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back_vector),
+                painter = painterResource(id = R.drawable.ic_chevron_left),
                 contentDescription = "Back",
-                tint = Color.Black,
-                modifier = Modifier.size(24.dp)
+                tint = Color(0xFF2C3E3E),
+                modifier = Modifier.size(32.dp)
             )
         }
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = "Student Database",
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-            
-            Text(
-                text = "$studentCount ${if (studentCount == 1) "student" else "students"}",
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFF888888)
-            )
-        }
-        
-        // Add Student Button
-        IconButton(
-            onClick = onAddClick,
-            modifier = Modifier
-                .size(40.dp)
-                .background(
-                    Color(0xFF7DD3C0).copy(alpha = 0.15f),
-                    CircleShape
-                )
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = "Add Student",
-                tint = Color(0xFF7DD3C0),
-                modifier = Modifier.size(20.dp)
-            )
-        }
+        // Title
+        Text(
+            text = "Student Management",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
+        )
     }
 }

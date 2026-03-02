@@ -26,7 +26,7 @@ import androidx.compose.ui.window.Dialog
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.AppBackgroundContainer
+import com.campusbussbuddy.ui.theme.GlassBackground
 import kotlinx.coroutines.launch
 
 @Composable
@@ -70,19 +70,15 @@ fun BusDatabaseScreen(
         }
     }
     
-    AppBackgroundContainer {
-        Box(
-            modifier = Modifier.fillMaxSize()
-        ) {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top Bar
-            TopBar(
-                onBackClick = onBackClick,
-                title = "Bus Database",
-                count = buses.size
-            )
+    GlassBackground {
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize()
+            ) {
+                // Top Bar
+                TopBar(
+                    onBackClick = onBackClick
+                )
             
             // Search Bar
             SearchBar(
@@ -116,8 +112,8 @@ fun BusDatabaseScreen(
                 // Bus List
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(horizontal = 20.dp, vertical = 12.dp),
-                    verticalArrangement = Arrangement.spacedBy(12.dp)
+                    contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 80.dp),
+                    verticalArrangement = Arrangement.spacedBy(16.dp)
                 ) {
                     items(filteredBuses) { bus ->
                         BusCard(
@@ -135,58 +131,69 @@ fun BusDatabaseScreen(
                 }
             }
         }
-        
-        // Floating Action Button
-        FloatingActionButton(
-            onClick = onAddBusClick,
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp),
-            containerColor = Color(0xFF7DD3C0),
-            contentColor = Color.White
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = "Add Bus",
-                modifier = Modifier.size(24.dp)
-            )
+            
+            // Floating Add Button (bottom right)
+            FloatingActionButton(
+                onClick = onAddBusClick,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(28.dp)
+                    .size(64.dp),
+                containerColor = Color(0xFF6B9A92),
+                contentColor = Color.White,
+                shape = CircleShape
+            ) {
+                Row(
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                        contentDescription = "Add Bus",
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_add),
+                        contentDescription = "Add",
+                        modifier = Modifier.size(20.dp).offset(x = (-4).dp)
+                    )
+                }
+            }
+            
+            // Edit Dialog
+            if (showEditDialog && selectedBus != null) {
+                EditBusDialog(
+                    bus = selectedBus!!,
+                    onDismiss = { showEditDialog = false },
+                    onSave = { updatedBus ->
+                        scope.launch {
+                            val result = FirebaseManager.updateBusInfo(updatedBus)
+                            if (result is com.campusbussbuddy.firebase.BusResult.Success) {
+                                loadBuses()
+                                showEditDialog = false
+                            }
+                        }
+                    }
+                )
+            }
+            
+            // Delete Confirmation Dialog
+            if (showDeleteDialog && busToDelete != null) {
+                DeleteConfirmationDialog(
+                    busNumber = busToDelete!!.busNumber,
+                    onDismiss = { showDeleteDialog = false },
+                    onConfirm = {
+                        scope.launch {
+                            val result = FirebaseManager.deleteBus(busToDelete!!.busId)
+                            if (result is com.campusbussbuddy.firebase.BusResult.Success) {
+                                loadBuses()
+                                showDeleteDialog = false
+                            }
+                        }
+                    }
+                )
+            }
         }
-    }
-    
-    // Edit Dialog
-    if (showEditDialog && selectedBus != null) {
-        EditBusDialog(
-            bus = selectedBus!!,
-            onDismiss = { showEditDialog = false },
-            onSave = { updatedBus ->
-                scope.launch {
-                    // Update bus in Firestore
-                    val result = FirebaseManager.updateBusInfo(updatedBus)
-                    if (result is com.campusbussbuddy.firebase.BusResult.Success) {
-                        loadBuses()
-                        showEditDialog = false
-                    }
-                }
-            }
-        )
-    }
-    
-    // Delete Confirmation Dialog
-    if (showDeleteDialog && busToDelete != null) {
-        DeleteConfirmationDialog(
-            busNumber = busToDelete!!.busNumber,
-            onDismiss = { showDeleteDialog = false },
-            onConfirm = {
-                scope.launch {
-                    val result = FirebaseManager.deleteBus(busToDelete!!.busId)
-                    if (result is com.campusbussbuddy.firebase.BusResult.Success) {
-                        loadBuses()
-                        showDeleteDialog = false
-                    }
-                }
-            }
-        )
-    }
     }
 }
 
@@ -200,29 +207,27 @@ private fun BusCard(
         modifier = Modifier
             .fillMaxWidth()
             .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.06f),
-                spotColor = Color.Black.copy(alpha = 0.06f)
+                elevation = 0.dp,
+                shape = RoundedCornerShape(20.dp)
             ),
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(20.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.28f)
+            containerColor = Color(0xFFD9E8E6)
         ),
-        border = BorderStroke(2.dp, Color.White.copy(alpha = 0.55f))
+        border = BorderStroke(0.dp, Color.Transparent)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // Bus Icon
             Box(
                 modifier = Modifier
-                    .size(48.dp)
+                    .size(70.dp)
                     .background(
-                        Color(0xFF7DD3C0).copy(alpha = 0.15f),
+                        Color(0xFFB8D4D1),
                         CircleShape
                     ),
                 contentAlignment = Alignment.Center
@@ -230,8 +235,8 @@ private fun BusCard(
                 Icon(
                     painter = painterResource(id = R.drawable.ic_directions_bus_vector),
                     contentDescription = "Bus",
-                    tint = Color(0xFF7DD3C0),
-                    modifier = Modifier.size(24.dp)
+                    tint = Color(0xFF6B9090),
+                    modifier = Modifier.size(36.dp)
                 )
             }
             
@@ -243,179 +248,61 @@ private fun BusCard(
             ) {
                 Text(
                     text = "Bus ${bus.busNumber}",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color.Black
+                    fontSize = 19.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = Color(0xFF1A1A1A),
+                    letterSpacing = 0.sp
                 )
                 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(2.dp))
                 
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
-                        contentDescription = "Capacity",
-                        tint = Color(0xFF888888),
-                        modifier = Modifier.size(14.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = "Capacity: ${bus.capacity}",
-                        fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF888888)
-                    )
-                }
+                Text(
+                    text = "Capacity: ${bus.capacity}",
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Normal,
+                    color = Color(0xFF4A5F5F)
+                )
                 
                 if (bus.activeDriverName.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Box(
-                            modifier = Modifier
-                                .size(8.dp)
-                                .background(Color(0xFF4CAF50), CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(6.dp))
-                        Text(
-                            text = "Active: ${bus.activeDriverName}",
-                            fontSize = 12.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF4CAF50)
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(2.dp))
+                    Text(
+                        text = "Driver: ${bus.activeDriverName}",
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF1A1A1A)
+                    )
                 }
             }
             
-            // Action Buttons
-            Row {
+            // Action Buttons - stacked vertically on the right
+            Column(
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                // Edit Button (settings icon)
                 IconButton(
                     onClick = onEditClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_settings),
-                        contentDescription = "Edit",
-                        tint = Color(0xFF7DD3C0),
-                        modifier = Modifier.size(20.dp)
+                        contentDescription = "Edit Bus",
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
                 }
                 
+                // Delete Button (trash/remove icon)
                 IconButton(
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(36.dp)
+                    modifier = Modifier.size(40.dp)
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_remove),
-                        contentDescription = "Delete",
-                        tint = Color(0xFFFF5252),
-                        modifier = Modifier.size(20.dp)
+                        contentDescription = "Delete Bus",
+                        tint = Color(0xFF2A2A2A),
+                        modifier = Modifier.size(24.dp)
                     )
-                }
-            }
-        }
-    }
-}
-
-@Composable
-private fun EditBusDialog(
-    bus: BusInfo,
-    onDismiss: () -> Unit,
-    onSave: (BusInfo) -> Unit
-) {
-    var busNumber by remember { mutableStateOf(bus.busNumber.toString()) }
-    var capacity by remember { mutableStateOf(bus.capacity.toString()) }
-    
-    Dialog(onDismissRequest = onDismiss) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-                .shadow(
-                    elevation = 12.dp,
-                    shape = RoundedCornerShape(20.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.06f),
-                    spotColor = Color.Black.copy(alpha = 0.06f)
-                ),
-            shape = RoundedCornerShape(20.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.30f)
-            ),
-            border = BorderStroke(1.5.dp, Color.White.copy(alpha = 0.15f))
-        ) {
-            Column(
-                modifier = Modifier.padding(20.dp)
-            ) {
-                Text(
-                    text = "Edit Bus",
-                    fontSize = 20.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.Black
-                )
-                
-                Spacer(modifier = Modifier.height(20.dp))
-                
-                OutlinedTextField(
-                    value = busNumber,
-                    onValueChange = { busNumber = it },
-                    label = { Text("Bus Number") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                OutlinedTextField(
-                    value = capacity,
-                    onValueChange = { capacity = it },
-                    label = { Text("Capacity") },
-                    modifier = Modifier.fillMaxWidth(),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = Color(0xFF7DD3C0),
-                        unfocusedBorderColor = Color(0xFFE0E0E0)
-                    )
-                )
-                
-                Spacer(modifier = Modifier.height(24.dp))
-                
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(12.dp)
-                ) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = Color(0xFF666666)
-                        )
-                    ) {
-                        Text("Cancel")
-                    }
-                    
-                    Button(
-                        onClick = {
-                            val updatedBus = bus.copy(
-                                busNumber = busNumber.toIntOrNull() ?: bus.busNumber,
-                                capacity = capacity.toIntOrNull() ?: bus.capacity
-                            )
-                            onSave(updatedBus)
-                        },
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(12.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF7DD3C0)
-                        )
-                    ) {
-                        Text("Save")
-                    }
                 }
             }
         }
@@ -507,49 +394,38 @@ private fun DeleteConfirmationDialog(
 
 @Composable
 private fun TopBar(
-    onBackClick: () -> Unit,
-    title: String,
-    count: Int
+    onBackClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
+            .height(64.dp)
+            .background(Color.Transparent)
+            .padding(horizontal = 20.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Back button - using chevron left icon
         IconButton(
             onClick = onBackClick,
             modifier = Modifier.size(40.dp)
         ) {
             Icon(
-                painter = painterResource(id = R.drawable.ic_arrow_back_vector),
+                painter = painterResource(id = R.drawable.ic_chevron_left),
                 contentDescription = "Back",
-                tint = Color.Black,
-                modifier = Modifier.size(24.dp)
+                tint = Color(0xFF2C3E3E),
+                modifier = Modifier.size(32.dp)
             )
         }
         
         Spacer(modifier = Modifier.width(16.dp))
         
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = title,
-                fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color.Black
-            )
-            
-            if (count > 0) {
-                Text(
-                    text = "$count ${if (count == 1) "bus" else "buses"}",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF888888)
-                )
-            }
-        }
+        // Title
+        Text(
+            text = "Bus Management",
+            fontSize = 22.sp,
+            fontWeight = FontWeight.Bold,
+            color = Color(0xFF1A1A1A)
+        )
     }
 }
 
@@ -563,42 +439,39 @@ private fun SearchBar(
     OutlinedTextField(
         value = searchQuery,
         onValueChange = onSearchQueryChange,
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(56.dp),
         placeholder = {
             Text(
                 text = placeholder,
-                color = Color(0xFFAAAAAA),
-                fontSize = 14.sp
+                color = Color(0xFF7A9B9B),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Normal
             )
         },
         leadingIcon = {
             Icon(
                 painter = painterResource(id = R.drawable.ic_directions_bus_vector),
                 contentDescription = "Search",
-                tint = Color(0xFF888888),
-                modifier = Modifier.size(20.dp)
+                tint = Color(0xFF6B9090),
+                modifier = Modifier.size(24.dp)
             )
         },
-        trailingIcon = {
-            if (searchQuery.isNotEmpty()) {
-                IconButton(
-                    onClick = { onSearchQueryChange("") }
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_remove),
-                        contentDescription = "Clear",
-                        tint = Color(0xFF888888),
-                        modifier = Modifier.size(18.dp)
-                    )
-                }
-            }
-        },
-        shape = RoundedCornerShape(16.dp),
+        shape = RoundedCornerShape(28.dp),
         colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF7DD3C0),
-            unfocusedBorderColor = Color(0xFFE0E0E0),
-            focusedContainerColor = Color.White,
-            unfocusedContainerColor = Color.White
+            focusedBorderColor = Color.Transparent,
+            unfocusedBorderColor = Color.Transparent,
+            focusedContainerColor = Color(0xFFD9E8E6),
+            unfocusedContainerColor = Color(0xFFD9E8E6),
+            focusedTextColor = Color(0xFF2C3E3E),
+            unfocusedTextColor = Color(0xFF2C3E3E),
+            cursorColor = Color(0xFF5A9A8A)
+        ),
+        textStyle = androidx.compose.ui.text.TextStyle(
+            fontSize = 16.sp,
+            fontWeight = FontWeight.Normal,
+            color = Color(0xFF2C3E3E)
         ),
         singleLine = true
     )
@@ -622,7 +495,7 @@ private fun EmptyState(
                 painter = painterResource(id = icon),
                 contentDescription = title,
                 modifier = Modifier.size(80.dp),
-                tint = Color(0xFFCCCCCC)
+                tint = Color(0xFF8AAFA8)
             )
             
             Spacer(modifier = Modifier.height(16.dp))
@@ -631,7 +504,7 @@ private fun EmptyState(
                 text = title,
                 fontSize = 20.sp,
                 fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF666666)
+                color = Color(0xFF3A4F4F)
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -640,7 +513,7 @@ private fun EmptyState(
                 text = subtitle,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Normal,
-                color = Color(0xFF888888),
+                color = Color(0xFF5A7070),
                 textAlign = TextAlign.Center
             )
         }
