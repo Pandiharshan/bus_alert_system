@@ -56,6 +56,10 @@
         "source": "com.campusbussbuddy.app-main-70:/mipmap-xxxhdpi/ic_launcher_round.webp"
     },
     {
+        "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_qr_code.xml.flat",
+        "source": "com.campusbussbuddy.app-main-70:/drawable/ic_qr_code.xml"
+    },
+    {
         "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_arrow_back.xml.flat",
         "source": "com.campusbussbuddy.app-main-70:/drawable/ic_arrow_back.xml"
     },

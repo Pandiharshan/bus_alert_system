@@ -157,6 +157,7 @@ drawable ic_passkey
 drawable ic_password
 drawable ic_person
 drawable ic_pin_drop
+drawable ic_qr_code
 drawable ic_remove
 drawable ic_route
 drawable ic_settings

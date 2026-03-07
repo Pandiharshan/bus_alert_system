@@ -35,6 +35,7 @@ drawable ic_my_location
 drawable ic_notifications
 drawable ic_person
 drawable ic_pin_drop
+drawable ic_qr_code
 drawable ic_remove
 drawable ic_route
 drawable ic_settings
