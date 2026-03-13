@@ -155,38 +155,58 @@ object FirebaseManager {
         photoUri: Uri? = null
     ): DriverResult {
         return try {
+            Log.d("FirebaseManager", "Creating driver account for: ${driverData.username}")
+            
+            // Validate input data
+            if (driverData.username.isBlank() || driverData.name.isBlank()) {
+                return DriverResult.Error("Username and name are required")
+            }
+            
+            if (password.length < 6) {
+                return DriverResult.Error("Password must be at least 6 characters")
+            }
+            
             // Convert username to email format for Firebase Auth
             val email = "${driverData.username.trim()}@gmail.com"
+            
+            Log.d("FirebaseManager", "Creating Firebase Auth account with email: $email")
             
             // Step 1: Create Firebase Auth account
             val authResult = auth.createUserWithEmailAndPassword(email, password).await()
             val driverUid = authResult.user?.uid ?: return DriverResult.Error("Failed to create account")
             
+            Log.d("FirebaseManager", "Firebase Auth account created, UID: $driverUid")
+            
             // Step 2: Upload photo to Firebase Storage if provided
             var photoUrl: String? = null
             if (photoUri != null) {
+                Log.d("FirebaseManager", "Uploading driver photo...")
                 photoUrl = uploadDriverPhoto(driverUid, photoUri)
+                Log.d("FirebaseManager", "Photo upload result: $photoUrl")
             }
             
             // Step 3: Create driver document in Firestore using UID as document ID
             val driverDocument = hashMapOf(
-                "name" to driverData.name,
-                "username" to driverData.username,
+                "name" to driverData.name.trim(),
+                "username" to driverData.username.trim(),
                 "email" to email,
-                "phone" to driverData.phone,
+                "phone" to driverData.phone.trim(),
                 "photoUrl" to (photoUrl ?: ""),
-                "assignedBusId" to driverData.assignedBusId,
+                "assignedBusId" to driverData.assignedBusId.trim(),
                 "isActive" to false,
                 "createdAt" to System.currentTimeMillis()
             )
             
             firestore.collection("drivers").document(driverUid).set(driverDocument).await()
             
+            Log.d("FirebaseManager", "Driver document created in Firestore")
+            
             // Step 4: Sign out the newly created driver account (admin should remain signed in)
             // Note: This is handled by re-authenticating admin after driver creation
             
             DriverResult.Success("Driver account created successfully", driverUid)
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "Create driver account failed", e)
             DriverResult.Error(getErrorMessage(e))
         }
     }
@@ -239,12 +259,15 @@ object FirebaseManager {
             val result = auth.signInWithEmailAndPassword(email, password).await()
             val user = result.user ?: return DriverAuthResult.Error("Authentication failed")
             
+            Log.d("FirebaseManager", "Driver authenticated successfully, UID: ${user.uid}")
+            
             // Step 2: Fetch driver data from Firestore
             val driverDoc = firestore.collection("drivers").document(user.uid).get().await()
             
             if (!driverDoc.exists()) {
+                Log.e("FirebaseManager", "Driver document not found for UID: ${user.uid}")
                 auth.signOut()
-                return DriverAuthResult.Error("Driver account not found")
+                return DriverAuthResult.Error("Driver account not found in database")
             }
             
             val driverInfo = DriverInfo(
@@ -258,10 +281,13 @@ object FirebaseManager {
                 isActive = driverDoc.getBoolean("isActive") ?: false
             )
             
+            Log.d("FirebaseManager", "Driver info loaded: ${driverInfo.name}, Bus: ${driverInfo.assignedBusId}")
+            
             // Step 3: Fetch assigned bus information
             val busInfo = if (driverInfo.assignedBusId.isNotEmpty()) {
                 getBusInfo(driverInfo.assignedBusId)
             } else {
+                Log.w("FirebaseManager", "Driver has no assigned bus")
                 null
             }
             
@@ -857,9 +883,10 @@ object FirebaseManager {
      */
     suspend fun getAllBuses(): List<BusInfo> {
         return try {
+            Log.d("FirebaseManager", "Fetching all buses from Firestore...")
             val busesSnapshot = firestore.collection("buses").get().await()
             
-            busesSnapshot.documents.mapNotNull { doc ->
+            val buses = busesSnapshot.documents.mapNotNull { doc ->
                 try {
                     BusInfo(
                         busId = doc.id,
@@ -870,10 +897,13 @@ object FirebaseManager {
                         activeDriverPhone = doc.getString("activeDriverPhone") ?: ""
                     )
                 } catch (e: Exception) {
-                    Log.e("FirebaseManager", "Error parsing bus document", e)
+                    Log.e("FirebaseManager", "Error parsing bus document: ${doc.id}", e)
                     null
                 }
             }
+            
+            Log.d("FirebaseManager", "Successfully loaded ${buses.size} buses")
+            buses
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Get all buses failed", e)
             emptyList()

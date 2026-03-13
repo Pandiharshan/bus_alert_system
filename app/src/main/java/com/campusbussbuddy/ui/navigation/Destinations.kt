@@ -7,6 +7,8 @@ object Destinations {
     const val DRIVER_HOME = "driver_home"
     const val BUS_ASSIGNMENT_LOGIN = "bus_assignment_login"
     const val BUS_OPERATIONS_HUB = "bus_operations_hub"
+    const val TRIP_SUPERVISOR = "trip_supervisor"
+    const val BUS_STOP_DETAILS = "bus_stop_details"
     const val STUDENT_PORTAL_HOME = "student_portal_home"
     const val ADMIN_LOGIN = "admin_login"
     const val ADMIN_HOME = "admin_home"

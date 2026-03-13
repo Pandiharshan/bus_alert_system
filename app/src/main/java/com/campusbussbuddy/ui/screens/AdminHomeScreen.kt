@@ -51,9 +51,9 @@ fun AdminHomeScreen(
     
     // Fetch dashboard counts from Firestore
     LaunchedEffect(Unit) {
-        scope.launch {
-            Log.d("AdminHomeScreen", "Fetching dashboard counts...")
-            
+        Log.d("AdminHomeScreen", "Fetching dashboard counts...")
+        
+        try {
             // Fetch students count
             val students = FirebaseManager.getAllStudents()
             totalStudents = students.size
@@ -83,6 +83,9 @@ fun AdminHomeScreen(
             Log.d("AdminHomeScreen", "Buses Running: $busesRunning")
             Log.d("AdminHomeScreen", "Students Onboard: $studentsOnboard")
             
+            isLoading = false
+        } catch (e: Exception) {
+            Log.e("AdminHomeScreen", "Failed to load dashboard data", e)
             isLoading = false
         }
     }

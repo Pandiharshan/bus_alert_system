@@ -47,10 +47,15 @@ fun BusDatabaseScreen(
     // Load buses from Firestore
     fun loadBuses() {
         scope.launch {
-            isLoading = true
-            buses = FirebaseManager.getAllBuses()
-            Log.d("BusDatabaseScreen", "Loaded ${buses.size} buses")
-            isLoading = false
+            try {
+                isLoading = true
+                buses = FirebaseManager.getAllBuses()
+                Log.d("BusDatabaseScreen", "Loaded ${buses.size} buses")
+            } catch (e: Exception) {
+                Log.e("BusDatabaseScreen", "Failed to load buses", e)
+            } finally {
+                isLoading = false
+            }
         }
     }
     
