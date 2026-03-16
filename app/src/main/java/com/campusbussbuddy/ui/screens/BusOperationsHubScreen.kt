@@ -1,8 +1,7 @@
-﻿package com.campusbussbuddy.ui.screens
+package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
@@ -15,7 +14,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
@@ -25,6 +23,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.components.*
 
 @Composable
 fun BusOperationsHubScreen(
@@ -46,15 +45,18 @@ fun BusOperationsHubScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
-                // Top Bar
-                BusOperationsTopBar(onBackClick = onLogoutClick)
+                // Top Bar (reusable component)
+                TopBarLayout(
+                    title = "Bus Operations",
+                    onBackClick = onLogoutClick
+                )
                 
                 // Main Content
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 20.dp)
-                        .padding(bottom = 90.dp), // Add bottom padding for fixed footer
+                        .padding(bottom = 90.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Spacer(modifier = Modifier.height(16.dp))
@@ -68,11 +70,23 @@ fun BusOperationsHubScreen(
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Stats Cards Row
-                    BusOperationsStatsCardsRow(
-                        totalMembers = totalMembers,
-                        presentToday = presentToday
-                    )
+                    // Stats Cards Row (reusable stat cards)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        StatCard(
+                            value = totalMembers.toString(),
+                            label = "TOTAL MEMBERS",
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        StatCard(
+                            value = presentToday.toString(),
+                            label = "PRESENT TODAY",
+                            modifier = Modifier.weight(1f)
+                        )
+                    }
                     
                     Spacer(modifier = Modifier.height(32.dp))
                     
@@ -86,62 +100,65 @@ fun BusOperationsHubScreen(
                     
                     Spacer(modifier = Modifier.height(32.dp))
                     
-                    // Management Cards
-                    BusOperationsManagementCards()
+                    // Management Cards (reusable glass list cards)
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        BusOperationsManagementCard(
+                            icon = R.drawable.ic_group,
+                            title = "Members List",
+                            modifier = Modifier.weight(1f),
+                            onClick = { /* TODO: Navigate to members list */ }
+                        )
+                        
+                        BusOperationsManagementCard(
+                            icon = R.drawable.ic_directions_bus_vector,
+                            title = "Bus Profile",
+                            modifier = Modifier.weight(1f),
+                            onClick = { /* TODO: Navigate to bus profile */ }
+                        )
+                    }
                     
                     Spacer(modifier = Modifier.height(24.dp))
                 }
             }
             
-            // Fixed Bottom Navigation
+            // Fixed Bottom Navigation (reusable component)
             Box(
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .fillMaxWidth()
                     .background(Color.Transparent)
             ) {
-                BusOperationsBottomNavigationBar(onMembersClick = onMembersClick)
+                BottomNavBar {
+                    BottomNavItem(
+                        icon = R.drawable.ic_home,
+                        label = "HOME",
+                        isSelected = true,
+                        onClick = { }
+                    )
+                    
+                    BottomNavItem(
+                        icon = R.drawable.ic_group,
+                        label = "MEMBERS",
+                        onClick = onMembersClick
+                    )
+                    
+                    BottomNavItem(
+                        icon = R.drawable.ic_map,
+                        label = "ROUTES",
+                        onClick = { }
+                    )
+                    
+                    BottomNavItem(
+                        icon = R.drawable.ic_settings,
+                        label = "SETTINGS",
+                        onClick = { }
+                    )
+                }
             }
         }
-    }
-}
-
-@Composable
-private fun BusOperationsTopBar(onBackClick: () -> Unit) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2C3E3E),
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        Text(
-            text = "Bus Operations",
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A),
-            textAlign = TextAlign.Center
-        )
-        
-        Spacer(modifier = Modifier.weight(1f))
-        
-        // Placeholder for symmetry
-        Spacer(modifier = Modifier.size(40.dp))
     }
 }
 
@@ -189,11 +206,9 @@ private fun BusOperationsDriverProfileSection(
         Column(
             modifier = Modifier.weight(1f)
         ) {
-            Text(
+            SectionTitle(
                 text = driverName,
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A)
+                fontSize = 18
             )
             
             Text(
@@ -201,84 +216,6 @@ private fun BusOperationsDriverProfileSection(
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Normal,
                 color = Color(0xFF4A5F5F)
-            )
-        }
-    }
-}
-
-@Composable
-private fun BusOperationsStatsCardsRow(
-    totalMembers: Int,
-    presentToday: Int
-) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Total Members Card
-        BusOperationsStatsCard(
-            title = "TOTAL MEMBERS",
-            value = totalMembers.toString(),
-            modifier = Modifier.weight(1f)
-        )
-        
-        // Present Today Card
-        BusOperationsStatsCard(
-            title = "PRESENT TODAY",
-            value = presentToday.toString(),
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
-
-@Composable
-private fun BusOperationsStatsCard(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(100.dp)
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.25f)
-        ),
-        border = BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.30f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = title,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4A5F5F),
-                letterSpacing = 0.5.sp,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            Text(
-                text = value,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A),
-                textAlign = TextAlign.Center
             )
         }
     }
@@ -370,65 +307,20 @@ private fun BusOperationsRouteInformation(routeInfo: String) {
 }
 
 @Composable
-private fun BusOperationsManagementCards() {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(16.dp)
-    ) {
-        // Members List Card
-        BusOperationsManagementCard(
-            icon = R.drawable.ic_group,
-            title = "Members List",
-            modifier = Modifier.weight(1f),
-            onClick = { /* TODO: Navigate to members list */ }
-        )
-        
-        // Bus Profile Card
-        BusOperationsManagementCard(
-            icon = R.drawable.ic_directions_bus_vector,
-            title = "Bus Profile",
-            modifier = Modifier.weight(1f),
-            onClick = { /* TODO: Navigate to bus profile */ }
-        )
-    }
-}
-
-@Composable
 private fun BusOperationsManagementCard(
     icon: Int,
     title: String,
     modifier: Modifier = Modifier,
     onClick: () -> Unit = {}
 ) {
-    Card(
-        modifier = modifier
-            .height(120.dp)
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    color = Color(0xFF6B9A92).copy(alpha = 0.2f),
-                    bounded = true
-                )
-            ) { onClick() },
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.25f)
-        ),
-        border = BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.30f)
-        )
+    GlassListCard(
+        modifier = modifier.height(120.dp),
+        onClick = onClick
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(16.dp),
+                .padding(0.dp),
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -449,110 +341,5 @@ private fun BusOperationsManagementCard(
                 textAlign = TextAlign.Center
             )
         }
-    }
-}
-
-@Composable
-private fun BusOperationsBottomNavigationBar(onMembersClick: () -> Unit = {}) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 20.dp)
-            .padding(bottom = 24.dp)
-    ) {
-        Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .shadow(
-                    elevation = 8.dp,
-                    shape = RoundedCornerShape(35.dp),
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
-                ),
-            shape = RoundedCornerShape(35.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = Color.White.copy(alpha = 0.25f)
-            ),
-            border = BorderStroke(
-                1.dp,
-                Color.White.copy(alpha = 0.30f)
-            )
-        ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 24.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                BusOperationsBottomNavItem(
-                    icon = R.drawable.ic_home,
-                    label = "HOME",
-                    isSelected = true,
-                    onClick = { }
-                )
-                
-                BusOperationsBottomNavItem(
-                    icon = R.drawable.ic_group,
-                    label = "MEMBERS",
-                    isSelected = false,
-                    onClick = onMembersClick
-                )
-                
-                BusOperationsBottomNavItem(
-                    icon = R.drawable.ic_map,
-                    label = "ROUTES",
-                    isSelected = false,
-                    onClick = { }
-                )
-                
-                BusOperationsBottomNavItem(
-                    icon = R.drawable.ic_settings,
-                    label = "SETTINGS",
-                    isSelected = false,
-                    onClick = { }
-                )
-            }
-        }
-    }
-}
-
-@Composable
-private fun BusOperationsBottomNavItem(
-    icon: Int,
-    label: String,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = false,
-                    radius = 24.dp,
-                    color = Color(0xFF6B9A92).copy(alpha = 0.2f)
-                )
-            ) { onClick() }
-            .padding(8.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = icon),
-            contentDescription = label,
-            tint = if (isSelected) Color(0xFF2A2A2A) else Color(0xFF4A5F5F),
-            modifier = Modifier.size(20.dp)
-        )
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        Text(
-            text = label,
-            fontSize = 9.sp,
-            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) Color(0xFF2A2A2A) else Color(0xFF4A5F5F),
-            letterSpacing = 0.5.sp
-        )
     }
 }

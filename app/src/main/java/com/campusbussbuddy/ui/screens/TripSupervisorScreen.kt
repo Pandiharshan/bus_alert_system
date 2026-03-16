@@ -25,6 +25,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.components.*
 
 @Composable
 fun TripSupervisorScreen(
@@ -117,96 +118,27 @@ private fun TopBar(
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
         // Back Button
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = CircleShape,
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
-                )
-                .background(
-                    Color.White.copy(alpha = 0.25f),
-                    CircleShape
-                )
-                .border(
-                    1.dp,
-                    Color.White.copy(alpha = 0.30f),
-                    CircleShape
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(
-                        bounded = true,
-                        color = Color.White.copy(0.20f)
-                    )
-                ) { onBackClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2A2A2A),
-                modifier = Modifier.size(24.dp)
-            )
-        }
+        BackButtonCircle(onBackClick = onBackClick)
         
         // Title Section
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(
+            SectionTitle(
                 text = "Trip Supervisor",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A)
+                fontSize = 18
             )
             
-            Text(
-                text = "LIVE CONSOLE",
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4A5F5F),
-                letterSpacing = 1.sp
-            )
+            SectionSubtitle(text = "LIVE CONSOLE")
         }
         
         // Location Button
-        Box(
-            modifier = Modifier
-                .size(48.dp)
-                .shadow(
-                    elevation = 4.dp,
-                    shape = CircleShape,
-                    ambientColor = Color.Black.copy(alpha = 0.08f),
-                    spotColor = Color.Black.copy(alpha = 0.08f)
-                )
-                .background(
-                    Color.White.copy(alpha = 0.25f),
-                    CircleShape
-                )
-                .border(
-                    1.dp,
-                    Color.White.copy(alpha = 0.30f),
-                    CircleShape
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = rememberRipple(
-                        bounded = true,
-                        color = Color.White.copy(0.20f)
-                    )
-                ) { onLocationClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_my_location),
-                contentDescription = "Location",
-                tint = Color(0xFF4CAF50),
-                modifier = Modifier.size(24.dp)
-            )
-        }
+        ActionButtonCircle(
+            iconRes = R.drawable.ic_my_location,
+            contentDescription = "Location",
+            onClick = onLocationClick,
+            iconTint = Color(0xFF4CAF50)
+        )
     }
 }
 
@@ -351,59 +283,11 @@ private fun TripStatusTabs(
 ) {
     val tabs = listOf("PAST", "CURRENT", "UPCOMING")
     
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.25f)
-        ),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.30f)
-        )
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(4.dp)
-        ) {
-            tabs.forEach { tab ->
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(40.dp)
-                        .background(
-                            if (selectedTab == tab) Color.White.copy(alpha = 0.8f)
-                            else Color.Transparent,
-                            RoundedCornerShape(16.dp)
-                        )
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple(
-                                bounded = true,
-                                color = Color(0xFF6B9A92).copy(alpha = 0.2f)
-                            )
-                        ) { onTabSelected(tab) },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = tab,
-                        fontSize = 12.sp,
-                        fontWeight = if (selectedTab == tab) FontWeight.Bold else FontWeight.Normal,
-                        color = if (selectedTab == tab) Color(0xFF2A2A2A) else Color(0xFF4A5F5F),
-                        letterSpacing = 0.5.sp
-                    )
-                }
-            }
-        }
-    }
+    AnimatedTabSelector(
+        tabs = tabs,
+        selectedTab = selectedTab,
+        onTabSelected = onTabSelected
+    )
 }
 
 @Composable
@@ -414,279 +298,117 @@ private fun CurrentStopCard(
     attendanceGoal: Int,
     currentProgress: Int
 ) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            ),
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.25f)
-        ),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.30f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+    GlassCardContainer {
+        // Active Stop Header
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Active Stop Header
+            StatusIndicator(
+                text = "ACTIVE STOP",
+                dotColor = Color(0xFF4CAF50)
+            )
+            
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(
+                        Color(0xFF4CAF50),
+                        CircleShape
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_pin_drop),
+                    contentDescription = "Location",
+                    tint = Color.White,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(12.dp))
+        
+        // Stop Name
+        SectionTitle(
+            text = stopName,
+            fontSize = 24
+        )
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        // Stats Row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(16.dp)
+        ) {
+            // Boarded Here
+            StatCard(
+                value = boardedHere.toString(),
+                label = "BOARDED HERE",
+                valueColor = Color(0xFF4CAF50),
+                modifier = Modifier.weight(1f)
+            )
+            
+            // Total Onboard
+            StatCard(
+                value = totalOnboard.toString(),
+                label = "TOTAL ONBOARD",
+                valueColor = Color(0xFF2A2A2A),
+                modifier = Modifier.weight(1f)
+            )
+        }
+        
+        Spacer(modifier = Modifier.height(20.dp))
+        
+        // Attendance Goal Section
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(8.dp)
-                            .background(
-                                Color(0xFF4CAF50),
-                                CircleShape
-                            )
-                    )
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    Text(
-                        text = "ACTIVE STOP",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A5F5F),
-                        letterSpacing = 1.sp
-                    )
-                }
+                SectionSubtitle(text = "ATTENDANCE GOAL")
                 
-                Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(
-                            Color(0xFF4CAF50),
-                            CircleShape
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_pin_drop),
-                        contentDescription = "Location",
-                        tint = Color.White,
-                        modifier = Modifier.size(20.dp)
-                    )
-                }
+                SectionSubtitle(text = "$currentProgress% REACHED")
             }
             
-            Spacer(modifier = Modifier.height(12.dp))
+            Spacer(modifier = Modifier.height(8.dp))
             
-            // Stop Name
-            Text(
-                text = stopName,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A),
-                lineHeight = 28.sp
+            // Progress Bar
+            RoundedProgressBar(
+                progress = currentProgress / 100f
             )
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            // Stats Row
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                // Boarded Here
-                StopStatsCard(
-                    value = boardedHere.toString(),
-                    label = "BOARDED HERE",
-                    valueColor = Color(0xFF4CAF50),
-                    modifier = Modifier.weight(1f)
-                )
-                
-                // Total Onboard
-                StopStatsCard(
-                    value = totalOnboard.toString(),
-                    label = "TOTAL ONBOARD",
-                    valueColor = Color(0xFF2A2A2A),
-                    modifier = Modifier.weight(1f)
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(20.dp))
-            
-            // Attendance Goal Section
-            Column {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "ATTENDANCE GOAL",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A5F5F),
-                        letterSpacing = 1.sp
-                    )
-                    
-                    Text(
-                        text = "$currentProgress% REACHED",
-                        fontSize = 11.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF4A5F5F),
-                        letterSpacing = 1.sp
-                    )
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                // Progress Bar
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .background(
-                            Color.White.copy(alpha = 0.3f),
-                            RoundedCornerShape(4.dp)
-                        )
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth(currentProgress / 100f)
-                            .fillMaxHeight()
-                            .background(
-                                Color(0xFF4CAF50),
-                                RoundedCornerShape(4.dp)
-                            )
-                    )
-                }
-            }
         }
     }
 }
 
-@Composable
-private fun StopStatsCard(
-    value: String,
-    label: String,
-    valueColor: Color,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .height(80.dp)
-            .shadow(
-                elevation = 4.dp,
-                shape = RoundedCornerShape(16.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            ),
-        shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.4f)
-        ),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.50f)
-        )
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(12.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = value,
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = valueColor,
-                textAlign = TextAlign.Center
-            )
-            
-            Spacer(modifier = Modifier.height(4.dp))
-            
-            Text(
-                text = label,
-                fontSize = 9.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF4A5F5F),
-                letterSpacing = 0.5.sp,
-                textAlign = TextAlign.Center
-            )
-        }
-    }
-}
+
 
 @Composable
 private fun AttendancePortalCard() {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(24.dp),
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    bounded = true,
-                    color = Color(0xFF6B9A92).copy(alpha = 0.2f)
-                )
-            ) { /* TODO: Open attendance portal */ },
-        shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color.White.copy(alpha = 0.25f)
-        ),
-        border = androidx.compose.foundation.BorderStroke(
-            1.dp,
-            Color.White.copy(alpha = 0.30f)
-        )
+    GlassCardContainer(
+        onClick = { /* TODO: Open attendance portal */ }
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
+            modifier = Modifier.fillMaxWidth(),
             verticalAlignment = Alignment.CenterVertically
         ) {
             // QR Code Icon
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .background(
-                        Color.White.copy(alpha = 0.8f),
-                        RoundedCornerShape(12.dp)
-                    ),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_qr_code),
-                    contentDescription = "QR Code",
-                    tint = Color(0xFF2A2A2A),
-                    modifier = Modifier.size(32.dp)
-                )
-            }
+            IconContainer(
+                iconRes = R.drawable.ic_qr_code,
+                contentDescription = "QR Code"
+            )
             
             Spacer(modifier = Modifier.width(16.dp))
             
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                Text(
+                SectionTitle(
                     text = "Attendance Portal",
-                    fontSize = 16.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A1A)
+                    fontSize = 16
                 )
                 
                 Spacer(modifier = Modifier.height(4.dp))
@@ -701,12 +423,9 @@ private fun AttendancePortalCard() {
                 
                 Spacer(modifier = Modifier.height(8.dp))
                 
-                Text(
+                TextBadge(
                     text = "SCAN ACTIVE",
-                    fontSize = 10.sp,
-                    fontWeight = FontWeight.Bold,
-                    color = Color(0xFF4CAF50),
-                    letterSpacing = 1.sp
+                    backgroundColor = Color(0xFF4CAF50)
                 )
             }
         }
@@ -715,39 +434,9 @@ private fun AttendancePortalCard() {
 
 @Composable
 private fun CompleteTripButton(onClick: () -> Unit) {
-    Button(
+    PrimaryActionButton(
+        text = "Complete Trip",
         onClick = onClick,
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = RoundedCornerShape(28.dp)
-            ),
-        shape = RoundedCornerShape(28.dp),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Color(0xFF4CAF50),
-            contentColor = Color.White
-        )
-    ) {
-        Row(
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_check_circle),
-                contentDescription = "Complete",
-                modifier = Modifier.size(24.dp)
-            )
-            
-            Spacer(modifier = Modifier.width(12.dp))
-            
-            Text(
-                text = "Complete Trip",
-                fontSize = 18.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+        iconRes = R.drawable.ic_check_circle
+    )
 }

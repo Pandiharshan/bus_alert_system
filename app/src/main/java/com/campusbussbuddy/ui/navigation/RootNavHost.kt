@@ -12,6 +12,7 @@ import com.campusbussbuddy.ui.screens.BusOperationsHubScreen
 import com.campusbussbuddy.ui.screens.TripSupervisorScreen
 import com.campusbussbuddy.ui.screens.BusStopDetailsScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
+import com.campusbussbuddy.ui.screens.DriverSettingsScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
 import com.campusbussbuddy.ui.screens.AddDriverScreen
 import com.campusbussbuddy.ui.screens.AddStudentScreen
@@ -66,6 +67,17 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onSettingsClick = {
+                    navController.navigate(Destinations.DRIVER_SETTINGS)
+                }
+            )
+        }
+        
+        composable(Destinations.DRIVER_SETTINGS) {
+            DriverSettingsScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

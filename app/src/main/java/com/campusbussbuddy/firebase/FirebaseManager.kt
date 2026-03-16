@@ -278,7 +278,9 @@ object FirebaseManager {
                 phone = driverDoc.getString("phone") ?: "",
                 photoUrl = driverDoc.getString("photoUrl") ?: "",
                 assignedBusId = driverDoc.getString("assignedBusId") ?: "",
-                isActive = driverDoc.getBoolean("isActive") ?: false
+                isActive = driverDoc.getBoolean("isActive") ?: false,
+                shift = driverDoc.getString("shift") ?: "",
+                routeName = driverDoc.getString("routeName") ?: ""
             )
             
             Log.d("FirebaseManager", "Driver info loaded: ${driverInfo.name}, Bus: ${driverInfo.assignedBusId}")
@@ -421,7 +423,9 @@ object FirebaseManager {
                     phone = driverDoc.getString("phone") ?: "",
                     photoUrl = photoUrl,
                     assignedBusId = driverDoc.getString("assignedBusId") ?: "",
-                    isActive = driverDoc.getBoolean("isActive") ?: false
+                    isActive = driverDoc.getBoolean("isActive") ?: false,
+                    shift = driverDoc.getString("shift") ?: "",
+                    routeName = driverDoc.getString("routeName") ?: ""
                 )
             } else {
                 Log.w("FirebaseManager", "Driver document not found for UID: ${currentUser.uid}")
@@ -430,6 +434,74 @@ object FirebaseManager {
         } catch (e: Exception) {
             Log.e("FirebaseManager", "Get driver info failed", e)
             null
+        }
+    }
+    
+    /**
+     * Update driver profile (name and phone) in Firestore.
+     * Also updates activeDriverName on the assigned bus if the driver is active.
+     * This ensures sync across Driver App, Student App, and Admin Panel.
+     * @param uid Driver UID
+     * @param name Updated driver name
+     * @param phone Updated phone number
+     * @return DriverResult with success/error
+     */
+    suspend fun updateDriverProfile(uid: String, name: String, phone: String): DriverResult {
+        return try {
+            Log.d("FirebaseManager", "Updating driver profile for UID: $uid")
+            
+            val updateData = hashMapOf<String, Any>(
+                "name" to name.trim(),
+                "phone" to phone.trim()
+            )
+            
+            // Update driver document
+            firestore.collection("drivers").document(uid).update(updateData).await()
+            
+            // If driver is active on a bus, also update the bus document
+            // so students and admin see the latest name/phone
+            val driverDoc = firestore.collection("drivers").document(uid).get().await()
+            val assignedBusId = driverDoc.getString("assignedBusId") ?: ""
+            val isActive = driverDoc.getBoolean("isActive") ?: false
+            
+            if (isActive && assignedBusId.isNotEmpty()) {
+                val busUpdate = hashMapOf<String, Any>(
+                    "activeDriverName" to name.trim(),
+                    "activeDriverPhone" to phone.trim()
+                )
+                firestore.collection("buses").document(assignedBusId).update(busUpdate).await()
+                Log.d("FirebaseManager", "Also updated active bus driver info")
+            }
+            
+            Log.d("FirebaseManager", "Driver profile updated successfully")
+            DriverResult.Success("Profile updated successfully", uid)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Update driver profile failed", e)
+            DriverResult.Error("Failed to update profile: ${e.message}")
+        }
+    }
+    
+    /**
+     * Change the current driver's password using FirebaseAuth.
+     * @param newPassword New password (minimum 6 characters)
+     * @return DriverResult with success/error
+     */
+    suspend fun changeDriverPassword(newPassword: String): DriverResult {
+        return try {
+            val currentUser = auth.currentUser
+                ?: return DriverResult.Error("No user is currently signed in")
+            
+            if (newPassword.length < 6) {
+                return DriverResult.Error("Password must be at least 6 characters")
+            }
+            
+            currentUser.updatePassword(newPassword).await()
+            
+            Log.d("FirebaseManager", "Password changed successfully")
+            DriverResult.Success("Password changed successfully", currentUser.uid)
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Change password failed", e)
+            DriverResult.Error(getErrorMessage(e))
         }
     }
     
@@ -512,7 +584,9 @@ object FirebaseManager {
                         phone = doc.getString("phone") ?: "",
                         photoUrl = doc.getString("photoUrl") ?: "",
                         assignedBusId = doc.getString("assignedBusId") ?: "",
-                        isActive = doc.getBoolean("isActive") ?: false
+                        isActive = doc.getBoolean("isActive") ?: false,
+                        shift = doc.getString("shift") ?: "",
+                        routeName = doc.getString("routeName") ?: ""
                     )
                 } catch (e: Exception) {
                     null
@@ -1077,7 +1151,9 @@ data class DriverInfo(
     val phone: String,
     val photoUrl: String,
     val assignedBusId: String,
-    val isActive: Boolean
+    val isActive: Boolean,
+    val shift: String = "",
+    val routeName: String = ""
 )
 
 /**

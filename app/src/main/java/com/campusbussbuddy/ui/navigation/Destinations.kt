@@ -18,4 +18,5 @@ object Destinations {
     const val MANAGE_DRIVERS = "manage_drivers"
     const val MANAGE_BUSES = "manage_buses"
     const val MANAGE_STUDENTS = "manage_students"
+    const val DRIVER_SETTINGS = "driver_settings"
 }

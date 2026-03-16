@@ -1,4 +1,4 @@
-﻿package com.campusbussbuddy.ui.screens
+package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.BorderStroke

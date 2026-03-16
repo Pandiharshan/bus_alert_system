@@ -1,4 +1,4 @@
-﻿package com.campusbussbuddy.ui.screens
+package com.campusbussbuddy.ui.screens
 
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult

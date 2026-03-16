@@ -1,16 +1,13 @@
-﻿package com.campusbussbuddy.ui.screens
+package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -29,6 +26,7 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusAuthResult
 import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.components.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -54,45 +52,12 @@ fun BusAssignmentLoginScreen(
         ) {
             Spacer(modifier = Modifier.height(40.dp))
             
-            // Back Button - Top Left
+            // Back Button - Top Left (reusable component)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start
             ) {
-                Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .shadow(
-                            elevation = 4.dp,
-                            shape = CircleShape,
-                            ambientColor = Color.Black.copy(alpha = 0.08f),
-                            spotColor = Color.Black.copy(alpha = 0.08f)
-                        )
-                        .background(
-                            Color.White.copy(alpha = 0.25f),
-                            CircleShape
-                        )
-                        .border(
-                            1.dp,
-                            Color.White.copy(alpha = 0.30f),
-                            CircleShape
-                        )
-                        .clickable(
-                            interactionSource = remember { MutableInteractionSource() },
-                            indication = rememberRipple(
-                                bounded = true,
-                                color = Color.White.copy(0.20f)
-                            )
-                        ) { onBackClick() },
-                    contentAlignment = Alignment.Center
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_chevron_left),
-                        contentDescription = "Back",
-                        tint = Color(0xFF2A2A2A),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                BackButtonCircle(onBackClick = onBackClick)
             }
             
             Spacer(modifier = Modifier.height(80.dp))
@@ -129,13 +94,9 @@ fun BusAssignmentLoginScreen(
             Spacer(modifier = Modifier.height(32.dp))
             
             // Title
-            Text(
+            SectionTitle(
                 text = "Bus Assignment Login",
-                fontSize = 28.sp,
-                fontWeight = FontWeight.Bold,
-                color = Color(0xFF1A1A1A),
-                textAlign = TextAlign.Center,
-                letterSpacing = (-0.5).sp
+                fontSize = 28
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -152,29 +113,10 @@ fun BusAssignmentLoginScreen(
             
             Spacer(modifier = Modifier.height(40.dp))
             
-            // Login Card
-            Card(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .shadow(
-                        elevation = 12.dp,
-                        shape = RoundedCornerShape(28.dp),
-                        ambientColor = Color.Black.copy(alpha = 0.08f),
-                        spotColor = Color.Black.copy(alpha = 0.08f)
-                    ),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.22f)
-                ),
-                border = androidx.compose.foundation.BorderStroke(
-                    1.dp,
-                    Color.White.copy(alpha = 0.30f)
-                )
-            ) {
+            // Login Card (reusable glass card)
+            GlassCardContainer {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(24.dp),
+                    modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     // Bus Number Field
@@ -219,12 +161,13 @@ fun BusAssignmentLoginScreen(
                     
                     Spacer(modifier = Modifier.height(24.dp))
                     
-                    // Enter Bus Button
-                    Button(
+                    // Enter Bus Button (reusable action button)
+                    PrimaryActionButton(
+                        text = if (isLoading) "" else "Enter Bus",
                         onClick = {
                             if (busNumber.isBlank() || busPassword.isBlank()) {
                                 errorMessage = "Please fill in all fields"
-                                return@Button
+                                return@PrimaryActionButton
                             }
                             
                             scope.launch {
@@ -249,31 +192,17 @@ fun BusAssignmentLoginScreen(
                                     }
                                 }
                             }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        shape = RoundedCornerShape(28.dp),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = Color(0xFF4CAF50),
-                            disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.5f)
-                        ),
-                        enabled = !isLoading
-                    ) {
-                        if (isLoading) {
-                            CircularProgressIndicator(
-                                modifier = Modifier.size(20.dp),
-                                color = Color.White,
-                                strokeWidth = 2.dp
-                            )
-                        } else {
-                            Text(
-                                text = "Enter Bus",
-                                fontSize = 17.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = Color.White
-                            )
                         }
+                    )
+                    
+                    // Show loading indicator over the button when loading
+                    if (isLoading) {
+                        Spacer(modifier = Modifier.height(8.dp))
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(20.dp),
+                            color = Color(0xFF4CAF50),
+                            strokeWidth = 2.dp
+                        )
                     }
                 }
             }
