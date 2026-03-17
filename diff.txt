@@ -1,0 +1,837 @@
+﻿diff --git a/app/src/main/java/com/campusbussbuddy/ui/screens/UnifiedLoginScreen.kt b/app/src/main/java/com/campusbussbuddy/ui/screens/UnifiedLoginScreen.kt
+index 2aa0709..b2e5691 100644
+--- a/app/src/main/java/com/campusbussbuddy/ui/screens/UnifiedLoginScreen.kt
++++ b/app/src/main/java/com/campusbussbuddy/ui/screens/UnifiedLoginScreen.kt
+@@ -49,8 +49,7 @@ enum class LoginRole {
+     STUDENT, DRIVER, ADMIN
+ }
+ 
+-// Using Glassmorphism Design Tokens from theme
+-
++// ΓöÇΓöÇΓöÇ Unified Login Screen ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ @Composable
+ fun UnifiedLoginScreen(
+     onStudentLoginSuccess: () -> Unit,
+@@ -63,10 +62,10 @@ fun UnifiedLoginScreen(
+     var showAppInfoDialog by remember { mutableStateOf(false) }
+ 
+     Box(
+-        modifier = Modifier.fillMaxSize().background(NeumorphBgPrimary)
++        modifier = Modifier
++            .fillMaxSize()
++            .background(NeumorphBgPrimary)
+     ) {
+-        // No overlay needed - background gradient is perfect
+-
+         MainContent(
+             selectedRole          = selectedRole,
+             onRoleChange          = { selectedRole = it },
+@@ -85,8 +84,7 @@ fun UnifiedLoginScreen(
+ }
+ 
+ // ΓöÇΓöÇΓöÇ Main Content ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+-// ONLY CHANGE: pill drawn on top of card (overlaps card top edge, centered)
+-// Everything else (bottom pills, scroll) untouched.
++// Pill overlaps card top edge (centered), card offset 18dp down.
+ @Composable
+ private fun MainContent(
+     selectedRole: LoginRole,
+@@ -105,32 +103,32 @@ private fun MainContent(
+             .padding(horizontal = 24.dp),
+         horizontalAlignment = Alignment.CenterHorizontally
+     ) {
+-        Spacer(modifier = Modifier.height(32.dp))   // top-8 = 32dp
++        Spacer(modifier = Modifier.height(48.dp))
+ 
+-        // ΓöÇΓöÇ Pill + Card layered: pill sits on top of card at top-center ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++        // ΓöÇΓöÇ Pill + Card layered ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+         Box(
+             modifier         = Modifier.fillMaxWidth(),
+             contentAlignment = Alignment.TopCenter
+         ) {
+-            // Card is offset 18dp down (half pill height ~36dp)
+-            // so pill center aligns exactly with card top edge
++            // Card offset 18dp down so pill center aligns with card top edge
+             Box(modifier = Modifier.padding(top = 18.dp)) {
+                 DynamicLoginCard(
+                     selectedRole          = selectedRole,
+                     onRoleChange          = onRoleChange,
+                     onStudentLoginSuccess = onStudentLoginSuccess,
+                     onDriverLoginSuccess  = onDriverLoginSuccess,
+-                    onAdminLoginSuccess   = onAdminLoginSuccess
++                    onAdminLoginSuccess   = onAdminLoginSuccess,
++                    onAppInfoClick        = onAppInfoClick
+                 )
+             }
+ 
+-            // Pill rendered LAST = drawn on top of card, perfectly centered
++            // Pill drawn on top, perfectly centered at card top edge
+             AppLabelPill(onAppInfoClick)
+         }
+ 
+-        Spacer(modifier = Modifier.height(24.dp))
++        Spacer(modifier = Modifier.height(28.dp))
+ 
+-        // ΓöÇΓöÇ Bottom Nav Pills ΓÇö UNTOUCHED ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++        // ΓöÇΓöÇ Bottom Nav Pills ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+         Row(
+             horizontalArrangement = Arrangement.spacedBy(12.dp),
+             verticalAlignment     = Alignment.CenterVertically
+@@ -140,28 +138,24 @@ private fun MainContent(
+             BottomPill("ABOUT")   { onAppInfoClick() }
+         }
+ 
+-        Spacer(modifier = Modifier.height(24.dp))
++        Spacer(modifier = Modifier.height(32.dp))
+     }
+ }
+ 
+ // ΓöÇΓöÇΓöÇ App Label Pill ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++// Design: text on LEFT, icon circle on RIGHT
+ @Composable
+ private fun AppLabelPill(onClick: () -> Unit) {
+     Row(
+         modifier = Modifier
+-            .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
+-            .background(NeumorphSurface, RoundedCornerShape(20.dp))
++            .neumorphic(cornerRadius = 28.dp, elevation = 5.dp, blur = 10.dp)
++            .background(NeumorphSurface, RoundedCornerShape(28.dp))
+             .bounceClick { onClick() }
+-            .padding(horizontal = 20.dp, vertical = 8.dp),
++            .padding(start = 20.dp, end = 6.dp, top = 6.dp, bottom = 6.dp),
+         verticalAlignment     = Alignment.CenterVertically,
+-        horizontalArrangement = Arrangement.spacedBy(8.dp)
++        horizontalArrangement = Arrangement.spacedBy(12.dp)
+     ) {
+-        Icon(
+-            painter           = painterResource(id = R.drawable.ic_directions_bus_vector),
+-            contentDescription = null,
+-            tint              = NeumorphTextSecondary,
+-            modifier          = Modifier.size(18.dp)
+-        )
++        // App name ΓÇö left side
+         Text(
+             text          = "Campus Bus Buddy",
+             fontSize      = 14.sp,
+@@ -169,6 +163,22 @@ private fun AppLabelPill(onClick: () -> Unit) {
+             color         = NeumorphTextPrimary,
+             letterSpacing = (-0.3).sp
+         )
++
++        // Icon in raised circle ΓÇö right side
++        Box(
++            modifier = Modifier
++                .size(42.dp)
++                .neumorphic(cornerRadius = 21.dp, elevation = 4.dp, blur = 8.dp)
++                .background(NeumorphSurface, CircleShape),
++            contentAlignment = Alignment.Center
++        ) {
++            Icon(
++                painter            = painterResource(id = R.drawable.ic_directions_bus_vector),
++                contentDescription = null,
++                tint               = NeumorphTextSecondary,
++                modifier           = Modifier.size(20.dp)
++            )
++        }
+     }
+ }
+ 
+@@ -180,7 +190,7 @@ private fun BottomPill(label: String, onClick: () -> Unit) {
+             .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
+             .background(NeumorphSurface, RoundedCornerShape(20.dp))
+             .bounceClick { onClick() }
+-            .padding(horizontal = 16.dp, vertical = 8.dp)
++            .padding(horizontal = 18.dp, vertical = 9.dp)
+     ) {
+         Text(
+             text          = label,
+@@ -199,7 +209,8 @@ private fun DynamicLoginCard(
+     onRoleChange: (LoginRole) -> Unit,
+     onStudentLoginSuccess: () -> Unit,
+     onDriverLoginSuccess: () -> Unit,
+-    onAdminLoginSuccess: () -> Unit
++    onAdminLoginSuccess: () -> Unit,
++    onAppInfoClick: () -> Unit
+ ) {
+     var username          by remember { mutableStateOf("") }
+     var password          by remember { mutableStateOf("") }
+@@ -217,112 +228,68 @@ private fun DynamicLoginCard(
+             LoginRole.STUDENT -> RoleData(
+                 icon          = R.drawable.ic_student,
+                 title         = "Student Login",
+-                subtitle      = "",  // removed caption
++                subtitle      = "Welcome to the Campus Bus Buddy",
+                 usernameLabel = "Username",
+-                isImage       = false  // use as icon, not image
++                isImage       = false
+             )
+             LoginRole.DRIVER  -> RoleData(
+                 icon          = R.drawable.driver_login,
+                 title         = "Driver Login",
+-                subtitle      = "",  // removed caption
++                subtitle      = "Welcome back, Driver",
+                 usernameLabel = "Driver Username",
+                 isImage       = true
+             )
+             LoginRole.ADMIN   -> RoleData(
+                 icon          = R.drawable.admin_panel,
+                 title         = "Admin Login",
+-                subtitle      = "",  // removed caption
++                subtitle      = "Admin Control Panel",
+                 usernameLabel = "Admin Username",
+-                isImage       = false  // use as icon, not image
++                isImage       = false
+             )
+         }
+     }
+ 
+-    // ΓöÇΓöÇ Card Shell: floating neumorphic card with soft shadows ΓöÇΓöÇ
++    // ΓöÇΓöÇ Card Shell ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+     Box(
+         modifier = Modifier
+-            .fillMaxWidth(0.92f)
+-            .neumorphic(cornerRadius = NeumorphCardRadius)
++            .fillMaxWidth(0.94f)
++            .neumorphic(cornerRadius = NeumorphCardRadius, elevation = 8.dp, blur = 16.dp)
+             .background(NeumorphSurface, RoundedCornerShape(NeumorphCardRadius))
+     ) {
+         Column(
+             modifier = Modifier
+                 .fillMaxWidth()
+-                .padding(top = 32.dp, bottom = 28.dp, start = 24.dp, end = 24.dp),
++                .padding(top = 40.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
+             horizontalAlignment = Alignment.CenterHorizontally
+         ) {
+ 
+-            // ΓöÇΓöÇ Profile Icon Circle + Teal Dot Indicator ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+-            // Dot: -bottom-1 in Tailwind = overlaps circle bottom by 4px.
+-            // Use Box with contentAlignment BottomCenter + offset(y = 4.dp) on dot.
+-            AnimatedContent(
+-                targetState = roleData,
+-                transitionSpec = {
+-                    fadeIn(tween(300)) + scaleIn(initialScale = 0.85f, animationSpec = tween(300)) togetherWith
+-                    fadeOut(tween(200)) + scaleOut(targetScale = 0.85f, animationSpec = tween(200))
+-                },
+-                label = "role_icon"
+-            ) { data ->
+-                Box(
+-                    contentAlignment = Alignment.BottomCenter,
+-                    modifier         = Modifier.wrapContentSize()
+-                ) {
+-                    Box(
+-                        modifier = Modifier
+-                            .size(96.dp)
+-                            .neumorphic(cornerRadius = 48.dp, elevation = 6.dp, blur = 12.dp)
+-                            .background(NeumorphSurface, CircleShape),
+-                        contentAlignment = Alignment.Center
+-                    ) {
+-                        if (data.isImage) {
+-                            Image(
+-                                painter           = painterResource(id = data.icon),
+-                                contentDescription = data.title,
+-                                modifier          = Modifier
+-                                    .size(72.dp)
+-                                    .clip(CircleShape),
+-                                contentScale      = ContentScale.Crop,
+-                                alignment         = BiasAlignment(0f, -0.2f)
+-                            )
+-                        } else {
+-                            Icon(
+-                                painter           = painterResource(id = data.icon),
+-                                contentDescription = data.title,
+-                                tint              = NeumorphTextPrimary,
+-                                modifier          = Modifier.size(44.dp)
+-                            )
+-                        }
+-                    }
+-                }
+-            }
+-
+-            Spacer(modifier = Modifier.height(20.dp))
+-
+-            // ΓöÇΓöÇ Title + Subtitle (text-3xl font-bold tracking-tight) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++            // ΓöÇΓöÇ Title + Subtitle ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             AnimatedContent(
+                 targetState = roleData,
+                 transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(200)) },
+                 label = "role_text"
+             ) { data ->
+-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
++                Column(
++                    horizontalAlignment = Alignment.CenterHorizontally,
++                    modifier            = Modifier.fillMaxWidth()
++                ) {
+                     Text(
+                         text          = data.title,
+-                        fontSize      = 28.sp,
+-                        fontWeight    = FontWeight.Bold,
++                        fontSize      = 30.sp,
++                        fontWeight    = FontWeight.ExtraBold,
+                         color         = NeumorphTextPrimary,
+                         textAlign     = TextAlign.Center,
+-                        letterSpacing = (-0.5).sp
++                        letterSpacing = (-0.8).sp
+                     )
+                     if (data.subtitle.isNotEmpty()) {
+-                        Spacer(modifier = Modifier.height(8.dp))
++                        Spacer(modifier = Modifier.height(6.dp))
+                         Text(
+                             text       = data.subtitle,
+                             fontSize   = 13.sp,
+-                            fontWeight = FontWeight.Medium,
++                            fontWeight = FontWeight.Normal,
+                             color      = NeumorphTextSecondary,
+                             textAlign  = TextAlign.Center,
+-                            lineHeight = 19.sp,
+-                            modifier   = Modifier.padding(horizontal = 8.dp)
++                            lineHeight = 19.sp
+                         )
+                     }
+                 }
+@@ -332,119 +299,108 @@ private fun DynamicLoginCard(
+ 
+             // ΓöÇΓöÇ Username Field ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             NeumorphicInputField(
+-                value          = username,
+-                onValueChange  = { username = it; errorMessage = null },
+-                placeholder    = roleData.usernameLabel,
+-                leadingIcon     = {
++                value         = username,
++                onValueChange = { username = it; errorMessage = null },
++                placeholder   = roleData.usernameLabel,
++                leadingIcon   = {
+                     Icon(
+-                        painter = painterResource(id = R.drawable.ic_person),
++                        painter            = painterResource(id = R.drawable.ic_person),
+                         contentDescription = null,
+-                        tint    = NeumorphTextSecondary,
+-                        modifier = Modifier.size(20.dp)
++                        tint               = NeumorphTextSecondary,
++                        modifier           = Modifier.size(20.dp)
+                     )
+                 },
+-                enabled        = !isLoading
++                enabled = !isLoading
+             )
+ 
+             Spacer(modifier = Modifier.height(14.dp))
+ 
+-            // ΓöÇΓöÇ Password Field (NO leading icon, only trailing visibility toggle) ΓöÇ
++            // ΓöÇΓöÇ Password Field ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             NeumorphicInputField(
+-                value                = password,
+-                onValueChange        = { password = it; errorMessage = null },
+-                placeholder          = "Password",
+-                trailingIcon         = {
+-                    IconButton(
+-                        onClick = { isPasswordVisible = !isPasswordVisible }
+-                    ) {
++                value         = password,
++                onValueChange = { password = it; errorMessage = null },
++                placeholder   = "Password",
++                leadingIcon   = {
++                    Icon(
++                        painter            = painterResource(id = R.drawable.ic_lock),
++                        contentDescription = null,
++                        tint               = NeumorphTextSecondary,
++                        modifier           = Modifier.size(20.dp)
++                    )
++                },
++                trailingIcon = {
++                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                         Icon(
+                             painter = painterResource(
+-                                id = if (isPasswordVisible) R.drawable.ic_visibility 
+-                                else R.drawable.ic_visibility_off
++                                id = if (isPasswordVisible) R.drawable.ic_visibility
++                                     else R.drawable.ic_visibility_off
+                             ),
+                             contentDescription = null,
+-                            tint = NeumorphTextSecondary,
+-                            modifier = Modifier.size(20.dp)
++                            tint               = NeumorphTextSecondary,
++                            modifier           = Modifier.size(20.dp)
+                         )
+                     }
+                 },
+-                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
++                visualTransformation = if (isPasswordVisible) VisualTransformation.None
++                                       else PasswordVisualTransformation(),
+                 keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password),
+                 enabled              = !isLoading
+             )
+ 
+-            // ΓöÇΓöÇ Error Message ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+-            if (errorMessage != null) {
+-                Spacer(modifier = Modifier.height(10.dp))
+-                Text(
+-                    text      = errorMessage!!,
+-                    fontSize  = 13.sp,
+-                    color     = Color(0xFFE53935),
+-                    textAlign = TextAlign.Center,
+-                    modifier  = Modifier.fillMaxWidth()
+-                )
++            // ΓöÇΓöÇ Error Message ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++            AnimatedVisibility(visible = errorMessage != null) {
++                Column {
++                    Spacer(modifier = Modifier.height(10.dp))
++                    Text(
++                        text      = errorMessage ?: "",
++                        fontSize  = 13.sp,
++                        color     = Color(0xFFE53935),
++                        textAlign = TextAlign.Center,
++                        modifier  = Modifier.fillMaxWidth()
++                    )
++                }
+             }
+ 
+             Spacer(modifier = Modifier.height(24.dp))
+ 
+-            // ΓöÇΓöÇ Sign In Button ΓÇö Neumorphic Primary Button ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+-            Box(
+-                modifier = Modifier
+-                    .fillMaxWidth()
+-                    .height(56.dp)
+-                    .neumorphic(cornerRadius = NeumorphButtonRadius, darkShadowColor = NeumorphAccentGlow)
+-                    .background(NeumorphAccentPrimary, RoundedCornerShape(NeumorphButtonRadius))
+-                    .bounceClick {
+-                        if (isLoading) return@bounceClick
+-                        if (username.isBlank() || password.isBlank()) {
+-                            errorMessage = "Please fill in all fields"
+-                            return@bounceClick
+-                        }
+-                        scope.launch {
+-                            isLoading = true
+-                            errorMessage = null
+-                            when (selectedRole) {
+-                                LoginRole.STUDENT -> when (val r = FirebaseManager.authenticateStudent(username.trim(), password)) {
+-                                    is StudentAuthResult.Success -> { isLoading = false; onStudentLoginSuccess() }
+-                                    is StudentAuthResult.Error   -> { isLoading = false; errorMessage = r.message }
+-                                }
+-                                LoginRole.DRIVER  -> when (val r = FirebaseManager.authenticateDriver(username.trim(), password)) {
+-                                    is DriverAuthResult.Success  -> { isLoading = false; onDriverLoginSuccess() }
+-                                    is DriverAuthResult.Error    -> { isLoading = false; errorMessage = r.message }
+-                                }
+-                                LoginRole.ADMIN   -> when (val r = FirebaseManager.authenticateAdmin(username.trim(), password)) {
+-                                    is AuthResult.Success        -> { isLoading = false; onAdminLoginSuccess() }
+-                                    is AuthResult.Error          -> { isLoading = false; errorMessage = r.message }
+-                                }
++            // ΓöÇΓöÇ Sign In Button ΓÇö white bg, dark text, purple bottom glow ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++            SignInButton(
++                isLoading = isLoading,
++                onClick   = {
++                    if (isLoading) return@SignInButton
++                    if (username.isBlank() || password.isBlank()) {
++                        errorMessage = "Please fill in all fields"
++                        return@SignInButton
++                    }
++                    scope.launch {
++                        isLoading    = true
++                        errorMessage = null
++                        when (selectedRole) {
++                            LoginRole.STUDENT -> when (val r = FirebaseManager.authenticateStudent(username.trim(), password)) {
++                                is StudentAuthResult.Success -> { isLoading = false; onStudentLoginSuccess() }
++                                is StudentAuthResult.Error   -> { isLoading = false; errorMessage = r.message }
++                            }
++                            LoginRole.DRIVER  -> when (val r = FirebaseManager.authenticateDriver(username.trim(), password)) {
++                                is DriverAuthResult.Success  -> { isLoading = false; onDriverLoginSuccess() }
++                                is DriverAuthResult.Error    -> { isLoading = false; errorMessage = r.message }
++                            }
++                            LoginRole.ADMIN   -> when (val r = FirebaseManager.authenticateAdmin(username.trim(), password)) {
++                                is AuthResult.Success        -> { isLoading = false; onAdminLoginSuccess() }
++                                is AuthResult.Error          -> { isLoading = false; errorMessage = r.message }
+                             }
+                         }
+-                    },
+-                contentAlignment = Alignment.Center
+-            ) {
+-                if (isLoading) {
+-                    CircularProgressIndicator(
+-                        modifier    = Modifier.size(20.dp),
+-                        color       = Color.White,
+-                        strokeWidth = 2.dp
+-                    )
+-                } else {
+-                    Text(
+-                        text       = "Sign In",
+-                        fontSize   = 17.sp,
+-                        fontWeight = FontWeight.Bold,
+-                        color      = Color.White
+-                    )
++                    }
+                 }
+-            }
++            )
+ 
+             Spacer(modifier = Modifier.height(28.dp))
+ 
+-            // ΓöÇΓöÇ Divider (very subtle, white/40) ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++            // ΓöÇΓöÇ Divider ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             Divider(color = DividerColor, thickness = 0.8.dp)
+ 
+             Spacer(modifier = Modifier.height(16.dp))
+ 
+-            // ΓöÇΓöÇ Switch Role label ΓöÇΓöÇ
++            // ΓöÇΓöÇ Switch Role label ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             Text(
+                 text          = "Switch Role",
+                 fontSize      = 11.sp,
+@@ -455,7 +411,7 @@ private fun DynamicLoginCard(
+ 
+             Spacer(modifier = Modifier.height(14.dp))
+ 
+-            // ΓöÇΓöÇ Role Selector Scoop Container ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++            // ΓöÇΓöÇ Role Selector Scoop Container ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+             Box(
+                 modifier = Modifier
+                     .widthIn(min = 200.dp, max = 240.dp)
+@@ -466,20 +422,23 @@ private fun DynamicLoginCard(
+                 contentAlignment = Alignment.Center
+             ) {
+                 Row(
+-                    modifier = Modifier.fillMaxWidth(),
++                    modifier              = Modifier.fillMaxWidth(),
+                     horizontalArrangement = Arrangement.SpaceBetween,
+-                    verticalAlignment = Alignment.CenterVertically
++                    verticalAlignment     = Alignment.CenterVertically
+                 ) {
+-                    RoleIcon(
+-                        icon       = R.drawable.ic_student,
+-                        isSelected = selectedRole == LoginRole.STUDENT,
+-                        onClick    = { onRoleChange(LoginRole.STUDENT) }
+-                    )
++                    // Driver icon (briefcase)
+                     RoleIcon(
+                         icon       = R.drawable.ic_directions_bus_vector,
+                         isSelected = selectedRole == LoginRole.DRIVER,
+                         onClick    = { onRoleChange(LoginRole.DRIVER) }
+                     )
++                    // Student icon (person ΓÇö center, default selected)
++                    RoleIcon(
++                        icon       = R.drawable.ic_student,
++                        isSelected = selectedRole == LoginRole.STUDENT,
++                        onClick    = { onRoleChange(LoginRole.STUDENT) }
++                    )
++                    // Admin icon
+                     RoleIcon(
+                         icon       = R.drawable.ic_admin_panel,
+                         isSelected = selectedRole == LoginRole.ADMIN,
+@@ -491,7 +450,80 @@ private fun DynamicLoginCard(
+     }
+ }
+ 
+-// ΓöÇΓöÇΓöÇ Neumorphic Input Field ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++// ΓöÇΓöÇΓöÇ Sign In Button ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
++// Design: neumorphic raised white button with purple/violet glow at bottom edge
++@Composable
++private fun SignInButton(
++    isLoading: Boolean,
++    onClick: () -> Unit
++) {
++    // Purple accent glow wrapper ΓÇö slightly larger, acts as bottom shadow
++    Box(
++        modifier = Modifier
++            .fillMaxWidth()
++            .height(58.dp),
++        contentAlignment = Alignment.Center
++    ) {
++        // Purple bottom glow layer
++        Box(
++            modifier = Modifier
++                .fillMaxWidth()
++                .height(58.dp)
++                .background(
++                    brush  = Brush.verticalGradient(
++                        colors     = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.45f)),
++                        startY     = 0f,
++                        endY       = Float.POSITIVE_INFINITY
++                    ),
++                    shape  = RoundedCornerShape(NeumorphButtonRadius)
++                )
++        )
++
++        // Main raised button on top
++        Box(
++            modifier = Modifier
++                .fillMaxWidth()
++                .height(54.dp)
++                .neumorphic(
++                    cornerRadius   = NeumorphButtonRadius,
++                    elevation      = 5.dp,
++                    blur           = 10.dp,
++                    darkShadowColor = NeumorphAccentGlow
++                )
++                .background(NeumorphSurface, RoundedCornerShape(NeumorphButtonRadius))
++                .border(
++                    width = 1.dp,
++                    brush = Brush.verticalGradient(
++                        colors = listOf(
++                            Color.White.copy(alpha = 0.9f),
++                            NeumorphAccentPrimary.copy(alpha = 0.6f)
++                        )
++                    ),
++                    shape = RoundedCornerShape(NeumorphButtonRadius)
++                )
++                .bounceClick { onClick() },
++            contentAlignment = Alignment.Center
++        ) {
++            if (isLoading) {
++                CircularProgressIndicator(
++                    modifier    = Modifier.size(22.dp),
++                    color       = NeumorphAccentPrimary,
++                    strokeWidth = 2.5.dp
++                )
++            } else {
++                Text(
++                    text       = "Sign In",
++                    fontSize   = 17.sp,
++                    fontWeight = FontWeight.Bold,
++                    color      = NeumorphTextPrimary,
++                    letterSpacing = 0.3.sp
++                )
++            }
++        }
++    }
++}
++
++// ΓöÇΓöÇΓöÇ Neumorphic Input Field ΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇΓöÇ
+ @Composable
+ private fun NeumorphicInputField(
+     value: String,
+@@ -504,9 +536,9 @@ private fun NeumorphicInputField(
+     enabled: Boolean = true
+ ) {
+     OutlinedTextField(
+-        value         = value,
+-        onValueChange = onValueChange,
+-        placeholder   = {
++        value                = value,
++        onValueChange        = onValueChange,
++        placeholder          = {
+             Text(
+                 text       = placeholder,
+                 color      = NeumorphTextSecondary,
+@@ -514,8 +546,8 @@ private fun NeumorphicInputField(
+                 fontWeight = FontWeight.Medium
+             )
+         },
+-        leadingIcon = leadingIcon,
+-        trailingIcon = trailingIcon,
++        leadingIcon          = leadingIcon,
++        trailingIcon         = trailingIcon,
+         visualTransformation = visualTransformation,
+         keyboardOptions      = keyboardOptions,
+         modifier             = Modifier
+@@ -557,11 +589,10 @@ private fun RoleIcon(
+         modifier = Modifier
+             .size(48.dp)
+             .then(
+-                if (isSelected) {
++                if (isSelected)
+                     Modifier.neumorphicInset(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
+-                } else {
++                else
+                     Modifier.neumorphic(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
+-                }
+             )
+             .background(NeumorphSurface, CircleShape)
+             .bounceClick { onClick() },
+@@ -569,18 +600,18 @@ private fun RoleIcon(
+     ) {
+         if (isImage) {
+             Image(
+-                painter           = painterResource(id = icon),
++                painter            = painterResource(id = icon),
+                 contentDescription = null,
+-                modifier          = Modifier.size(24.dp),
+-                contentScale      = ContentScale.Fit,
+-                alpha             = if (isSelected) 1f else 0.7f
++                modifier           = Modifier.size(24.dp),
++                contentScale       = ContentScale.Fit,
++                alpha              = if (isSelected) 1f else 0.6f
+             )
+         } else {
+             Icon(
+-                painter           = painterResource(id = icon),
++                painter            = painterResource(id = icon),
+                 contentDescription = null,
+-                tint              = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
+-                modifier          = Modifier.size(24.dp)
++                tint               = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
++                modifier           = Modifier.size(24.dp)
+             )
+         }
+     }
+@@ -605,7 +636,11 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
+ 
+     Dialog(
+         onDismissRequest = { visible = false; onDismiss() },
+-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
++        properties       = DialogProperties(
++            dismissOnBackPress    = true,
++            dismissOnClickOutside = true,
++            usePlatformDefaultWidth = false
++        )
+     ) {
+         Box(
+             modifier = Modifier
+@@ -616,18 +651,27 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
+         ) {
+             Card(
+                 modifier = Modifier
+-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
++                    .fillMaxWidth()
++                    .padding(32.dp)
++                    .scale(scale)
++                    .alpha(alpha)
+                     .shadow(12.dp, RoundedCornerShape(24.dp))
+                     .clickable(remember { MutableInteractionSource() }, null) { },
+                 shape  = RoundedCornerShape(24.dp),
+                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
+             ) {
+-                Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
++                Column(
++                    modifier            = Modifier.fillMaxWidth().padding(28.dp),
++                    horizontalAlignment = Alignment.CenterHorizontally
++                ) {
+                     Text("Privacy Policy", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor)
+                     Spacer(Modifier.height(16.dp))
+                     Text(
+                         "This app is a student-developed project designed to help colleges manage bus tracking and attendance efficiently, and all data used is for educational and demonstration purposes only.",
+-                        fontSize = 14.sp, color = SubtitleColor, textAlign = TextAlign.Center, lineHeight = 22.sp
++                        fontSize  = 14.sp,
++                        color     = SubtitleColor,
++                        textAlign = TextAlign.Center,
++                        lineHeight = 22.sp
+                     )
+                     Spacer(Modifier.height(24.dp))
+                     Button(
+@@ -635,7 +679,9 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
+                         modifier = Modifier.fillMaxWidth().height(48.dp),
+                         shape    = RoundedCornerShape(24.dp),
+                         colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
+-                    ) { Text("Got it", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
++                    ) {
++                        Text("Got it", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
++                    }
+                 }
+             }
+         }
+@@ -653,7 +699,11 @@ private fun SupportDialog(onDismiss: () -> Unit) {
+ 
+     Dialog(
+         onDismissRequest = { visible = false; onDismiss() },
+-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
++        properties       = DialogProperties(
++            dismissOnBackPress    = true,
++            dismissOnClickOutside = true,
++            usePlatformDefaultWidth = false
++        )
+     ) {
+         Box(
+             modifier = Modifier
+@@ -664,13 +714,19 @@ private fun SupportDialog(onDismiss: () -> Unit) {
+         ) {
+             Card(
+                 modifier = Modifier
+-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
++                    .fillMaxWidth()
++                    .padding(32.dp)
++                    .scale(scale)
++                    .alpha(alpha)
+                     .shadow(12.dp, RoundedCornerShape(24.dp))
+                     .clickable(remember { MutableInteractionSource() }, null) { },
+                 shape  = RoundedCornerShape(24.dp),
+                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
+             ) {
+-                Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
++                Column(
++                    modifier            = Modifier.fillMaxWidth().padding(28.dp),
++                    horizontalAlignment = Alignment.CenterHorizontally
++                ) {
+                     Text("Support & Contact", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor)
+                     Spacer(Modifier.height(16.dp))
+                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
+@@ -693,7 +749,9 @@ private fun SupportDialog(onDismiss: () -> Unit) {
+                         modifier = Modifier.fillMaxWidth().height(48.dp),
+                         shape    = RoundedCornerShape(24.dp),
+                         colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
+-                    ) { Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
++                    ) {
++                        Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
++                    }
+                 }
+             }
+         }
+@@ -713,7 +771,9 @@ private fun ContactItem(iconRes: Int, title: String, subtitle: String, onClick:
+         verticalAlignment = Alignment.CenterVertically
+     ) {
+         Box(
+-            modifier         = Modifier.size(38.dp).background(BtnGreen.copy(alpha = 0.15f), CircleShape),
++            modifier         = Modifier
++                .size(38.dp)
++                .background(BtnGreen.copy(alpha = 0.15f), CircleShape),
+             contentAlignment = Alignment.Center
+         ) {
+             Icon(painterResource(iconRes), null, tint = BtnGreen, modifier = Modifier.size(18.dp))
+@@ -737,7 +797,11 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
+ 
+     Dialog(
+         onDismissRequest = { visible = false; onDismiss() },
+-        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
++        properties       = DialogProperties(
++            dismissOnBackPress    = true,
++            dismissOnClickOutside = true,
++            usePlatformDefaultWidth = false
++        )
+     ) {
+         Box(
+             modifier = Modifier
+@@ -748,7 +812,10 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
+         ) {
+             Card(
+                 modifier = Modifier
+-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
++                    .fillMaxWidth()
++                    .padding(32.dp)
++                    .scale(scale)
++                    .alpha(alpha)
+                     .shadow(12.dp, RoundedCornerShape(24.dp))
+                     .clickable(remember { MutableInteractionSource() }, null) { },
+                 shape  = RoundedCornerShape(24.dp),
+@@ -761,12 +828,21 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
+                         .padding(28.dp),
+                     horizontalAlignment = Alignment.CenterHorizontally
+                 ) {
+-                    Text("About Campus Buddy", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor, textAlign = TextAlign.Center)
++                    Text(
++                        "About Campus Buddy",
++                        fontSize   = 22.sp,
++                        fontWeight = FontWeight.Bold,
++                        color      = TitleColor,
++                        textAlign  = TextAlign.Center
++                    )
+                     Spacer(Modifier.height(16.dp))
+                     Text(
+                         "A smart bus attendance and tracking system for colleges ΓÇö GPS-based live tracking, QR attendance, student absence planning, real-time stop management, and multi-role support for drivers, students, and admins.",
+-                        fontSize = 14.sp, color = SubtitleColor, textAlign = TextAlign.Start,
+-                        lineHeight = 21.sp, modifier = Modifier.fillMaxWidth()
++                        fontSize   = 14.sp,
++                        color      = SubtitleColor,
++                        textAlign  = TextAlign.Start,
++                        lineHeight = 21.sp,
++                        modifier   = Modifier.fillMaxWidth()
+                     )
+                     Spacer(Modifier.height(12.dp))
+                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+@@ -790,7 +866,9 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
+                         modifier = Modifier.fillMaxWidth().height(48.dp),
+                         shape    = RoundedCornerShape(24.dp),
+                         colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
+-                    ) { Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
++                    ) {
++                        Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White)
++                    }
+                 }
+             }
+         }

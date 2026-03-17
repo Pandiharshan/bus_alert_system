@@ -49,8 +49,7 @@ enum class LoginRole {
     STUDENT, DRIVER, ADMIN
 }
 
-// Using Glassmorphism Design Tokens from theme
-
+// ─── Unified Login Screen ─────────────────────────────────────────────────────
 @Composable
 fun UnifiedLoginScreen(
     onStudentLoginSuccess: () -> Unit,
@@ -63,10 +62,10 @@ fun UnifiedLoginScreen(
     var showAppInfoDialog by remember { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.fillMaxSize().background(NeumorphBgPrimary)
+        modifier = Modifier
+            .fillMaxSize()
+            .background(NeumorphBgPrimary)
     ) {
-        // No overlay needed - background gradient is perfect
-
         MainContent(
             selectedRole          = selectedRole,
             onRoleChange          = { selectedRole = it },
@@ -85,8 +84,6 @@ fun UnifiedLoginScreen(
 }
 
 // ─── Main Content ─────────────────────────────────────────────────────────────
-// ONLY CHANGE: pill drawn on top of card (overlaps card top edge, centered)
-// Everything else (bottom pills, scroll) untouched.
 @Composable
 private fun MainContent(
     selectedRole: LoginRole,
@@ -105,16 +102,14 @@ private fun MainContent(
             .padding(horizontal = 24.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(modifier = Modifier.height(32.dp))   // top-8 = 32dp
+        Spacer(modifier = Modifier.height(48.dp))
 
-        // ── Pill + Card layered: pill sits on top of card at top-center ───────
         Box(
             modifier         = Modifier.fillMaxWidth(),
             contentAlignment = Alignment.TopCenter
         ) {
-            // Card is offset 18dp down (half pill height ~36dp)
-            // so pill center aligns exactly with card top edge
-            Box(modifier = Modifier.padding(top = 18.dp)) {
+            // Card pushed down 26dp so pill center aligns with card top edge
+            Box(modifier = Modifier.padding(top = 26.dp)) {
                 DynamicLoginCard(
                     selectedRole          = selectedRole,
                     onRoleChange          = onRoleChange,
@@ -124,13 +119,15 @@ private fun MainContent(
                 )
             }
 
-            // Pill rendered LAST = drawn on top of card, perfectly centered
-            AppLabelPill(onAppInfoClick)
+            // Pill drawn last — overlaps card top edge, perfectly centered
+            AppLabelPill(
+                selectedRole = selectedRole,
+                onClick      = onAppInfoClick
+            )
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(28.dp))
 
-        // ── Bottom Nav Pills — UNTOUCHED ──────────────────────────────────────
         Row(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment     = Alignment.CenterVertically
@@ -140,35 +137,61 @@ private fun MainContent(
             BottomPill("ABOUT")   { onAppInfoClick() }
         }
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(32.dp))
     }
 }
 
 // ─── App Label Pill ───────────────────────────────────────────────────────────
 @Composable
-private fun AppLabelPill(onClick: () -> Unit) {
+private fun AppLabelPill(
+    selectedRole: LoginRole,
+    onClick: () -> Unit
+) {
+    val roleIcon = when (selectedRole) {
+        LoginRole.STUDENT -> R.drawable.ic_student
+        LoginRole.DRIVER  -> R.drawable.ic_directions_bus_vector
+        LoginRole.ADMIN   -> R.drawable.ic_admin_panel
+    }
+
     Row(
         modifier = Modifier
-            .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
-            .background(NeumorphSurface, RoundedCornerShape(20.dp))
+            .fillMaxWidth(0.78f)
+            .neumorphic(cornerRadius = 28.dp, elevation = 6.dp, blur = 12.dp)
+            .background(NeumorphSurface, RoundedCornerShape(28.dp))
             .bounceClick { onClick() }
-            .padding(horizontal = 20.dp, vertical = 8.dp),
+            .padding(start = 22.dp, end = 5.dp, top = 5.dp, bottom = 5.dp),
         verticalAlignment     = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.SpaceBetween
     ) {
-        Icon(
-            painter           = painterResource(id = R.drawable.ic_directions_bus_vector),
-            contentDescription = null,
-            tint              = NeumorphTextSecondary,
-            modifier          = Modifier.size(18.dp)
-        )
         Text(
             text          = "Campus Bus Buddy",
             fontSize      = 14.sp,
-            fontWeight    = FontWeight.Bold,
-            color         = NeumorphTextPrimary,
-            letterSpacing = (-0.3).sp
+            fontWeight    = FontWeight.SemiBold,
+            color         = NeumorphTextSecondary,
+            letterSpacing = 0.sp
         )
+
+        // Circle stays static — only the icon inside crossfades (no ghosting)
+        Box(
+            modifier = Modifier
+                .size(46.dp)
+                .neumorphic(cornerRadius = 23.dp, elevation = 4.dp, blur = 8.dp)
+                .background(NeumorphSurface, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            AnimatedContent(
+                targetState   = roleIcon,
+                transitionSpec = { fadeIn(tween(220)) togetherWith fadeOut(tween(160)) },
+                label         = "pill_role_icon"
+            ) { icon ->
+                Icon(
+                    painter            = painterResource(id = icon),
+                    contentDescription = null,
+                    tint               = NeumorphTextSecondary,
+                    modifier           = Modifier.size(22.dp)
+                )
+            }
+        }
     }
 }
 
@@ -180,7 +203,7 @@ private fun BottomPill(label: String, onClick: () -> Unit) {
             .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
             .background(NeumorphSurface, RoundedCornerShape(20.dp))
             .bounceClick { onClick() }
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 18.dp, vertical = 9.dp)
     ) {
         Text(
             text          = label,
@@ -217,112 +240,67 @@ private fun DynamicLoginCard(
             LoginRole.STUDENT -> RoleData(
                 icon          = R.drawable.ic_student,
                 title         = "Student Login",
-                subtitle      = "",  // removed caption
+                subtitle      = "Welcome to the Campus Bus Buddy",
                 usernameLabel = "Username",
-                isImage       = false  // use as icon, not image
+                isImage       = false
             )
             LoginRole.DRIVER  -> RoleData(
                 icon          = R.drawable.driver_login,
                 title         = "Driver Login",
-                subtitle      = "",  // removed caption
+                subtitle      = "Welcome back, Driver",
                 usernameLabel = "Driver Username",
                 isImage       = true
             )
             LoginRole.ADMIN   -> RoleData(
                 icon          = R.drawable.admin_panel,
                 title         = "Admin Login",
-                subtitle      = "",  // removed caption
+                subtitle      = "Admin Control Panel",
                 usernameLabel = "Admin Username",
-                isImage       = false  // use as icon, not image
+                isImage       = false
             )
         }
     }
 
-    // ── Card Shell: floating neumorphic card with soft shadows ──
     Box(
         modifier = Modifier
-            .fillMaxWidth(0.92f)
-            .neumorphic(cornerRadius = NeumorphCardRadius)
+            .fillMaxWidth(0.94f)
+            .neumorphic(cornerRadius = NeumorphCardRadius, elevation = 8.dp, blur = 18.dp)
             .background(NeumorphSurface, RoundedCornerShape(NeumorphCardRadius))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 32.dp, bottom = 28.dp, start = 24.dp, end = 24.dp),
+                .padding(top = 40.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
-            // ── Profile Icon Circle + Teal Dot Indicator ──────────────────────
-            // Dot: -bottom-1 in Tailwind = overlaps circle bottom by 4px.
-            // Use Box with contentAlignment BottomCenter + offset(y = 4.dp) on dot.
+            // ── Title + Subtitle ──────────────────────────────────────────────
             AnimatedContent(
-                targetState = roleData,
-                transitionSpec = {
-                    fadeIn(tween(300)) + scaleIn(initialScale = 0.85f, animationSpec = tween(300)) togetherWith
-                    fadeOut(tween(200)) + scaleOut(targetScale = 0.85f, animationSpec = tween(200))
-                },
-                label = "role_icon"
-            ) { data ->
-                Box(
-                    contentAlignment = Alignment.BottomCenter,
-                    modifier         = Modifier.wrapContentSize()
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(96.dp)
-                            .neumorphic(cornerRadius = 48.dp, elevation = 6.dp, blur = 12.dp)
-                            .background(NeumorphSurface, CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        if (data.isImage) {
-                            Image(
-                                painter           = painterResource(id = data.icon),
-                                contentDescription = data.title,
-                                modifier          = Modifier
-                                    .size(72.dp)
-                                    .clip(CircleShape),
-                                contentScale      = ContentScale.Crop,
-                                alignment         = BiasAlignment(0f, -0.2f)
-                            )
-                        } else {
-                            Icon(
-                                painter           = painterResource(id = data.icon),
-                                contentDescription = data.title,
-                                tint              = NeumorphTextPrimary,
-                                modifier          = Modifier.size(44.dp)
-                            )
-                        }
-                    }
-                }
-            }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // ── Title + Subtitle (text-3xl font-bold tracking-tight) ──────────
-            AnimatedContent(
-                targetState = roleData,
+                targetState  = roleData,
                 transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(200)) },
-                label = "role_text"
+                label        = "role_title"
             ) { data ->
-                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Column(
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    modifier            = Modifier.fillMaxWidth()
+                ) {
                     Text(
                         text          = data.title,
-                        fontSize      = 28.sp,
-                        fontWeight    = FontWeight.Bold,
+                        fontSize      = 30.sp,
+                        fontWeight    = FontWeight.ExtraBold,
                         color         = NeumorphTextPrimary,
                         textAlign     = TextAlign.Center,
-                        letterSpacing = (-0.5).sp
+                        letterSpacing = (-0.8).sp
                     )
                     if (data.subtitle.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(6.dp))
                         Text(
                             text       = data.subtitle,
                             fontSize   = 13.sp,
-                            fontWeight = FontWeight.Medium,
+                            fontWeight = FontWeight.Normal,
                             color      = NeumorphTextSecondary,
                             textAlign  = TextAlign.Center,
-                            lineHeight = 19.sp,
-                            modifier   = Modifier.padding(horizontal = 8.dp)
+                            lineHeight = 19.sp
                         )
                     }
                 }
@@ -332,153 +310,135 @@ private fun DynamicLoginCard(
 
             // ── Username Field ────────────────────────────────────────────────
             NeumorphicInputField(
-                value          = username,
-                onValueChange  = { username = it; errorMessage = null },
-                placeholder    = roleData.usernameLabel,
-                leadingIcon     = {
+                value         = username,
+                onValueChange = { username = it; errorMessage = null },
+                placeholder   = roleData.usernameLabel,
+                leadingIcon   = {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
+                        painter            = painterResource(id = R.drawable.ic_person),
                         contentDescription = null,
-                        tint    = NeumorphTextSecondary,
-                        modifier = Modifier.size(20.dp)
+                        tint               = NeumorphTextSecondary,
+                        modifier           = Modifier.size(20.dp)
                     )
                 },
-                enabled        = !isLoading
+                enabled = !isLoading
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // ── Password Field (NO leading icon, only trailing visibility toggle) ─
+            // ── Password Field ────────────────────────────────────────────────
             NeumorphicInputField(
-                value                = password,
-                onValueChange        = { password = it; errorMessage = null },
-                placeholder          = "Password",
-                trailingIcon         = {
-                    IconButton(
-                        onClick = { isPasswordVisible = !isPasswordVisible }
-                    ) {
+                value         = password,
+                onValueChange = { password = it; errorMessage = null },
+                placeholder   = "Password",
+                leadingIcon   = {
+                    Icon(
+                        painter            = painterResource(id = R.drawable.ic_lock),
+                        contentDescription = null,
+                        tint               = NeumorphTextSecondary,
+                        modifier           = Modifier.size(20.dp)
+                    )
+                },
+                trailingIcon = {
+                    IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
                         Icon(
                             painter = painterResource(
-                                id = if (isPasswordVisible) R.drawable.ic_visibility 
-                                else R.drawable.ic_visibility_off
+                                id = if (isPasswordVisible) R.drawable.ic_visibility
+                                     else R.drawable.ic_visibility_off
                             ),
                             contentDescription = null,
-                            tint = NeumorphTextSecondary,
-                            modifier = Modifier.size(20.dp)
+                            tint               = NeumorphTextSecondary,
+                            modifier           = Modifier.size(20.dp)
                         )
                     }
                 },
-                visualTransformation = if (isPasswordVisible) VisualTransformation.None else PasswordVisualTransformation(),
+                visualTransformation = if (isPasswordVisible) VisualTransformation.None
+                                       else PasswordVisualTransformation(),
                 keyboardOptions      = KeyboardOptions(keyboardType = KeyboardType.Password),
                 enabled              = !isLoading
             )
 
-            // ── Error Message ──────────────────────────────────────────────────
-            if (errorMessage != null) {
-                Spacer(modifier = Modifier.height(10.dp))
-                Text(
-                    text      = errorMessage!!,
-                    fontSize  = 13.sp,
-                    color     = Color(0xFFE53935),
-                    textAlign = TextAlign.Center,
-                    modifier  = Modifier.fillMaxWidth()
-                )
-            }
-
-            Spacer(modifier = Modifier.height(24.dp))
-
-            // ── Sign In Button — Neumorphic Primary Button ──────────
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(56.dp)
-                    .neumorphic(cornerRadius = NeumorphButtonRadius, darkShadowColor = NeumorphAccentGlow)
-                    .background(NeumorphAccentPrimary, RoundedCornerShape(NeumorphButtonRadius))
-                    .bounceClick {
-                        if (isLoading) return@bounceClick
-                        if (username.isBlank() || password.isBlank()) {
-                            errorMessage = "Please fill in all fields"
-                            return@bounceClick
-                        }
-                        scope.launch {
-                            isLoading = true
-                            errorMessage = null
-                            when (selectedRole) {
-                                LoginRole.STUDENT -> when (val r = FirebaseManager.authenticateStudent(username.trim(), password)) {
-                                    is StudentAuthResult.Success -> { isLoading = false; onStudentLoginSuccess() }
-                                    is StudentAuthResult.Error   -> { isLoading = false; errorMessage = r.message }
-                                }
-                                LoginRole.DRIVER  -> when (val r = FirebaseManager.authenticateDriver(username.trim(), password)) {
-                                    is DriverAuthResult.Success  -> { isLoading = false; onDriverLoginSuccess() }
-                                    is DriverAuthResult.Error    -> { isLoading = false; errorMessage = r.message }
-                                }
-                                LoginRole.ADMIN   -> when (val r = FirebaseManager.authenticateAdmin(username.trim(), password)) {
-                                    is AuthResult.Success        -> { isLoading = false; onAdminLoginSuccess() }
-                                    is AuthResult.Error          -> { isLoading = false; errorMessage = r.message }
-                                }
-                            }
-                        }
-                    },
-                contentAlignment = Alignment.Center
-            ) {
-                if (isLoading) {
-                    CircularProgressIndicator(
-                        modifier    = Modifier.size(20.dp),
-                        color       = Color.White,
-                        strokeWidth = 2.dp
-                    )
-                } else {
+            // ── Error Message ─────────────────────────────────────────────────
+            AnimatedVisibility(visible = errorMessage != null) {
+                Column {
+                    Spacer(modifier = Modifier.height(10.dp))
                     Text(
-                        text       = "Sign In",
-                        fontSize   = 17.sp,
-                        fontWeight = FontWeight.Bold,
-                        color      = Color.White
+                        text      = errorMessage ?: "",
+                        fontSize  = 13.sp,
+                        color     = Color(0xFFE53935),
+                        textAlign = TextAlign.Center,
+                        modifier  = Modifier.fillMaxWidth()
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.height(28.dp))
+            Spacer(modifier = Modifier.height(24.dp))
 
-            // ── Divider (very subtle, white/40) ───────────────────────────────
-            Divider(color = DividerColor, thickness = 0.8.dp)
+            // ── Sign In Button ────────────────────────────────────────────────
+            SignInButton(
+                isLoading = isLoading,
+                onClick   = {
+                    if (isLoading) return@SignInButton
+                    if (username.isBlank() || password.isBlank()) {
+                        errorMessage = "Please fill in all fields"
+                        return@SignInButton
+                    }
+                    scope.launch {
+                        isLoading    = true
+                        errorMessage = null
+                        when (selectedRole) {
+                            LoginRole.STUDENT -> when (val r = FirebaseManager.authenticateStudent(username.trim(), password)) {
+                                is StudentAuthResult.Success -> { isLoading = false; onStudentLoginSuccess() }
+                                is StudentAuthResult.Error   -> { isLoading = false; errorMessage = r.message }
+                            }
+                            LoginRole.DRIVER  -> when (val r = FirebaseManager.authenticateDriver(username.trim(), password)) {
+                                is DriverAuthResult.Success  -> { isLoading = false; onDriverLoginSuccess() }
+                                is DriverAuthResult.Error    -> { isLoading = false; errorMessage = r.message }
+                            }
+                            LoginRole.ADMIN   -> when (val r = FirebaseManager.authenticateAdmin(username.trim(), password)) {
+                                is AuthResult.Success        -> { isLoading = false; onAdminLoginSuccess() }
+                                is AuthResult.Error          -> { isLoading = false; errorMessage = r.message }
+                            }
+                        }
+                    }
+                }
+            )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
 
-            // ── Switch Role label ──
             Text(
-                text          = "Switch Role",
-                fontSize      = 11.sp,
-                fontWeight    = FontWeight.Bold,
-                color         = NeumorphTextSecondary,
-                letterSpacing = 1.5.sp
+                text       = "Switch Role",
+                fontSize   = 12.sp,
+                fontWeight = FontWeight.SemiBold,
+                color      = NeumorphTextSecondary
             )
 
             Spacer(modifier = Modifier.height(14.dp))
 
-            // ── Role Selector Scoop Container ────────────────────────
+            // ── Role Selector ─────────────────────────────────────────────────
             Box(
                 modifier = Modifier
-                    .widthIn(min = 200.dp, max = 240.dp)
+                    .widthIn(min = 220.dp, max = 252.dp)
                     .height(64.dp)
-                    .neumorphicInset(cornerRadius = 32.dp, elevation = 4.dp, blur = 8.dp)
+                    .neumorphicInset(cornerRadius = 32.dp, elevation = 5.dp, blur = 10.dp)
                     .background(NeumorphSurface, RoundedCornerShape(32.dp))
-                    .padding(horizontal = 8.dp),
+                    .padding(horizontal = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
-                    modifier = Modifier.fillMaxWidth(),
+                    modifier              = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment     = Alignment.CenterVertically
                 ) {
-                    RoleIcon(
-                        icon       = R.drawable.ic_student,
-                        isSelected = selectedRole == LoginRole.STUDENT,
-                        onClick    = { onRoleChange(LoginRole.STUDENT) }
-                    )
                     RoleIcon(
                         icon       = R.drawable.ic_directions_bus_vector,
                         isSelected = selectedRole == LoginRole.DRIVER,
                         onClick    = { onRoleChange(LoginRole.DRIVER) }
+                    )
+                    RoleIcon(
+                        icon       = R.drawable.ic_student,
+                        isSelected = selectedRole == LoginRole.STUDENT,
+                        onClick    = { onRoleChange(LoginRole.STUDENT) }
                     )
                     RoleIcon(
                         icon       = R.drawable.ic_admin_panel,
@@ -491,7 +451,85 @@ private fun DynamicLoginCard(
     }
 }
 
-// ─── Neumorphic Input Field ──────────────────────────────────────────────────
+// ─── Sign In Button ───────────────────────────────────────────────────────────
+@Composable
+private fun SignInButton(
+    isLoading: Boolean,
+    onClick: () -> Unit
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(64.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(64.dp)
+                .align(Alignment.BottomCenter)
+                .background(
+                    brush = Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f  to Color.Transparent,
+                            0.45f to Color.Transparent,
+                            0.72f to NeumorphAccentPrimary.copy(alpha = 0.30f),
+                            1.0f  to NeumorphAccentPrimary.copy(alpha = 0.60f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(NeumorphButtonRadius)
+                )
+        )
+
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(56.dp)
+                .align(Alignment.TopCenter)
+                .neumorphic(
+                    cornerRadius    = NeumorphButtonRadius,
+                    elevation       = 6.dp,
+                    blur            = 12.dp,
+                    darkShadowColor = NeumorphAccentGlow
+                )
+                .background(NeumorphSurface, RoundedCornerShape(NeumorphButtonRadius))
+                .border(
+                    width = 1.2.dp,
+                    brush = Brush.verticalGradient(
+                        colorStops = arrayOf(
+                            0.0f  to Color.White.copy(alpha = 0.90f),
+                            0.50f to Color.White.copy(alpha = 0.40f),
+                            1.0f  to NeumorphAccentPrimary.copy(alpha = 0.80f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(NeumorphButtonRadius)
+                )
+                .bounceClick { onClick() },
+            contentAlignment = Alignment.Center
+        ) {
+            if (isLoading) {
+                CircularProgressIndicator(
+                    modifier    = Modifier.size(22.dp),
+                    color       = NeumorphAccentPrimary,
+                    strokeWidth = 2.5.dp
+                )
+            } else {
+                Text(
+                    text          = "Sign In",
+                    fontSize      = 17.sp,
+                    fontWeight    = FontWeight.Bold,
+                    color         = NeumorphTextPrimary,
+                    letterSpacing = 0.2.sp
+                )
+            }
+        }
+    }
+}
+
+// ─── Neumorphic Input Field ───────────────────────────────────────────────────
+// Pressed-in effect achieved by:
+//   1. Box draws the slightly darker background (sunk-in illusion)
+//   2. neumorphicInset draws inner shadows ON TOP via drawWithContent
+//   3. TextField inside is fully transparent — shadows stay visible
 @Composable
 private fun NeumorphicInputField(
     value: String,
@@ -503,46 +541,53 @@ private fun NeumorphicInputField(
     keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
-        value         = value,
-        onValueChange = onValueChange,
-        placeholder   = {
-            Text(
-                text       = placeholder,
-                color      = NeumorphTextSecondary,
-                fontSize   = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-        },
-        leadingIcon = leadingIcon,
-        trailingIcon = trailingIcon,
-        visualTransformation = visualTransformation,
-        keyboardOptions      = keyboardOptions,
-        modifier             = Modifier
+    val insetBg = Color(0xFFDADADA) // Slightly darker than surface (#E6E6E6)
+
+    Box(
+        modifier = Modifier
             .fillMaxWidth()
-            .height(54.dp)
-            .neumorphicInset(cornerRadius = NeumorphInputRadius, elevation = 4.dp, blur = 8.dp),
-        shape  = RoundedCornerShape(NeumorphInputRadius),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor      = Color.Transparent,
-            unfocusedBorderColor    = Color.Transparent,
-            disabledBorderColor     = Color.Transparent,
-            focusedContainerColor   = NeumorphSurface,
-            unfocusedContainerColor = NeumorphSurface,
-            disabledContainerColor  = NeumorphSurface,
-            focusedTextColor        = NeumorphTextPrimary,
-            unfocusedTextColor      = NeumorphTextPrimary,
-            cursorColor             = NeumorphAccentPrimary
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize      = 14.sp,
-            fontWeight    = FontWeight.Medium,
-            color         = NeumorphTextPrimary,
-            letterSpacing = 0.2.sp
-        ),
-        singleLine = true,
-        enabled    = enabled
-    )
+            .height(56.dp)
+            .background(insetBg, RoundedCornerShape(NeumorphInputRadius))
+            .neumorphicInset(cornerRadius = NeumorphInputRadius, elevation = 5.dp, blur = 10.dp)
+    ) {
+        OutlinedTextField(
+            value                = value,
+            onValueChange        = onValueChange,
+            placeholder          = {
+                Text(
+                    text       = placeholder,
+                    color      = NeumorphTextSecondary,
+                    fontSize   = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            },
+            leadingIcon          = leadingIcon,
+            trailingIcon         = trailingIcon,
+            visualTransformation = visualTransformation,
+            keyboardOptions      = keyboardOptions,
+            modifier             = Modifier.fillMaxSize(),
+            shape  = RoundedCornerShape(NeumorphInputRadius),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor      = Color.Transparent,
+                unfocusedBorderColor    = Color.Transparent,
+                disabledBorderColor     = Color.Transparent,
+                focusedContainerColor   = Color.Transparent,
+                unfocusedContainerColor = Color.Transparent,
+                disabledContainerColor  = Color.Transparent,
+                focusedTextColor        = NeumorphTextPrimary,
+                unfocusedTextColor      = NeumorphTextPrimary,
+                cursorColor             = NeumorphAccentPrimary
+            ),
+            textStyle = androidx.compose.ui.text.TextStyle(
+                fontSize      = 14.sp,
+                fontWeight    = FontWeight.Medium,
+                color         = NeumorphTextPrimary,
+                letterSpacing = 0.2.sp
+            ),
+            singleLine = true,
+            enabled    = enabled
+        )
+    }
 }
 
 // ─── Role Icon ────────────────────────────────────────────────────────────────
@@ -557,11 +602,10 @@ private fun RoleIcon(
         modifier = Modifier
             .size(48.dp)
             .then(
-                if (isSelected) {
+                if (isSelected)
                     Modifier.neumorphicInset(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
-                } else {
+                else
                     Modifier.neumorphic(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
-                }
             )
             .background(NeumorphSurface, CircleShape)
             .bounceClick { onClick() },
@@ -569,24 +613,24 @@ private fun RoleIcon(
     ) {
         if (isImage) {
             Image(
-                painter           = painterResource(id = icon),
+                painter            = painterResource(id = icon),
                 contentDescription = null,
-                modifier          = Modifier.size(24.dp),
-                contentScale      = ContentScale.Fit,
-                alpha             = if (isSelected) 1f else 0.7f
+                modifier           = Modifier.size(25.dp),
+                contentScale       = ContentScale.Fit,
+                alpha              = if (isSelected) 1f else 0.55f
             )
         } else {
             Icon(
-                painter           = painterResource(id = icon),
+                painter            = painterResource(id = icon),
                 contentDescription = null,
-                tint              = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
-                modifier          = Modifier.size(24.dp)
+                tint               = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
+                modifier           = Modifier.size(25.dp)
             )
         }
     }
 }
 
-// ─── Data holder ─────────────────────────────────────────────────────────────
+// ─── Data Holder ─────────────────────────────────────────────────────────────
 private data class RoleData(
     val icon: Int,
     val title: String,
@@ -755,16 +799,13 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                 colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .verticalScroll(rememberScrollState())
-                        .padding(28.dp),
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text("About Campus Buddy", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor, textAlign = TextAlign.Center)
                     Spacer(Modifier.height(16.dp))
                     Text(
-                        "A smart bus attendance and tracking system for colleges — GPS-based live tracking, QR attendance, student absence planning, real-time stop management, and multi-role support for drivers, students, and admins.",
+                        "A smart bus attendance and tracking system for colleges \u2014 GPS-based live tracking, QR attendance, student absence planning, real-time stop management, and multi-role support for drivers, students, and admins.",
                         fontSize = 14.sp, color = SubtitleColor, textAlign = TextAlign.Start,
                         lineHeight = 21.sp, modifier = Modifier.fillMaxWidth()
                     )

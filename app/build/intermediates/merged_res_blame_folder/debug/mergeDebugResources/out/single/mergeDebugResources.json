@@ -100,6 +100,10 @@
         "source": "com.campusbussbuddy.app-main-70:/drawable/driver_login.png"
     },
     {
+        "merged": "com.campusbussbuddy.app-debug-68:/drawable_ic_lock.xml.flat",
+        "source": "com.campusbussbuddy.app-main-70:/drawable/ic_lock.xml"
+    },
+    {
         "merged": "com.campusbussbuddy.app-debug-68:/mipmap-xxhdpi_ic_launcher_round.webp.flat",
         "source": "com.campusbussbuddy.app-main-70:/mipmap-xxhdpi/ic_launcher_round.webp"
     },

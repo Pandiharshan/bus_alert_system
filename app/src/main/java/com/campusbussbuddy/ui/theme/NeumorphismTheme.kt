@@ -36,19 +36,19 @@ import androidx.compose.ui.unit.dp
 
 // ─── NEUMORPHISM DESIGN TOKEN SYSTEM ─────────────────────────────────────────
 
-val NeumorphBgPrimary = Color(0xFFECECEC)        // #ECECEC - Primary Background
-val NeumorphSurface = Color(0xFFE6E6E6)          // #E6E6E6 - Secondary Surface
-val NeumorphTextPrimary = Color(0xFF1F1F1F)      // #1F1F1F - Text Primary
-val NeumorphTextSecondary = Color(0xFF6E6E6E)    // #6E6E6E - Text Secondary
+val NeumorphBgPrimary = Color(0xFFE6E6E6)        // Very light grey background
+val NeumorphSurface = Color(0xFFE6E6E6)          // Same as background
+val NeumorphTextPrimary = Color(0xFF111111)      // Near Black
+val NeumorphTextSecondary = Color(0xFF6B7280)    // Gray-500
 
 // Accents
-val NeumorphAccentPrimary = Color(0xFF6D28D9)    // #6D28D9 - Primary Accent
-val NeumorphAccentHover = Color(0xFF7C3AED)      // #7C3AED - Hover Accent
-val NeumorphAccentGlow = Color(0x596D28D9)       // rgba(109,40,217,0.35) - Glow Accent
+val NeumorphAccentPrimary = Color(0xFF8A5CFF)    // Purple accent to match target
+val NeumorphAccentHover = Color(0xFF7C3AED)      // Hover Accent
+val NeumorphAccentGlow = Color(0x4D8A5CFF)       // Purple glow with more opacity
 
-// Shadows
-val NeumorphLightShadow = Color(0xFFFFFFFF)      // #FFFFFF
-val NeumorphDarkShadow = Color(0xFFCFCFCF)       // #CFCFCF
+// Shadows — balanced for clean neumorphism
+val NeumorphLightShadow = Color(0xFFF0F0F0)      // Slightly off-white (reduces corner brightness)
+val NeumorphDarkShadow = Color(0xFFBEBEBE)       // Darker grey for depth contrast
 
 // Radii
 val NeumorphCardRadius = 24.dp
@@ -58,21 +58,21 @@ val NeumorphInputRadius = 28.dp
 // ─── NEUMORPHIC MODIFIERS ───────────────────────────────────────────────────
 
 /**
- * Creates a raised neumorphic shadow effect.
- * box-shadow: 10px 10px 20px #CFCFCF, -10px -10px 20px #FFFFFF
+ * Creates a raised neumorphic shadow effect with enhanced depth.
+ * Enhanced shadows: light shadow (-8dp, -8dp) and dark shadow (8dp, 8dp) with higher blur
  */
 fun Modifier.neumorphic(
     cornerRadius: Dp = NeumorphCardRadius,
     lightShadowColor: Color = NeumorphLightShadow,
     darkShadowColor: Color = NeumorphDarkShadow,
-    elevation: Dp = 10.dp,
-    blur: Dp = 20.dp
+    elevation: Dp = 8.dp,
+    blur: Dp = 16.dp
 ) = this.drawBehind {
     val cornerRadiusPx = cornerRadius.toPx()
     val elevationPx = elevation.toPx()
     val blurPx = blur.toPx()
 
-    // Draw Dark Shadow (Bottom Right)
+    // Draw Dark Shadow (Bottom Right) - Enhanced offset and blur
     drawIntoCanvas { canvas ->
         val paint = Paint()
         val frameworkPaint = paint.asFrameworkPaint()
@@ -93,7 +93,7 @@ fun Modifier.neumorphic(
             paint = paint
         )
 
-        // Draw Light Shadow (Top Left)
+        // Draw Light Shadow (Top Left) - Enhanced offset and blur
         frameworkPaint.setShadowLayer(
             blurPx,
             -elevationPx,
@@ -113,8 +113,9 @@ fun Modifier.neumorphic(
 }
 
 /**
- * Creates an inset neumorphic shadow effect.
- * inset: 6px 6px 12px #CFCFCF, inset -6px -6px 12px #FFFFFF
+ * Creates an inset (pressed-in) neumorphic shadow effect.
+ * Uses canvas.translate to shift shadow drawing, producing clean inner shadows
+ * when clipped to the element's rounded rect boundary.
  */
 fun Modifier.neumorphicInset(
     cornerRadius: Dp = NeumorphInputRadius,
@@ -124,31 +125,25 @@ fun Modifier.neumorphicInset(
     blur: Dp = 12.dp
 ) = this.drawWithContent {
     drawContent()
-    
+
     val cornerRadiusPx = cornerRadius.toPx()
     val elevationPx = elevation.toPx()
     val blurPx = blur.toPx()
 
-    drawIntoCanvas { canvas ->
-        val paint = Paint()
-        val frameworkPaint = paint.asFrameworkPaint()
-        frameworkPaint.isAntiAlias = true
-        frameworkPaint.color = Color.Transparent.toArgb()
-        
-        // Dark Inner Shadow (Top Left)
-        canvas.save()
-        val pathDark = Path().apply {
-            addRoundRect(
-                androidx.compose.ui.geometry.RoundRect(
-                    left = 0f, top = 0f, right = size.width, bottom = size.height,
-                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
-                )
+    val clipPath = Path().apply {
+        addRoundRect(
+            androidx.compose.ui.geometry.RoundRect(
+                left = 0f, top = 0f,
+                right = size.width, bottom = size.height,
+                cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx)
             )
-        }
-        canvas.clipPath(pathDark)
+        )
+    }
 
+    drawIntoCanvas { canvas ->
+        // ── Dark Inner Shadow (Top-Left light source → shadow inside at top & left) ──
         val shadowPaintDark = Paint().apply {
-            color = darkShadowColor
+            color = darkShadowColor.copy(alpha = 0.65f)
             style = PaintingStyle.Stroke
             strokeWidth = blurPx + elevationPx
         }
@@ -156,26 +151,15 @@ fun Modifier.neumorphicInset(
             maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
         }
 
-        // Draw slightly offset border to create inset effect
-        canvas.drawPath(
-            Path().apply {
-                addRoundRect(
-                    androidx.compose.ui.geometry.RoundRect(
-                        left = -elevationPx, top = -elevationPx, right = size.width + elevationPx, bottom = size.height + elevationPx,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
-                    )
-                )
-            },
-            shadowPaintDark
-        )
+        canvas.save()
+        canvas.clipPath(clipPath)
+        canvas.translate(-elevationPx, -elevationPx)
+        canvas.drawPath(clipPath, shadowPaintDark)
         canvas.restore()
 
-        // Light Inner Shadow (Bottom Right)
-        canvas.save()
-        canvas.clipPath(pathDark)
-
+        // ── Light Inner Shadow (Bottom-Right highlight edge) ──
         val shadowPaintLight = Paint().apply {
-            color = lightShadowColor
+            color = lightShadowColor.copy(alpha = 0.5f)
             style = PaintingStyle.Stroke
             strokeWidth = blurPx + elevationPx
         }
@@ -183,17 +167,10 @@ fun Modifier.neumorphicInset(
             maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
         }
 
-        canvas.drawPath(
-            Path().apply {
-                addRoundRect(
-                    androidx.compose.ui.geometry.RoundRect(
-                        left = elevationPx, top = elevationPx, right = size.width - elevationPx, bottom = size.height - elevationPx,
-                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
-                    )
-                )
-            },
-            shadowPaintLight
-        )
+        canvas.save()
+        canvas.clipPath(clipPath)
+        canvas.translate(elevationPx, elevationPx)
+        canvas.drawPath(clipPath, shadowPaintLight)
         canvas.restore()
     }
 }
@@ -231,4 +208,109 @@ fun Modifier.bounceClick(
             }
             true
         }
+}
+
+/**
+ * Creates a raised neumorphic shadow effect using a custom [Shape].
+ */
+fun Modifier.neumorphicShape(
+    shape: androidx.compose.ui.graphics.Shape,
+    lightShadowColor: Color = NeumorphLightShadow,
+    darkShadowColor: Color = NeumorphDarkShadow,
+    elevation: Dp = 10.dp,
+    blur: Dp = 20.dp
+) = this.drawBehind {
+    val elevationPx = elevation.toPx()
+    val blurPx = blur.toPx()
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val path = when (outline) {
+        is androidx.compose.ui.graphics.Outline.Generic -> outline.path
+        is androidx.compose.ui.graphics.Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+        is androidx.compose.ui.graphics.Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+    }
+
+    drawIntoCanvas { canvas ->
+        val paint = Paint()
+        val frameworkPaint = paint.asFrameworkPaint()
+        frameworkPaint.color = Color.Transparent.toArgb()
+
+        frameworkPaint.setShadowLayer(
+            blurPx,
+            elevationPx,
+            elevationPx,
+            darkShadowColor.toArgb()
+        )
+        canvas.drawPath(path, paint)
+
+        frameworkPaint.setShadowLayer(
+            blurPx,
+            -elevationPx,
+            -elevationPx,
+            lightShadowColor.toArgb()
+        )
+        canvas.drawPath(path, paint)
+    }
+}
+
+/**
+ * Creates an inset neumorphic shadow effect using a custom [Shape].
+ */
+fun Modifier.neumorphicInsetShape(
+    shape: androidx.compose.ui.graphics.Shape,
+    lightShadowColor: Color = NeumorphLightShadow,
+    darkShadowColor: Color = NeumorphDarkShadow,
+    elevation: Dp = 6.dp,
+    blur: Dp = 12.dp
+) = this.drawWithContent {
+    drawContent()
+    
+    val elevationPx = elevation.toPx()
+    val blurPx = blur.toPx()
+
+    val outline = shape.createOutline(size, layoutDirection, this)
+    val path = when (outline) {
+        is androidx.compose.ui.graphics.Outline.Generic -> outline.path
+        is androidx.compose.ui.graphics.Outline.Rounded -> Path().apply { addRoundRect(outline.roundRect) }
+        is androidx.compose.ui.graphics.Outline.Rectangle -> Path().apply { addRect(outline.rect) }
+    }
+
+    drawIntoCanvas { canvas ->
+        // Dark Inner Shadow (Top Left)
+        canvas.save()
+        canvas.clipPath(path)
+
+        val shadowPaintDark = Paint().apply {
+            color = darkShadowColor
+            style = PaintingStyle.Stroke
+            strokeWidth = blurPx + elevationPx
+        }
+        shadowPaintDark.asFrameworkPaint().apply {
+            maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
+        }
+
+        canvas.save()
+        canvas.translate(-elevationPx, -elevationPx)
+        canvas.drawPath(path, shadowPaintDark)
+        canvas.restore()
+        canvas.restore()
+
+        // Light Inner Shadow (Bottom Right)
+        canvas.save()
+        canvas.clipPath(path)
+
+        val shadowPaintLight = Paint().apply {
+            color = lightShadowColor
+            style = PaintingStyle.Stroke
+            strokeWidth = blurPx + elevationPx
+        }
+        shadowPaintLight.asFrameworkPaint().apply {
+            maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
+        }
+
+        canvas.save()
+        canvas.translate(elevationPx, elevationPx)
+        canvas.drawPath(path, shadowPaintLight)
+        canvas.restore()
+        canvas.restore()
+    }
 }
