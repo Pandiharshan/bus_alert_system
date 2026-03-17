@@ -113,9 +113,8 @@ fun Modifier.neumorphic(
 }
 
 /**
- * Creates an inset (pressed-in) neumorphic shadow effect.
- * Uses canvas.translate to shift shadow drawing, producing clean inner shadows
- * when clipped to the element's rounded rect boundary.
+ * Creates an inset neumorphic shadow effect with enhanced depth.
+ * Enhanced inset shadows for input fields and pressed states
  */
 fun Modifier.neumorphicInset(
     cornerRadius: Dp = NeumorphInputRadius,
@@ -125,52 +124,76 @@ fun Modifier.neumorphicInset(
     blur: Dp = 12.dp
 ) = this.drawWithContent {
     drawContent()
-
+    
     val cornerRadiusPx = cornerRadius.toPx()
     val elevationPx = elevation.toPx()
     val blurPx = blur.toPx()
 
-    val clipPath = Path().apply {
-        addRoundRect(
-            androidx.compose.ui.geometry.RoundRect(
-                left = 0f, top = 0f,
-                right = size.width, bottom = size.height,
-                cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx)
-            )
-        )
-    }
-
     drawIntoCanvas { canvas ->
-        // ── Dark Inner Shadow (Top-Left light source → shadow inside at top & left) ──
+        val paint = Paint()
+        val frameworkPaint = paint.asFrameworkPaint()
+        frameworkPaint.isAntiAlias = true
+        frameworkPaint.color = Color.Transparent.toArgb()
+        
+        // Dark Inner Shadow (Top Left) - Enhanced for better visibility
+        canvas.save()
+        val pathDark = Path().apply {
+            addRoundRect(
+                androidx.compose.ui.geometry.RoundRect(
+                    left = 0f, top = 0f, right = size.width, bottom = size.height,
+                    cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
+                )
+            )
+        }
+        canvas.clipPath(pathDark)
+
         val shadowPaintDark = Paint().apply {
-            color = darkShadowColor.copy(alpha = 0.65f)
+            color = darkShadowColor.copy(alpha = 0.6f)
             style = PaintingStyle.Stroke
-            strokeWidth = blurPx + elevationPx
+            strokeWidth = blurPx + elevationPx * 0.5f
         }
         shadowPaintDark.asFrameworkPaint().apply {
             maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
         }
 
-        canvas.save()
-        canvas.clipPath(clipPath)
-        canvas.translate(-elevationPx, -elevationPx)
-        canvas.drawPath(clipPath, shadowPaintDark)
+        // Draw slightly offset border to create inset effect
+        canvas.drawPath(
+            Path().apply {
+                addRoundRect(
+                    androidx.compose.ui.geometry.RoundRect(
+                        left = -elevationPx, top = -elevationPx, right = size.width + elevationPx, bottom = size.height + elevationPx,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
+                    )
+                )
+            },
+            shadowPaintDark
+        )
         canvas.restore()
 
-        // ── Light Inner Shadow (Bottom-Right highlight edge) ──
+        // Light Inner Shadow (Bottom Right) - Enhanced for better visibility
+        canvas.save()
+        canvas.clipPath(pathDark)
+
         val shadowPaintLight = Paint().apply {
-            color = lightShadowColor.copy(alpha = 0.5f)
+            color = lightShadowColor.copy(alpha = 0.4f)
             style = PaintingStyle.Stroke
-            strokeWidth = blurPx + elevationPx
+            strokeWidth = blurPx + elevationPx * 0.5f
         }
         shadowPaintLight.asFrameworkPaint().apply {
             maskFilter = android.graphics.BlurMaskFilter(blurPx, android.graphics.BlurMaskFilter.Blur.NORMAL)
         }
 
-        canvas.save()
-        canvas.clipPath(clipPath)
-        canvas.translate(elevationPx, elevationPx)
-        canvas.drawPath(clipPath, shadowPaintLight)
+        canvas.drawPath(
+            Path().apply {
+                addRoundRect(
+                    androidx.compose.ui.geometry.RoundRect(
+                        left = elevationPx, top = elevationPx, right = size.width - elevationPx, bottom = size.height - elevationPx,
+                        cornerRadius = androidx.compose.ui.geometry.CornerRadius(cornerRadiusPx, cornerRadiusPx)
+                    )
+                )
+            },
+            shadowPaintLight
+        )
         canvas.restore()
     }
 }

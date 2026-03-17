@@ -29,6 +29,9 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.buttons.*
+import com.campusbussbuddy.ui.neumorphism.inputs.*
+import com.campusbussbuddy.ui.neumorphism.layout.*
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
@@ -132,9 +135,9 @@ private fun MainContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            BottomPill("PRIVACY") { onPrivacyPolicyClick() }
-            BottomPill("SUPPORT") { onSupportClick() }
-            BottomPill("ABOUT")   { onAppInfoClick() }
+            NeumorphismPill("PRIVACY", onClick = { onPrivacyPolicyClick() })
+            NeumorphismPill("SUPPORT", onClick = { onSupportClick() })
+            NeumorphismPill("ABOUT",   onClick = { onAppInfoClick() })
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -195,25 +198,7 @@ private fun AppLabelPill(
     }
 }
 
-// ─── Bottom Pill Button ───────────────────────────────────────────────────────
-@Composable
-private fun BottomPill(label: String, onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
-            .background(NeumorphSurface, RoundedCornerShape(20.dp))
-            .bounceClick { onClick() }
-            .padding(horizontal = 18.dp, vertical = 9.dp)
-    ) {
-        Text(
-            text          = label,
-            fontSize      = 10.sp,
-            fontWeight    = FontWeight.Bold,
-            color         = NeumorphTextSecondary,
-            letterSpacing = 1.5.sp
-        )
-    }
-}
+
 
 // ─── Dynamic Login Card ───────────────────────────────────────────────────────
 @Composable
@@ -309,7 +294,7 @@ private fun DynamicLoginCard(
             Spacer(modifier = Modifier.height(28.dp))
 
             // ── Username Field ────────────────────────────────────────────────
-            NeumorphicInputField(
+            NeumorphismTextField(
                 value         = username,
                 onValueChange = { username = it; errorMessage = null },
                 placeholder   = roleData.usernameLabel,
@@ -327,7 +312,7 @@ private fun DynamicLoginCard(
             Spacer(modifier = Modifier.height(14.dp))
 
             // ── Password Field ────────────────────────────────────────────────
-            NeumorphicInputField(
+            NeumorphismTextField(
                 value         = password,
                 onValueChange = { password = it; errorMessage = null },
                 placeholder   = "Password",
@@ -375,13 +360,14 @@ private fun DynamicLoginCard(
             Spacer(modifier = Modifier.height(24.dp))
 
             // ── Sign In Button ────────────────────────────────────────────────
-            SignInButton(
+            NeumorphismButton(
+                text      = "Sign In",
                 isLoading = isLoading,
                 onClick   = {
-                    if (isLoading) return@SignInButton
+                    if (isLoading) return@NeumorphismButton
                     if (username.isBlank() || password.isBlank()) {
                         errorMessage = "Please fill in all fields"
-                        return@SignInButton
+                        return@NeumorphismButton
                     }
                     scope.launch {
                         isLoading    = true
@@ -430,18 +416,18 @@ private fun DynamicLoginCard(
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment     = Alignment.CenterVertically
                 ) {
-                    RoleIcon(
-                        icon       = R.drawable.ic_directions_bus_vector,
+                    NeumorphismIconButton(
+                        iconRes    = R.drawable.ic_directions_bus_vector,
                         isSelected = selectedRole == LoginRole.DRIVER,
                         onClick    = { onRoleChange(LoginRole.DRIVER) }
                     )
-                    RoleIcon(
-                        icon       = R.drawable.ic_student,
+                    NeumorphismIconButton(
+                        iconRes    = R.drawable.ic_student,
                         isSelected = selectedRole == LoginRole.STUDENT,
                         onClick    = { onRoleChange(LoginRole.STUDENT) }
                     )
-                    RoleIcon(
-                        icon       = R.drawable.ic_admin_panel,
+                    NeumorphismIconButton(
+                        iconRes    = R.drawable.ic_admin_panel,
                         isSelected = selectedRole == LoginRole.ADMIN,
                         onClick    = { onRoleChange(LoginRole.ADMIN) }
                     )
@@ -451,184 +437,7 @@ private fun DynamicLoginCard(
     }
 }
 
-// ─── Sign In Button ───────────────────────────────────────────────────────────
-@Composable
-private fun SignInButton(
-    isLoading: Boolean,
-    onClick: () -> Unit
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
-                .align(Alignment.BottomCenter)
-                .background(
-                    brush = Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f  to Color.Transparent,
-                            0.45f to Color.Transparent,
-                            0.72f to NeumorphAccentPrimary.copy(alpha = 0.30f),
-                            1.0f  to NeumorphAccentPrimary.copy(alpha = 0.60f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(NeumorphButtonRadius)
-                )
-        )
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(56.dp)
-                .align(Alignment.TopCenter)
-                .neumorphic(
-                    cornerRadius    = NeumorphButtonRadius,
-                    elevation       = 6.dp,
-                    blur            = 12.dp,
-                    darkShadowColor = NeumorphAccentGlow
-                )
-                .background(NeumorphSurface, RoundedCornerShape(NeumorphButtonRadius))
-                .border(
-                    width = 1.2.dp,
-                    brush = Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0.0f  to Color.White.copy(alpha = 0.90f),
-                            0.50f to Color.White.copy(alpha = 0.40f),
-                            1.0f  to NeumorphAccentPrimary.copy(alpha = 0.80f)
-                        )
-                    ),
-                    shape = RoundedCornerShape(NeumorphButtonRadius)
-                )
-                .bounceClick { onClick() },
-            contentAlignment = Alignment.Center
-        ) {
-            if (isLoading) {
-                CircularProgressIndicator(
-                    modifier    = Modifier.size(22.dp),
-                    color       = NeumorphAccentPrimary,
-                    strokeWidth = 2.5.dp
-                )
-            } else {
-                Text(
-                    text          = "Sign In",
-                    fontSize      = 17.sp,
-                    fontWeight    = FontWeight.Bold,
-                    color         = NeumorphTextPrimary,
-                    letterSpacing = 0.2.sp
-                )
-            }
-        }
-    }
-}
-
-// ─── Neumorphic Input Field ───────────────────────────────────────────────────
-// Pressed-in effect achieved by:
-//   1. Box draws the slightly darker background (sunk-in illusion)
-//   2. neumorphicInset draws inner shadows ON TOP via drawWithContent
-//   3. TextField inside is fully transparent — shadows stay visible
-@Composable
-private fun NeumorphicInputField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    leadingIcon: (@Composable () -> Unit)? = null,
-    trailingIcon: (@Composable () -> Unit)? = null,
-    visualTransformation: VisualTransformation = VisualTransformation.None,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Text),
-    enabled: Boolean = true
-) {
-    val insetBg = Color(0xFFDADADA) // Slightly darker than surface (#E6E6E6)
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp)
-            .background(insetBg, RoundedCornerShape(NeumorphInputRadius))
-            .neumorphicInset(cornerRadius = NeumorphInputRadius, elevation = 5.dp, blur = 10.dp)
-    ) {
-        OutlinedTextField(
-            value                = value,
-            onValueChange        = onValueChange,
-            placeholder          = {
-                Text(
-                    text       = placeholder,
-                    color      = NeumorphTextSecondary,
-                    fontSize   = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            },
-            leadingIcon          = leadingIcon,
-            trailingIcon         = trailingIcon,
-            visualTransformation = visualTransformation,
-            keyboardOptions      = keyboardOptions,
-            modifier             = Modifier.fillMaxSize(),
-            shape  = RoundedCornerShape(NeumorphInputRadius),
-            colors = OutlinedTextFieldDefaults.colors(
-                focusedBorderColor      = Color.Transparent,
-                unfocusedBorderColor    = Color.Transparent,
-                disabledBorderColor     = Color.Transparent,
-                focusedContainerColor   = Color.Transparent,
-                unfocusedContainerColor = Color.Transparent,
-                disabledContainerColor  = Color.Transparent,
-                focusedTextColor        = NeumorphTextPrimary,
-                unfocusedTextColor      = NeumorphTextPrimary,
-                cursorColor             = NeumorphAccentPrimary
-            ),
-            textStyle = androidx.compose.ui.text.TextStyle(
-                fontSize      = 14.sp,
-                fontWeight    = FontWeight.Medium,
-                color         = NeumorphTextPrimary,
-                letterSpacing = 0.2.sp
-            ),
-            singleLine = true,
-            enabled    = enabled
-        )
-    }
-}
-
-// ─── Role Icon ────────────────────────────────────────────────────────────────
-@Composable
-private fun RoleIcon(
-    icon: Int,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    isImage: Boolean = false
-) {
-    Box(
-        modifier = Modifier
-            .size(48.dp)
-            .then(
-                if (isSelected)
-                    Modifier.neumorphicInset(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
-                else
-                    Modifier.neumorphic(cornerRadius = 24.dp, elevation = 4.dp, blur = 8.dp)
-            )
-            .background(NeumorphSurface, CircleShape)
-            .bounceClick { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        if (isImage) {
-            Image(
-                painter            = painterResource(id = icon),
-                contentDescription = null,
-                modifier           = Modifier.size(25.dp),
-                contentScale       = ContentScale.Fit,
-                alpha              = if (isSelected) 1f else 0.55f
-            )
-        } else {
-            Icon(
-                painter            = painterResource(id = icon),
-                contentDescription = null,
-                tint               = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
-                modifier           = Modifier.size(25.dp)
-            )
-        }
-    }
-}
 
 // ─── Data Holder ─────────────────────────────────────────────────────────────
 private data class RoleData(
