@@ -30,6 +30,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import com.campusbussbuddy.ui.theme.*
 import com.campusbussbuddy.ui.neumorphism.buttons.*
+import com.campusbussbuddy.ui.neumorphism.cards.*
 import com.campusbussbuddy.ui.neumorphism.inputs.*
 import com.campusbussbuddy.ui.neumorphism.layout.*
 import androidx.compose.ui.layout.ContentScale
@@ -135,9 +136,9 @@ private fun MainContent(
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
-            NeumorphismPill("PRIVACY", onClick = { onPrivacyPolicyClick() })
-            NeumorphismPill("SUPPORT", onClick = { onSupportClick() })
-            NeumorphismPill("ABOUT",   onClick = { onAppInfoClick() })
+            NeumorphismPill("PRIVACY", iconRes = R.drawable.ic_lock, onClick = { onPrivacyPolicyClick() })
+            NeumorphismPill("SUPPORT", iconRes = R.drawable.ic_call, onClick = { onSupportClick() })
+            NeumorphismPill("ABOUT",   iconRes = R.drawable.ic_group, onClick = { onAppInfoClick() })
         }
 
         Spacer(modifier = Modifier.height(32.dp))
@@ -246,16 +247,13 @@ private fun DynamicLoginCard(
         }
     }
 
-    Box(
-        modifier = Modifier
-            .fillMaxWidth(0.94f)
-            .neumorphic(cornerRadius = NeumorphCardRadius, elevation = 8.dp, blur = 18.dp)
-            .background(NeumorphSurface, RoundedCornerShape(NeumorphCardRadius))
+    NeumorphismCard(
+        widthFraction    = 0.94f,
+        contentPadding   = PaddingValues(top = 40.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 40.dp, bottom = 32.dp, start = 24.dp, end = 24.dp),
+            modifier = Modifier.fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
 
@@ -265,30 +263,10 @@ private fun DynamicLoginCard(
                 transitionSpec = { fadeIn(tween(300)) togetherWith fadeOut(tween(200)) },
                 label        = "role_title"
             ) { data ->
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier            = Modifier.fillMaxWidth()
-                ) {
-                    Text(
-                        text          = data.title,
-                        fontSize      = 30.sp,
-                        fontWeight    = FontWeight.ExtraBold,
-                        color         = NeumorphTextPrimary,
-                        textAlign     = TextAlign.Center,
-                        letterSpacing = (-0.8).sp
-                    )
-                    if (data.subtitle.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(6.dp))
-                        Text(
-                            text       = data.subtitle,
-                            fontSize   = 13.sp,
-                            fontWeight = FontWeight.Normal,
-                            color      = NeumorphTextSecondary,
-                            textAlign  = TextAlign.Center,
-                            lineHeight = 19.sp
-                        )
-                    }
-                }
+                NeumorphismHeader(
+                    title    = data.title,
+                    subtitle = data.subtitle
+                )
             }
 
             Spacer(modifier = Modifier.height(28.dp))
@@ -467,28 +445,27 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            Card(
+            NeumorphismCard(
                 modifier = Modifier
-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
-                    .shadow(12.dp, RoundedCornerShape(24.dp))
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(scale)
+                    .alpha(alpha)
                     .clickable(remember { MutableInteractionSource() }, null) { },
-                shape  = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
+                cornerRadius = 24.dp,
+                elevation = 6.dp,
+                blur = 12.dp,
+                contentPadding = PaddingValues(28.dp)
             ) {
-                Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Privacy Policy", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor)
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    NeumorphismHeader(title = "Privacy Policy", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Text(
                         "This app is a student-developed project designed to help colleges manage bus tracking and attendance efficiently, and all data used is for educational and demonstration purposes only.",
-                        fontSize = 14.sp, color = SubtitleColor, textAlign = TextAlign.Center, lineHeight = 22.sp
+                        fontSize = 14.sp, color = NeumorphTextSecondary, textAlign = TextAlign.Center, lineHeight = 22.sp
                     )
                     Spacer(Modifier.height(24.dp))
-                    Button(
-                        onClick  = { visible = false; onDismiss() },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape    = RoundedCornerShape(24.dp),
-                        colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
-                    ) { Text("Got it", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
+                    NeumorphismButton(text = "Got it", onClick = { visible = false; onDismiss() }, showGlow = false)
                 }
             }
         }
@@ -515,16 +492,20 @@ private fun SupportDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            Card(
+            NeumorphismCard(
                 modifier = Modifier
-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
-                    .shadow(12.dp, RoundedCornerShape(24.dp))
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(scale)
+                    .alpha(alpha)
                     .clickable(remember { MutableInteractionSource() }, null) { },
-                shape  = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
+                cornerRadius = 24.dp,
+                elevation = 6.dp,
+                blur = 12.dp,
+                contentPadding = PaddingValues(28.dp)
             ) {
-                Column(Modifier.fillMaxWidth().padding(28.dp), horizontalAlignment = Alignment.CenterHorizontally) {
-                    Text("Support & Contact", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor)
+                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    NeumorphismHeader(title = "Support & Contact", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
                         ContactItem(R.drawable.ic_share, "GitHub", "View source code") {
@@ -541,12 +522,7 @@ private fun SupportDialog(onDismiss: () -> Unit) {
                         }
                     }
                     Spacer(Modifier.height(24.dp))
-                    Button(
-                        onClick  = { visible = false; onDismiss() },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape    = RoundedCornerShape(24.dp),
-                        colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
-                    ) { Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
+                    NeumorphismButton(text = "Close", onClick = { visible = false; onDismiss() }, showGlow = false)
                 }
             }
         }
@@ -573,8 +549,8 @@ private fun ContactItem(iconRes: Int, title: String, subtitle: String, onClick: 
         }
         Spacer(Modifier.width(14.dp))
         Column(Modifier.weight(1f)) {
-            Text(title,    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = TitleColor)
-            Text(subtitle, fontSize = 13.sp, color = SubtitleColor)
+            Text(title,    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = NeumorphTextPrimary)
+            Text(subtitle, fontSize = 13.sp, color = NeumorphTextSecondary)
         }
         Icon(painterResource(R.drawable.ic_chevron_right), null, tint = Color(0xFFAAAAAA), modifier = Modifier.size(18.dp))
     }
@@ -599,23 +575,27 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            Card(
+            NeumorphismCard(
                 modifier = Modifier
-                    .fillMaxWidth().padding(32.dp).scale(scale).alpha(alpha)
-                    .shadow(12.dp, RoundedCornerShape(24.dp))
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(scale)
+                    .alpha(alpha)
                     .clickable(remember { MutableInteractionSource() }, null) { },
-                shape  = RoundedCornerShape(24.dp),
-                colors = CardDefaults.cardColors(containerColor = Color.White.copy(alpha = 0.96f))
+                cornerRadius = 24.dp,
+                elevation = 6.dp,
+                blur = 12.dp,
+                contentPadding = PaddingValues(28.dp)
             ) {
                 Column(
-                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()).padding(28.dp),
+                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Text("About Campus Buddy", fontSize = 22.sp, fontWeight = FontWeight.Bold, color = TitleColor, textAlign = TextAlign.Center)
+                    NeumorphismHeader(title = "About Campus Buddy", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Text(
                         "A smart bus attendance and tracking system for colleges \u2014 GPS-based live tracking, QR attendance, student absence planning, real-time stop management, and multi-role support for drivers, students, and admins.",
-                        fontSize = 14.sp, color = SubtitleColor, textAlign = TextAlign.Start,
+                        fontSize = 14.sp, color = NeumorphTextSecondary, textAlign = TextAlign.Start,
                         lineHeight = 21.sp, modifier = Modifier.fillMaxWidth()
                     )
                     Spacer(Modifier.height(12.dp))
@@ -628,19 +608,18 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                             "Driver and student role management"
                         ).forEach { feature ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
-                                Box(Modifier.size(6.dp).background(BtnGreen, CircleShape))
+                                Box(
+                                    Modifier.size(6.dp)
+                                        .background(NeumorphSurface, CircleShape)
+                                        .neumorphic(cornerRadius = 3.dp, elevation = 1.dp, blur = 2.dp, lightShadowColor = Color.White)
+                                )
                                 Spacer(Modifier.width(10.dp))
-                                Text(feature, fontSize = 13.sp, color = SubtitleColor)
+                                Text(feature, fontSize = 13.sp, color = NeumorphTextSecondary)
                             }
                         }
                     }
                     Spacer(Modifier.height(24.dp))
-                    Button(
-                        onClick  = { visible = false; onDismiss() },
-                        modifier = Modifier.fillMaxWidth().height(48.dp),
-                        shape    = RoundedCornerShape(24.dp),
-                        colors   = ButtonDefaults.buttonColors(containerColor = BtnGreen)
-                    ) { Text("Close", fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = Color.White) }
+                    NeumorphismButton(text = "Close", onClick = { visible = false; onDismiss() }, showGlow = false)
                 }
             }
         }
