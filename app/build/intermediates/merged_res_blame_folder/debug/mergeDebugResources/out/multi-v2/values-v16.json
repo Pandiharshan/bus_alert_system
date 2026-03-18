@@ -1,8 +1,27 @@
 {
     "logs": [
         {
-            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-66:/values-v16/values-v16.xml",
+            "outputFile": "com.campusbussbuddy.app-mergeDebugResources-74:/values-v16/values-v16.xml",
             "map": [
+                {
+                    "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\3baaa0ccc9a195ab12eb1ede470303ff\\transformed\\appcompat-1.6.1\\res\\values-v16\\values-v16.xml",
+                    "from": {
+                        "startLines": "2",
+                        "startColumns": "4",
+                        "startOffsets": "55",
+                        "endLines": "5",
+                        "endColumns": "12",
+                        "endOffsets": "223"
+                    },
+                    "to": {
+                        "startLines": "3",
+                        "startColumns": "4",
+                        "startOffsets": "121",
+                        "endLines": "6",
+                        "endColumns": "12",
+                        "endOffsets": "289"
+                    }
+                },
                 {
                     "source": "C:\\Users\\PANDI HARSHAN\\.gradle\\caches\\transforms-3\\86f72d3cf891e9dbf79bb02febd4cf09\\transformed\\core-1.12.0\\res\\values-v16\\values-v16.xml",
                     "from": {

@@ -1,38 +1,55 @@
 package com.campusbussbuddy.ui.screens
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.camera.core.CameraSelector
+import androidx.camera.core.ExperimentalGetImage
+import androidx.camera.core.ImageAnalysis
+import androidx.camera.core.Preview
+import androidx.camera.lifecycle.ProcessCameraProvider
+import androidx.camera.view.PreviewView
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import coil.compose.SubcomposeAsyncImage
-import coil.request.ImageRequest
+import androidx.compose.ui.viewinterop.AndroidView
+import androidx.compose.ui.zIndex
+import androidx.core.content.ContextCompat
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.StudentInfo
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismPill
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.mlkit.vision.barcode.BarcodeScannerOptions
+import com.google.mlkit.vision.barcode.BarcodeScanning
+import com.google.mlkit.vision.barcode.common.Barcode
+import com.google.mlkit.vision.common.InputImage
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,157 +59,213 @@ fun StudentPortalHomeScreen(
     var studentInfo by remember { mutableStateOf<StudentInfo?>(null) }
     var busInfo by remember { mutableStateOf<BusInfo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-    
+
+    // Scanner States
+    var showScanner by remember { mutableStateOf(false) }
+    var hasScannedSession by remember { mutableStateOf(false) }
+
     val scope = rememberCoroutineScope()
     val context = LocalContext.current
-    
+
+    val cameraPermissionLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.RequestPermission()
+    ) { isGranted ->
+        if (isGranted) {
+            showScanner = true
+        } else {
+            Toast.makeText(context, "Camera permission needed to scan QR.", Toast.LENGTH_SHORT).show()
+        }
+    }
+
     // Load student data on screen launch
     LaunchedEffect(Unit) {
         scope.launch {
-            Log.d("StudentPortalHome", "Loading student info...")
             studentInfo = FirebaseManager.getCurrentStudentInfo()
-            Log.d("StudentPortalHome", "Student info loaded: ${studentInfo?.name}")
-            Log.d("StudentPortalHome", "Bus ID: ${studentInfo?.busId}")
-            
             if (studentInfo?.busId?.isNotEmpty() == true) {
                 busInfo = FirebaseManager.getBusInfo(studentInfo!!.busId)
-                Log.d("StudentPortalHome", "Bus info loaded: Bus ${busInfo?.busNumber}")
             }
             isLoading = false
         }
     }
-    
-    GlassBackground {
+
+    NeumorphismScreenContainer {
         Box(modifier = Modifier.fillMaxSize()) {
             if (isLoading) {
-                // Loading State
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center),
-                    color = Color(0xFF6B9A92)
+                    color = NeumorphAccentPrimary
                 )
             } else {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(rememberScrollState())
-                        .padding(horizontal = 20.dp),
+                        .padding(horizontal = 24.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
-                    // Top Bar with Back Button and "HOME" title
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        IconButton(
-                            onClick = onLogoutClick,
-                            modifier = Modifier.size(40.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_chevron_left),
-                                contentDescription = "Back",
-                                tint = Color(0xFF2C3E3E),
-                                modifier = Modifier.size(32.dp)
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.weight(1f))
-                        
-                        Text(
-                            text = "HOME",
-                            fontSize = 16.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A),
-                            letterSpacing = 2.sp
-                        )
-                        
-                        Spacer(modifier = Modifier.weight(1f))
-                        
-                        // Placeholder for symmetry
-                        Spacer(modifier = Modifier.size(40.dp))
-                    }
-                    
-                    Spacer(modifier = Modifier.height(24.dp))
-                    
-                    // Profile Photo with green dot indicator
+                    Spacer(modifier = Modifier.height(48.dp))
+
+                    // Top AppLabelPill with back button
                     Box(
-                        contentAlignment = Alignment.BottomEnd
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
                     ) {
+                        NeumorphismIconButton(
+                            iconRes = R.drawable.ic_chevron_left,
+                            onClick = onLogoutClick,
+                            size = 44.dp,
+                            iconSize = 24.dp,
+                            modifier = Modifier.align(Alignment.CenterStart)
+                        )
+
+                        AppLabelPill(
+                            icon = R.drawable.ic_person,
+                            title = "Student Portal"
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
+                    // Profile Photo
+                    Box(contentAlignment = Alignment.BottomEnd) {
                         Box(
                             modifier = Modifier
                                 .size(110.dp)
-                                .clip(CircleShape)
-                                .background(Color(0xFFB8D4D1))
-                                .border(4.dp, Color.White.copy(alpha = 0.5f), CircleShape),
+                                .neumorphicInset(cornerRadius = 55.dp, blur = 12.dp)
+                                .background(NeumorphBgPrimary, CircleShape),
                             contentAlignment = Alignment.Center
                         ) {
                             Icon(
                                 painter = painterResource(id = R.drawable.ic_person),
                                 contentDescription = "Profile",
-                                tint = Color(0xFF6B9090),
+                                tint = NeumorphTextSecondary,
                                 modifier = Modifier.size(55.dp)
                             )
                         }
-                        
-                        // Green online indicator
+
+                        // Online indicator
                         Box(
                             modifier = Modifier
-                                .size(18.dp)
+                                .size(22.dp)
+                                .neumorphic(cornerRadius = 11.dp, elevation = 3.dp, blur = 6.dp)
                                 .background(Color(0xFF4CAF50), CircleShape)
-                                .border(3.dp, Color.White, CircleShape)
                         )
                     }
-                    
-                    Spacer(modifier = Modifier.height(12.dp))
-                    
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     // Student Name
                     Text(
-                        text = studentInfo?.name ?: "Alex Harrison",
-                        fontSize = 22.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A)
+                        text = studentInfo?.name ?: "Student",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.ExtraBold,
+                        color = NeumorphTextPrimary,
+                        letterSpacing = (-0.5).sp
                     )
-                    
-                    Spacer(modifier = Modifier.height(4.dp))
-                    
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
                     // Bus and Stop Info
                     Text(
-                        text = if (busInfo != null) 
+                        text = if (busInfo != null)
                             "Bus ${busInfo!!.busNumber} • Morning Express"
-                        else 
-                            "Bus 42 • Morning Express",
+                        else
+                            "Bus Not Assigned",
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF4A5F5F)
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextSecondary
                     )
-                    
+
                     Spacer(modifier = Modifier.height(2.dp))
-                    
-                    // Stop Name
+
                     Text(
-                        text = studentInfo?.stop ?: "Central Hub",
+                        text = studentInfo?.stop ?: "Stop Not Set",
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF4A5F5F)
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextSecondary
                     )
-                    
+
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
+                    // Scan QR Button
+                    NeumorphismButton(
+                        text = "Scan QR",
+                        onClick = {
+                            if (!hasScannedSession) {
+                                val permissionCheckResult = ContextCompat.checkSelfPermission(context, Manifest.permission.CAMERA)
+                                if (permissionCheckResult == PackageManager.PERMISSION_GRANTED) {
+                                    showScanner = true
+                                } else {
+                                    cameraPermissionLauncher.launch(Manifest.permission.CAMERA)
+                                }
+                            } else {
+                                Toast.makeText(context, "Already scanned for this session.", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
                     // My Bus Status Card
-                    BusStatusCard(busInfo)
-                    
+                    StudentBusStatusCard(busInfo)
+
                     Spacer(modifier = Modifier.height(20.dp))
-                    
+
                     // Action Grid (2x2)
-                    ActionGrid()
-                    
+                    StudentActionGrid()
+
                     Spacer(modifier = Modifier.height(24.dp))
-                    
+
                     // Bottom Links
-                    BottomLinks()
-                    
-                    Spacer(modifier = Modifier.height(20.dp))
+                    StudentBottomLinks(onLogoutClick = onLogoutClick)
+
+                    Spacer(modifier = Modifier.height(24.dp))
+                }
+            }
+
+            // QR Scanner Overlay
+            if (showScanner) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(Color.Black)
+                        .zIndex(10f)
+                ) {
+                    QRScannerView(
+                        onScan = { qrContent ->
+                            showScanner = false
+                            if (qrContent.startsWith("busId:")) {
+                                val scannedBusId = qrContent.removePrefix("busId:")
+                                
+                                // Get current user UID
+                                val uid = FirebaseAuth.getInstance().currentUser?.uid
+                                if (uid != null) {
+                                    FirebaseFirestore.getInstance().collection("students").document(uid)
+                                        .update(
+                                            mapOf(
+                                                "status" to "BOARDED",
+                                                "busId" to scannedBusId
+                                            )
+                                        )
+                                        .addOnSuccessListener {
+                                            Toast.makeText(context, "Boarded Successfully", Toast.LENGTH_SHORT).show()
+                                            hasScannedSession = true
+                                        }
+                                        .addOnFailureListener {
+                                            Toast.makeText(context, "Failed to update attendance.", Toast.LENGTH_SHORT).show()
+                                        }
+                                } else {
+                                    Toast.makeText(context, "Error: User not logged in", Toast.LENGTH_SHORT).show()
+                                }
+                            } else {
+                                Toast.makeText(context, "Invalid QR Code", Toast.LENGTH_SHORT).show()
+                            }
+                        },
+                        onClose = {
+                            showScanner = false
+                        }
+                    )
                 }
             }
         }
@@ -200,84 +273,62 @@ fun StudentPortalHomeScreen(
 }
 
 @Composable
-private fun BusStatusCard(busInfo: BusInfo?) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 0.dp,
-                shape = RoundedCornerShape(20.dp)
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD9E8E6)
-        ),
-        border = BorderStroke(0.dp, Color.Transparent)
+private fun StudentBusStatusCard(busInfo: BusInfo?) {
+    NeumorphismCard(
+        modifier = Modifier.fillMaxWidth(),
+        cornerRadius = 24.dp,
+        contentPadding = PaddingValues(20.dp)
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
-        ) {
-            // Header Row
+        Column(modifier = Modifier.fillMaxWidth()) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                        contentDescription = "Bus",
-                        tint = Color(0xFF6B9090),
-                        modifier = Modifier.size(22.dp)
-                    )
-                    
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(36.dp)
+                            .neumorphicInset(cornerRadius = 18.dp, blur = 6.dp)
+                            .background(NeumorphBgPrimary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                            contentDescription = "Bus",
+                            tint = NeumorphAccentPrimary,
+                            modifier = Modifier.size(18.dp)
+                        )
+                    }
+
                     Spacer(modifier = Modifier.width(10.dp))
-                    
+
                     Text(
                         text = "My Bus Status",
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A)
+                        color = NeumorphTextPrimary
                     )
                 }
-                
-                // LIVE Badge
-                Box(
-                    modifier = Modifier
-                        .background(
-                            Color(0xFF4CAF50),
-                            RoundedCornerShape(10.dp)
-                        )
-                        .padding(horizontal = 10.dp, vertical = 3.dp)
-                ) {
-                    Text(
-                        text = "LIVE",
-                        fontSize = 10.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color.White,
-                        letterSpacing = 1.sp
-                    )
-                }
+
+                NeumorphismPill(
+                    label = "LIVE",
+                    onClick = {}
+                )
             }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Route Info
+
+            Spacer(modifier = Modifier.height(16.dp))
+
             Text(
-                text = if (busInfo != null) "ROUTE ${busInfo.busNumber} - NORTH CAMPUS" else "ROUTE 42 - NORTH CAMPUS",
+                text = if (busInfo != null) "ROUTE ${busInfo.busNumber} - NORTH CAMPUS" else "ROUTE - NOT ASSIGNED",
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF6B9090),
+                color = NeumorphTextSecondary,
                 letterSpacing = 0.8.sp
             )
-            
-            Spacer(modifier = Modifier.height(6.dp))
-            
-            // Time and Next Bus Info
+
+            Spacer(modifier = Modifier.height(8.dp))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -287,72 +338,47 @@ private fun BusStatusCard(busInfo: BusInfo?) {
                     Text(
                         text = "4 mins",
                         fontSize = 32.sp,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A)
+                        fontWeight = FontWeight.ExtraBold,
+                        color = NeumorphTextPrimary
                     )
-                    
                     Text(
-                        text = "Arriving at Central Hub",
+                        text = "Arriving at Drop Point",
                         fontSize = 12.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFF4A5F5F)
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextSecondary
                     )
                 }
-                
-                Column(
-                    horizontalAlignment = Alignment.End
-                ) {
+
+                Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = "NEXT BUS",
                         fontSize = 9.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF6B9090),
+                        color = NeumorphTextSecondary,
                         letterSpacing = 0.8.sp
                     )
-                    
                     Text(
                         text = "16:45",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        color = Color(0xFF1A1A1A)
+                        color = NeumorphTextPrimary
                     )
                 }
             }
-            
-            Spacer(modifier = Modifier.height(12.dp))
-            
-            // Track on Map Button
-            Button(
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            NeumorphismButton(
+                text = "Track on Map",
                 onClick = { /* Handle track on map */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(44.dp),
-                shape = RoundedCornerShape(22.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = Color(0xFF8AAFA8),
-                    contentColor = Color.White
-                )
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_map),
-                    contentDescription = "Map",
-                    modifier = Modifier.size(18.dp)
-                )
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                Text(
-                    text = "Track on Map",
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.SemiBold
-                )
-            }
+                modifier = Modifier.fillMaxWidth()
+            )
         }
     }
 }
 
 @Composable
-private fun ActionGrid() {
+private fun StudentActionGrid() {
     Column(
         modifier = Modifier.fillMaxWidth(),
         verticalArrangement = Arrangement.spacedBy(14.dp)
@@ -361,30 +387,30 @@ private fun ActionGrid() {
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            ActionCard(
+            StudentActionCard(
                 icon = R.drawable.ic_qr_code,
                 label = "QR SCANNER",
                 modifier = Modifier.weight(1f)
             )
-            
-            ActionCard(
+
+            StudentActionCard(
                 icon = R.drawable.ic_person,
                 label = "PROFILE",
                 modifier = Modifier.weight(1f)
             )
         }
-        
+
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            ActionCard(
+            StudentActionCard(
                 icon = R.drawable.ic_calendar_today,
                 label = "ABSENT CALENDAR",
                 modifier = Modifier.weight(1f)
             )
-            
-            ActionCard(
+
+            StudentActionCard(
                 icon = R.drawable.ic_map,
                 label = "LIVE MAP",
                 modifier = Modifier.weight(1f)
@@ -394,30 +420,18 @@ private fun ActionGrid() {
 }
 
 @Composable
-private fun ActionCard(
+private fun StudentActionCard(
     icon: Int,
     label: String,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    NeumorphismCard(
         modifier = modifier
             .height(110.dp)
-            .shadow(
-                elevation = 0.dp,
-                shape = RoundedCornerShape(18.dp)
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    color = Color(0xFF6B9A92).copy(alpha = 0.2f),
-                    bounded = true
-                )
-            ) { /* Handle action */ },
-        shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD9E8E6)
-        ),
-        border = BorderStroke(0.dp, Color.Transparent)
+            .bounceClick { /* Handle Action */ },
+        cornerRadius = 20.dp,
+        contentPadding = PaddingValues(0.dp),
+        contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
@@ -426,20 +440,28 @@ private fun ActionCard(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = label,
-                tint = Color(0xFF2A2A2A),
-                modifier = Modifier.size(30.dp)
-            )
-            
+            Box(
+                modifier = Modifier
+                    .size(44.dp)
+                    .neumorphicInset(cornerRadius = 22.dp, blur = 8.dp)
+                    .background(NeumorphBgPrimary, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = icon),
+                    contentDescription = label,
+                    tint = NeumorphAccentPrimary,
+                    modifier = Modifier.size(22.dp)
+                )
+            }
+
             Spacer(modifier = Modifier.height(10.dp))
-            
+
             Text(
                 text = label,
                 fontSize = 10.sp,
                 fontWeight = FontWeight.Bold,
-                color = Color(0xFF2A2A2A),
+                color = NeumorphTextPrimary,
                 textAlign = TextAlign.Center,
                 letterSpacing = 0.4.sp,
                 lineHeight = 12.sp
@@ -449,36 +471,126 @@ private fun ActionCard(
 }
 
 @Composable
-private fun BottomLinks() {
+private fun StudentBottomLinks(onLogoutClick: () -> Unit = {}) {
     Row(
         modifier = Modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.SpaceEvenly
     ) {
-        BottomLink("HELP")
-        BottomLink("SETTINGS")
-        BottomLink("LOGOUT", color = Color(0xFFE53935))
+        NeumorphismPill(label = "HELP", onClick = {})
+        NeumorphismPill(label = "SETTINGS", onClick = {})
+        NeumorphismPill(label = "LOGOUT", onClick = onLogoutClick)
     }
 }
 
+/**
+ * Reusable QR Scanner View utilizing CameraX and Google ML Kit.
+ */
+@androidx.annotation.OptIn(ExperimentalGetImage::class)
 @Composable
-private fun BottomLink(
-    text: String,
-    color: Color = Color(0xFF6B9090)
+fun QRScannerView(
+    onScan: (String) -> Unit,
+    onClose: () -> Unit
 ) {
-    Text(
-        text = text,
-        fontSize = 12.sp,
-        fontWeight = FontWeight.Bold,
-        color = color,
-        letterSpacing = 1.sp,
-        modifier = Modifier
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = rememberRipple(
-                    color = color.copy(alpha = 0.2f),
-                    bounded = true
-                )
-            ) { /* Handle click */ }
-            .padding(8.dp)
-    )
+    val context = LocalContext.current
+    val lifecycleOwner = LocalLifecycleOwner.current
+    var hasScanned by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AndroidView(
+            factory = { ctx ->
+                val previewView = PreviewView(ctx)
+                val cameraProviderFuture = ProcessCameraProvider.getInstance(ctx)
+                val executor = ContextCompat.getMainExecutor(ctx)
+
+                cameraProviderFuture.addListener({
+                    val cameraProvider = cameraProviderFuture.get()
+                    val preview = Preview.Builder().build().also {
+                        it.setSurfaceProvider(previewView.surfaceProvider)
+                    }
+
+                    val imageAnalysis = ImageAnalysis.Builder()
+                        .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
+                        .build()
+
+                    val scanner = BarcodeScanning.getClient(
+                        BarcodeScannerOptions.Builder()
+                            .setBarcodeFormats(Barcode.FORMAT_QR_CODE)
+                            .build()
+                    )
+
+                    imageAnalysis.setAnalyzer(executor) { imageProxy ->
+                        val mediaImage = imageProxy.image
+                        if (mediaImage != null && !hasScanned) {
+                            val image = InputImage.fromMediaImage(mediaImage, imageProxy.imageInfo.rotationDegrees)
+                            scanner.process(image)
+                                .addOnSuccessListener { barcodes ->
+                                    for (barcode in barcodes) {
+                                        barcode.rawValue?.let { value ->
+                                            if (!hasScanned) {
+                                                hasScanned = true
+                                                onScan(value)
+                                            }
+                                        }
+                                    }
+                                }
+                                .addOnCompleteListener {
+                                    imageProxy.close()
+                                }
+                        } else {
+                            imageProxy.close()
+                        }
+                    }
+
+                    val cameraSelector = CameraSelector.DEFAULT_BACK_CAMERA
+                    try {
+                        cameraProvider.unbindAll()
+                        cameraProvider.bindToLifecycle(
+                            lifecycleOwner, cameraSelector, preview, imageAnalysis
+                        )
+                    } catch (e: Exception) {
+                        Log.e("QRScannerView", "Camera binding failed", e)
+                    }
+                }, executor)
+                previewView
+            },
+            modifier = Modifier.fillMaxSize()
+        )
+
+        // Close Button
+        NeumorphismIconButton(
+            iconRes = R.drawable.ic_chevron_left,
+            onClick = onClose,
+            size = 48.dp,
+            iconSize = 24.dp,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 48.dp, start = 24.dp)
+        )
+
+        // Overlay Guidance
+        Box(
+            modifier = Modifier
+                .size(250.dp)
+                .align(Alignment.Center)
+                .background(Color.Transparent)
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_qr_code),
+                contentDescription = null,
+                tint = Color.White.copy(alpha = 0.3f),
+                modifier = Modifier.fillMaxSize().padding(16.dp)
+            )
+        }
+        
+        Text(
+            text = "SCAN BUS QR CODE",
+            color = Color.White,
+            fontWeight = FontWeight.Bold,
+            fontSize = 16.sp,
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = 60.dp),
+            letterSpacing = 2.sp
+        )
+    }
 }

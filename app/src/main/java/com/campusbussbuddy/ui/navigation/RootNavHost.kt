@@ -10,9 +10,7 @@ import com.campusbussbuddy.ui.screens.DriverHomeScreen
 import com.campusbussbuddy.ui.screens.BusAssignmentLoginScreen
 import com.campusbussbuddy.ui.screens.BusOperationsHubScreen
 import com.campusbussbuddy.ui.screens.TripSupervisorScreen
-import com.campusbussbuddy.ui.screens.BusStopDetailsScreen
 import com.campusbussbuddy.ui.screens.StudentPortalHomeScreen
-import com.campusbussbuddy.ui.screens.DriverSettingsScreen
 import com.campusbussbuddy.ui.screens.AdminHomeScreen
 import com.campusbussbuddy.ui.screens.AddDriverScreen
 import com.campusbussbuddy.ui.screens.AddStudentScreen
@@ -67,20 +65,11 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
-                },
-                onSettingsClick = {
-                    navController.navigate(Destinations.DRIVER_SETTINGS)
                 }
             )
         }
         
-        composable(Destinations.DRIVER_SETTINGS) {
-            DriverSettingsScreen(
-                onBackClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
+
         
         composable(Destinations.BUS_ASSIGNMENT_LOGIN) {
             BusAssignmentLoginScreen(
@@ -103,33 +92,17 @@ fun RootNavHost() {
             
             BusOperationsHubScreen(
                 busNumber = busNumber,
+                busId = busId,
                 onLogoutClick = {
-                    // Navigate back to driver home
                     navController.popBackStack(Destinations.DRIVER_HOME, inclusive = false)
                 },
                 onStartTrip = {
                     navController.navigate("${Destinations.TRIP_SUPERVISOR}/$busNumber/$busId")
-                },
-                onMembersClick = {
-                    navController.navigate("${Destinations.BUS_STOP_DETAILS}/$busNumber/$busId")
                 }
             )
         }
         
-        composable("${Destinations.BUS_STOP_DETAILS}/{busNumber}/{busId}") { backStackEntry ->
-            val busNumber = backStackEntry.arguments?.getString("busNumber") ?: ""
-            val busId = backStackEntry.arguments?.getString("busId") ?: ""
-            
-            BusStopDetailsScreen(
-                stopName = "Main Gate Terminal", // You can make this dynamic based on current stop
-                onBackClick = {
-                    navController.popBackStack()
-                },
-                onHomeClick = {
-                    navController.popBackStack()
-                }
-            )
-        }
+
         
         composable("${Destinations.TRIP_SUPERVISOR}/{busNumber}/{busId}") { backStackEntry ->
             val busNumber = backStackEntry.arguments?.getString("busNumber") ?: ""

@@ -1,6 +1,7 @@
 package com.campusbussbuddy.ui.screens
 
 import android.util.Log
+import androidx.compose.animation.*
 import androidx.compose.animation.core.*
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -15,12 +16,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.google.firebase.firestore.FirebaseFirestore
+
+data class AdminStudent(val id: String, val name: String, val status: String)
+data class AdminDriver(val id: String, val name: String)
+data class AdminBus(val id: String, val busNumber: String)
 
 // ─── Admin Home Screen (Unified Neumorphic) ───────────────────────────────────
 @Composable
@@ -31,31 +37,56 @@ fun AdminHomeScreen(
     onLogoutClick: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
-    var totalStudents by remember { mutableStateOf(0) }
-    var totalDrivers  by remember { mutableStateOf(0) }
-    var totalBuses    by remember { mutableStateOf(0) }
-    var isLoading     by remember { mutableStateOf(true) }
+    var studentsList by remember { mutableStateOf(emptyList<AdminStudent>()) }
+    var driversList  by remember { mutableStateOf(emptyList<AdminDriver>()) }
+    var busesList    by remember { mutableStateOf(emptyList<AdminBus>()) }
+    var isLoading    by remember { mutableStateOf(true) }
 
-    // Selected bottom nav tab
-    var selectedTab by remember { mutableStateOf(0) }
+    // CENTRAL STATE CONTROL
+    var currentPage  by remember { mutableStateOf("HOME") }
+    var selectedCard by remember { mutableStateOf("students") } // Default selection for Board view
 
-    // Fetch dashboard counts from Firestore
-    LaunchedEffect(Unit) {
-        Log.d("AdminHomeScreen", "Fetching dashboard counts...")
-        try {
-            val students = FirebaseManager.getAllStudents()
-            totalStudents = students.size
+    val firestore = FirebaseFirestore.getInstance()
 
-            val drivers = FirebaseManager.getAllDrivers()
-            totalDrivers = drivers.size
+    // Fetch dashboard counts from Firestore with Realtime Listeners
+    DisposableEffect(Unit) {
+        val stListener = firestore.collection("students").addSnapshotListener { snapshot, error ->
+            if (error == null && snapshot != null) {
+                studentsList = snapshot.documents.map { doc ->
+                    AdminStudent(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "Unknown",
+                        status = doc.getString("status") ?: "WAITING"
+                    )
+                }
+                isLoading = false
+            }
+        }
+        val drListener = firestore.collection("drivers").addSnapshotListener { snapshot, error ->
+            if (error == null && snapshot != null) {
+                driversList = snapshot.documents.map { doc ->
+                    AdminDriver(
+                        id = doc.id,
+                        name = doc.getString("name") ?: "Unknown"
+                    )
+                }
+            }
+        }
+        val bsListener = firestore.collection("buses").addSnapshotListener { snapshot, error ->
+            if (error == null && snapshot != null) {
+                busesList = snapshot.documents.map { doc ->
+                    AdminBus(
+                        id = doc.id,
+                        busNumber = doc.getLong("busNumber")?.toString() ?: doc.getString("busNumber") ?: "Unknown"
+                    )
+                }
+            }
+        }
 
-            val buses = FirebaseManager.getAllBuses()
-            totalBuses = buses.size
-
-            isLoading = false
-        } catch (e: Exception) {
-            Log.e("AdminHomeScreen", "Failed to load dashboard data", e)
-            isLoading = false
+        onDispose {
+            stListener.remove()
+            drListener.remove()
+            bsListener.remove()
         }
     }
 
@@ -81,53 +112,77 @@ fun AdminHomeScreen(
 
             // ── Statistics Section ────────────────────────────────────────────
             StatsSection(
-                totalStudents = totalStudents,
-                totalDrivers  = totalDrivers,
-                totalBuses    = totalBuses,
-                isLoading     = isLoading
+                totalStudents = studentsList.size,
+                totalDrivers  = driversList.size,
+                totalBuses    = busesList.size,
+                isLoading     = isLoading,
+                // Only highlight card if we are in BOARD view
+                selectedCard  = if (currentPage == "BOARD") selectedCard else null,
+                onCardClick   = { card -> 
+                    selectedCard = card
+                    currentPage = "BOARD" // Clicking any card switches to BOARD view
+                }
             )
 
-            Spacer(modifier = Modifier.height(32.dp))
+            // ── UI MAPPING based on currentPage ───────────────────────────────
+            AnimatedContent(
+                targetState = currentPage,
+                transitionSpec = {
+                    fadeIn(tween(300)) togetherWith fadeOut(tween(200))
+                },
+                label = "page_transition"
+            ) { state ->
+                Column(modifier = Modifier.fillMaxWidth()) {
+                    if (state == "HOME") {
+                        Spacer(modifier = Modifier.height(32.dp))
 
-            // ── "Management" label ────────────────────────────────────────────
-            Text(
-                text       = "Management",
-                fontSize   = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color      = NeumorphTextSecondary,
-                modifier   = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 28.dp)
-            )
+                        // ── "Management" label ────────────────────────────────────────────
+                        Text(
+                            text       = "Management",
+                            fontSize   = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            color      = NeumorphTextSecondary,
+                            modifier   = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 28.dp)
+                        )
 
-            Spacer(modifier = Modifier.height(14.dp))
+                        Spacer(modifier = Modifier.height(14.dp))
 
-            // ── Management Section ────────────────────────────────────────────
-            ManagementSection(
-                onManageDriversClick  = onManageDriversClick,
-                onManageBusesClick    = onManageBusesClick,
-                onManageStudentsClick = onManageStudentsClick
-            )
+                        // ── Management Section ────────────────────────────────────────────
+                        ManagementSection(
+                            onManageDriversClick  = onManageDriversClick,
+                            onManageBusesClick    = onManageBusesClick,
+                            onManageStudentsClick = onManageStudentsClick
+                        )
 
-            Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
+                    } else if (state == "BOARD") {
+                        // ── Expanded Details Section ──────────────────────────────────────
+                        ExpandedDetailsSection(
+                            selectedCard = selectedCard,
+                            studentsList = studentsList,
+                            driversList  = driversList,
+                            busesList    = busesList
+                        )
+                        Spacer(modifier = Modifier.height(32.dp))
+                    }
+                }
+            }
         }
 
         // ── Bottom Navigation Bar (fixed) ─────────────────────────────────────
         BottomNavigationBar(
-            selectedTab = selectedTab,
-            onHomeClick = { selectedTab = 0 },
-            onSettingsClick = { selectedTab = 1 },
-            onLogoutClick = {
-                selectedTab = 2
-                onLogoutClick()
-            },
-            modifier = Modifier.align(Alignment.BottomCenter)
+            selectedTab   = if (currentPage == "HOME") 0 else 1,
+            onHomeClick   = { currentPage = "HOME" },   // ALWAYS sets to HOME
+            onBoardClick  = { currentPage = "BOARD" },  // Sets to BOARD
+            onLogoutClick = { onLogoutClick() },
+            modifier      = Modifier.align(Alignment.BottomCenter)
         )
     }
 }
 
 // ─── Top Header Section ───────────────────────────────────────────────────────
-// Welcome text + admin name + neumorphic avatar circle
 @Composable
 private fun TopHeaderSection() {
     Column(
@@ -136,7 +191,7 @@ private fun TopHeaderSection() {
             .padding(horizontal = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        // Admin avatar — raised neumorphic circle
+        // Admin avatar — raised neumorphic circle (same icon as UnifiedLoginScreen admin role)
         Box(
             modifier = Modifier
                 .size(90.dp)
@@ -174,13 +229,14 @@ private fun TopHeaderSection() {
 }
 
 // ─── Stats Section ────────────────────────────────────────────────────────────
-// Row of 3 neumorphic stat cards
 @Composable
 private fun StatsSection(
     totalStudents: Int,
     totalDrivers: Int,
     totalBuses: Int,
-    isLoading: Boolean
+    isLoading: Boolean,
+    selectedCard: String?,
+    onCardClick: (String) -> Unit
 ) {
     if (isLoading) {
         Box(
@@ -201,40 +257,51 @@ private fun StatsSection(
             horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
             StatCard(
-                count    = totalStudents,
-                label    = "Students",
-                icon     = R.drawable.ic_student,
-                modifier = Modifier.weight(1f)
+                count      = totalStudents,
+                label      = "Students",
+                icon       = R.drawable.ic_student,
+                isSelected = selectedCard == "students",
+                onClick    = { onCardClick("students") },
+                modifier   = Modifier.weight(1f)
             )
             StatCard(
-                count    = totalDrivers,
-                label    = "Drivers",
-                icon     = R.drawable.ic_person,
-                modifier = Modifier.weight(1f)
+                count      = totalDrivers,
+                label      = "Drivers",
+                icon       = R.drawable.ic_person,
+                isSelected = selectedCard == "drivers",
+                onClick    = { onCardClick("drivers") },
+                modifier   = Modifier.weight(1f)
             )
             StatCard(
-                count    = totalBuses,
-                label    = "Buses",
-                icon     = R.drawable.ic_directions_bus_vector,
-                modifier = Modifier.weight(1f)
+                count      = totalBuses,
+                label      = "Buses",
+                icon       = R.drawable.ic_directions_bus_vector,
+                isSelected = selectedCard == "buses",
+                onClick    = { onCardClick("buses") },
+                modifier   = Modifier.weight(1f)
             )
         }
     }
 }
 
 // ─── Stat Card ────────────────────────────────────────────────────────────────
-// Single raised neumorphic stat card with icon, count, label
 @Composable
 private fun StatCard(
     count: Int,
     label: String,
     icon: Int,
+    isSelected: Boolean,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier
-            .neumorphic(cornerRadius = 22.dp, elevation = 6.dp, blur = 12.dp)
-            .background(NeumorphSurface, RoundedCornerShape(22.dp))
+            .bounceClick { onClick() }
+            .then(
+                if (isSelected) Modifier.neumorphicInset(cornerRadius = 22.dp, elevation = 4.dp, blur = 8.dp)
+                else Modifier.neumorphic(cornerRadius = 22.dp, elevation = 6.dp, blur = 12.dp)
+            )
+            .background(if (isSelected) Color(0xFFDCDCDC) else NeumorphSurface, RoundedCornerShape(22.dp))
     ) {
         Column(
             modifier = Modifier
@@ -280,8 +347,82 @@ private fun StatCard(
     }
 }
 
+// ─── Expanded Details Section (Interactive List) ──────────────────────────────
+@Composable
+private fun ExpandedDetailsSection(
+    selectedCard: String,
+    studentsList: List<AdminStudent>,
+    driversList: List<AdminDriver>,
+    busesList: List<AdminBus>
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 24.dp)
+            .animateContentSize()
+    ) {
+        NeumorphismCard(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 24.dp),
+            cornerRadius = 22.dp,
+            contentPadding = PaddingValues(20.dp)
+        ) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                AnimatedContent(
+                    targetState = selectedCard,
+                    transitionSpec = {
+                        fadeIn(tween(200)) togetherWith fadeOut(tween(200))
+                    },
+                    label = "tab_content_transition"
+                ) { card ->
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        when (card) {
+                            "students" -> {
+                                val present = studentsList.filter { it.status == "BOARDED" }
+                                val absent = studentsList.filter { it.status == "WAITING" }
+
+                                Text("Present Students (${present.size})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeumorphTextPrimary)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (present.isEmpty()) Text("None", fontSize = 14.sp, color = NeumorphTextSecondary)
+                                present.forEach { 
+                                    Text("• ${it.name}", fontSize = 14.sp, color = NeumorphTextSecondary, modifier = Modifier.padding(vertical = 2.dp)) 
+                                }
+
+                                Spacer(modifier = Modifier.height(20.dp))
+                                
+                                Text("Absent Students (${absent.size})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeumorphTextPrimary)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (absent.isEmpty()) Text("None", fontSize = 14.sp, color = NeumorphTextSecondary)
+                                absent.forEach { 
+                                    Text("• ${it.name}", fontSize = 14.sp, color = NeumorphTextSecondary, modifier = Modifier.padding(vertical = 2.dp)) 
+                                }
+                            }
+                            "drivers" -> {
+                                Text("All Drivers (${driversList.size})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeumorphTextPrimary)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (driversList.isEmpty()) Text("None", fontSize = 14.sp, color = NeumorphTextSecondary)
+                                driversList.forEach { 
+                                    Text("• ${it.name}", fontSize = 14.sp, color = NeumorphTextSecondary, modifier = Modifier.padding(vertical = 2.dp)) 
+                                }
+                            }
+                            "buses" -> {
+                                Text("All Buses (${busesList.size})", fontSize = 16.sp, fontWeight = FontWeight.Bold, color = NeumorphTextPrimary)
+                                Spacer(modifier = Modifier.height(8.dp))
+                                if (busesList.isEmpty()) Text("None", fontSize = 14.sp, color = NeumorphTextSecondary)
+                                busesList.forEach { 
+                                    Text("• Bus #${it.busNumber}", fontSize = 14.sp, color = NeumorphTextSecondary, modifier = Modifier.padding(vertical = 2.dp)) 
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
 // ─── Management Section ───────────────────────────────────────────────────────
-// 3 neumorphic management cards stacked vertically
 @Composable
 private fun ManagementSection(
     onManageDriversClick: () -> Unit,
@@ -313,7 +454,6 @@ private fun ManagementSection(
 }
 
 // ─── Management Card ──────────────────────────────────────────────────────────
-// Raised neumorphic card with icon circle + title + chevron
 @Composable
 private fun ManagementCard(
     icon: Int,
@@ -334,7 +474,6 @@ private fun ManagementCard(
             verticalAlignment     = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Icon circle — raised
             Box(
                 modifier = Modifier
                     .size(44.dp)
@@ -350,7 +489,6 @@ private fun ManagementCard(
                 )
             }
 
-            // Title
             Text(
                 text       = title,
                 fontSize   = 16.sp,
@@ -359,7 +497,6 @@ private fun ManagementCard(
                 modifier   = Modifier.weight(1f)
             )
 
-            // Chevron
             Icon(
                 painter            = painterResource(id = R.drawable.ic_chevron_right),
                 contentDescription = "Open",
@@ -371,13 +508,11 @@ private fun ManagementCard(
 }
 
 // ─── Bottom Navigation Bar ────────────────────────────────────────────────────
-// 3 neumorphic nav items: Home, Settings, Logout
-// Selected = inset (pressed), Unselected = raised
 @Composable
-private fun BottomNavigationBar(
+fun BottomNavigationBar(
     selectedTab: Int,
     onHomeClick: () -> Unit,
-    onSettingsClick: () -> Unit,
+    onBoardClick: () -> Unit,
     onLogoutClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -402,11 +537,12 @@ private fun BottomNavigationBar(
                 isSelected = selectedTab == 0,
                 onClick    = onHomeClick
             )
+            // Replaced settings icon with admin role icon and renamed to Board
             NavItem(
-                icon       = R.drawable.ic_settings,
-                label      = "Settings",
+                icon       = R.drawable.ic_admin_panel,
+                label      = "Board",
                 isSelected = selectedTab == 1,
-                onClick    = onSettingsClick
+                onClick    = onBoardClick
             )
             NavItem(
                 icon       = R.drawable.ic_chevron_left,
@@ -420,7 +556,7 @@ private fun BottomNavigationBar(
 
 // ─── Nav Item ─────────────────────────────────────────────────────────────────
 @Composable
-private fun NavItem(
+fun NavItem(
     icon: Int,
     label: String,
     isSelected: Boolean,
