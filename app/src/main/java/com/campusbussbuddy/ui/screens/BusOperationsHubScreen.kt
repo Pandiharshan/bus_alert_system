@@ -1,7 +1,9 @@
 package com.campusbussbuddy.ui.screens
 
+import android.graphics.Bitmap
 import androidx.compose.animation.*
 import androidx.compose.animation.core.*
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -14,15 +16,19 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.asImageBitmap
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.ui.theme.*
 import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
 import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismStatCard
@@ -32,6 +38,10 @@ import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
 import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
 import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismPill
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.zxing.BarcodeFormat
+import com.google.zxing.qrcode.QRCodeWriter
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 enum class StudentStatus {
     WAITING_TO_BOARD,
@@ -53,19 +63,50 @@ fun BusOperationsHubScreen(
     onLogoutClick: () -> Unit = {},
     onStartTrip: () -> Unit = {}
 ) {
-    var currentTab by remember { mutableStateOf("HOME") }
+    // SECURITY: CRITICAL INITIALIZATION CHECK
+    if (busId.isBlank()) {
+        NeumorphismScreenContainer {
+            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    CircularProgressIndicator(color = NeumorphAccentPrimary)
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text("Loading Bus Operations...", color = NeumorphTextSecondary)
+                }
+            }
+        }
+        return
+    }
+
+    var currentTab by rememberSaveable { mutableStateOf("HOME") }
     var studentsList by remember { mutableStateOf<List<StudentMember>>(emptyList()) }
     val firestore = FirebaseFirestore.getInstance()
 
-    DisposableEffect(busId) {
-        if (busId.isEmpty()) return@DisposableEffect onDispose { }
+    var driverName by remember { mutableStateOf("Loading...") }
+    var shiftInfo by remember { mutableStateOf("Loading...") }
+    var routeInfo by remember { mutableStateOf("Loading route...") }
+    var driverEmail by remember { mutableStateOf("") }
+    var driverPhone by remember { mutableStateOf("") }
 
+    var isEndingTrip by remember { mutableStateOf(false) }
+
+    val scope = rememberCoroutineScope()
+
+    LaunchedEffect(Unit) {
+        val driverInfo = FirebaseManager.getCurrentDriverInfo()
+        if (driverInfo != null) {
+            driverName = driverInfo.name
+            driverEmail = driverInfo.email
+            driverPhone = driverInfo.phone
+            shiftInfo = if (driverInfo.shift.isNotEmpty()) driverInfo.shift else "Morning Shift"
+            routeInfo = if (driverInfo.routeName.isNotEmpty()) driverInfo.routeName else "Route: Main Campus"
+        }
+    }
+
+    DisposableEffect(busId) {
         val listener = firestore.collection("students")
             .whereEqualTo("busId", busId)
             .addSnapshotListener { snapshot, error ->
-                if (error != null) {
-                    return@addSnapshotListener
-                }
+                if (error != null) return@addSnapshotListener
                 if (snapshot != null) {
                     val list = snapshot.documents.map { doc ->
                         val name = doc.getString("name") ?: "Unknown"
@@ -84,18 +125,38 @@ fun BusOperationsHubScreen(
                     studentsList = list
                 }
             }
-
-        onDispose {
-            listener.remove()
-        }
+        onDispose { listener.remove() }
     }
 
     val totalMembers = studentsList.size
     val presentToday = studentsList.count { it.status == StudentStatus.BOARDED }
 
-    var driverName by remember { mutableStateOf("Alex Thompson") }
-    var shiftInfo by remember { mutableStateOf("Morning Shift") }
-    var routeInfo by remember { mutableStateOf("Route: North Campus → Science Park Terminal") }
+    val endTripAction: () -> Unit = {
+        scope.launch {
+            if (isEndingTrip) return@launch
+            isEndingTrip = true
+            try {
+                // Batch write all boarded students back to WAITING_TO_BOARD
+                val boardedDocs = firestore.collection("students")
+                    .whereEqualTo("busId", busId)
+                    .whereEqualTo("status", "BOARDED")
+                    .get().await()
+
+                if (!boardedDocs.isEmpty) {
+                    val batch = firestore.batch()
+                    for (doc in boardedDocs) {
+                        batch.update(doc.reference, "status", "WAITING_TO_BOARD")
+                    }
+                    batch.commit().await()
+                }
+            } catch (e: Exception) {
+                // Ignore error in this strict demo phase
+            } finally {
+                isEndingTrip = false
+                currentTab = "HOME"
+            }
+        }
+    }
 
     NeumorphismScreenContainer {
         Box(modifier = Modifier.fillMaxSize()) {
@@ -144,54 +205,42 @@ fun BusOperationsHubScreen(
                             )
 
                             Spacer(modifier = Modifier.height(24.dp))
+                            
+                            BusOpsRouteInfo(routeInfo)
+
+                            Spacer(modifier = Modifier.height(24.dp))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
+                                NeumorphismStatCard(
+                                    count = presentToday.toString(),
+                                    label = "Boarded",
+                                    iconRes = R.drawable.ic_person,
+                                    modifier = Modifier.weight(1f)
+                                )
+
                                 NeumorphismStatCard(
                                     count = totalMembers.toString(),
                                     label = "Total Members",
                                     iconRes = R.drawable.ic_group,
                                     modifier = Modifier.weight(1f)
                                 )
-
-                                NeumorphismStatCard(
-                                    count = presentToday.toString(),
-                                    label = "Present Today",
-                                    iconRes = R.drawable.ic_person,
-                                    modifier = Modifier.weight(1f)
-                                )
                             }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            TripAttendancePortalCard(busId = busId)
 
                             Spacer(modifier = Modifier.height(32.dp))
 
-                            BusOpsStartTripButton(onClick = onStartTrip)
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            BusOpsRouteInfo(routeInfo)
-
-                            Spacer(modifier = Modifier.height(32.dp))
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.spacedBy(16.dp)
-                            ) {
-                                BusOpsManagementCard(
-                                    icon = R.drawable.ic_group,
-                                    title = "Members List",
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { currentTab = "MEMBERS" }
-                                )
-
-                                BusOpsManagementCard(
-                                    icon = R.drawable.ic_directions_bus_vector,
-                                    title = "Bus Profile",
-                                    modifier = Modifier.weight(1f),
-                                    onClick = { }
-                                )
-                            }
+                            NeumorphismButton(
+                                text = "End Trip",
+                                onClick = endTripAction,
+                                isLoading = isEndingTrip,
+                                modifier = Modifier.fillMaxWidth()
+                            )
 
                             Spacer(modifier = Modifier.height(120.dp))
                         }
@@ -205,60 +254,137 @@ fun BusOperationsHubScreen(
                     }
                     "ROUTES" -> {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .neumorphicInset(cornerRadius = 40.dp, blur = 12.dp)
-                                    .background(NeumorphBgPrimary, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_pin_drop),
-                                    contentDescription = "Routes",
-                                    tint = NeumorphTextSecondary,
-                                    modifier = Modifier.size(40.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Text(
-                                text = "Routes coming soon",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = NeumorphTextSecondary
+                            Spacer(modifier = Modifier.height(48.dp))
+
+                            AppLabelPill(
+                                icon = R.drawable.ic_route,
+                                title = "Route Details"
                             )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            NeumorphismCard(
+                                modifier = Modifier.fillMaxWidth(),
+                                cornerRadius = 24.dp,
+                                contentPadding = PaddingValues(24.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(60.dp)
+                                            .neumorphicInset(cornerRadius = 30.dp, blur = 8.dp)
+                                            .background(NeumorphBgPrimary, CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                            contentDescription = "Bus",
+                                            tint = NeumorphAccentPrimary,
+                                            modifier = Modifier.size(32.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Text(
+                                        text = routeInfo,
+                                        fontSize = 18.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NeumorphTextPrimary,
+                                        textAlign = TextAlign.Center
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = "Bus $busNumber ($shiftInfo)",
+                                        fontSize = 14.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = NeumorphTextSecondary
+                                    )
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    Text(
+                                        text = "Additional stops and live traffic data will populate here seamlessly during dynamic route transitions.",
+                                        fontSize = 13.sp,
+                                        color = NeumorphTextSecondary,
+                                        textAlign = TextAlign.Center,
+                                        lineHeight = 20.sp
+                                    )
+                                }
+                            }
+                            Spacer(modifier = Modifier.height(120.dp))
                         }
                     }
                     "SETTINGS" -> {
                         Column(
-                            modifier = Modifier.fillMaxSize(),
-                            verticalArrangement = Arrangement.Center,
+                            modifier = Modifier
+                                .fillMaxSize()
+                                .verticalScroll(rememberScrollState())
+                                .padding(horizontal = 24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .size(80.dp)
-                                    .neumorphicInset(cornerRadius = 40.dp, blur = 12.dp)
-                                    .background(NeumorphBgPrimary, CircleShape),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Icon(
-                                    painter = painterResource(id = R.drawable.ic_settings),
-                                    contentDescription = "Settings",
-                                    tint = NeumorphTextSecondary,
-                                    modifier = Modifier.size(40.dp)
-                                )
-                            }
-                            Spacer(modifier = Modifier.height(24.dp))
-                            Text(
-                                text = "Settings coming soon",
-                                fontSize = 16.sp,
-                                fontWeight = FontWeight.Medium,
-                                color = NeumorphTextSecondary
+                            Spacer(modifier = Modifier.height(48.dp))
+
+                            AppLabelPill(
+                                icon = R.drawable.ic_settings,
+                                title = "Driver Profile"
                             )
+
+                            Spacer(modifier = Modifier.height(32.dp))
+
+                            NeumorphismCard(
+                                modifier = Modifier.fillMaxWidth(),
+                                cornerRadius = 24.dp,
+                                contentPadding = PaddingValues(24.dp)
+                            ) {
+                                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                    Box(
+                                        modifier = Modifier
+                                            .size(80.dp)
+                                            .neumorphicInset(cornerRadius = 40.dp, blur = 12.dp)
+                                            .background(NeumorphBgPrimary, CircleShape),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_person),
+                                            contentDescription = "Profile",
+                                            tint = NeumorphAccentPrimary,
+                                            modifier = Modifier.size(40.dp)
+                                        )
+                                    }
+                                    Spacer(modifier = Modifier.height(24.dp))
+                                    Text(
+                                        text = driverName,
+                                        fontSize = 20.sp,
+                                        fontWeight = FontWeight.Bold,
+                                        color = NeumorphTextPrimary
+                                    )
+                                    Spacer(modifier = Modifier.height(8.dp))
+                                    Text(
+                                        text = driverEmail,
+                                        fontSize = 14.sp,
+                                        color = NeumorphTextSecondary
+                                    )
+                                    Spacer(modifier = Modifier.height(4.dp))
+                                    Text(
+                                        text = driverPhone,
+                                        fontSize = 14.sp,
+                                        color = NeumorphTextSecondary
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(24.dp))
+
+                            NeumorphismButton(
+                                text = "Logout",
+                                onClick = onLogoutClick,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+
+                            Spacer(modifier = Modifier.height(120.dp))
                         }
                     }
                 }
@@ -275,6 +401,157 @@ fun BusOperationsHubScreen(
 }
 
 // ─── INTERNAL COMPOSABLES ───────────────────────────────────────────────────
+
+@Composable
+private fun TripAttendancePortalCard(busId: String) {
+    var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
+
+    NeumorphismCard(
+        modifier = Modifier.fillMaxWidth(),
+        cornerRadius = 24.dp,
+        contentPadding = PaddingValues(20.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (qrBitmap == null) {
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(60.dp)
+                            .neumorphicInset(cornerRadius = 30.dp, blur = 8.dp)
+                            .background(NeumorphBgPrimary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_qr_code),
+                            contentDescription = "QR Code",
+                            tint = NeumorphAccentPrimary,
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(16.dp))
+
+                    Column(modifier = Modifier.weight(1f)) {
+                        Text(
+                            text = "Attendance Portal",
+                            fontSize = 16.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = NeumorphTextPrimary
+                        )
+                        Spacer(modifier = Modifier.height(4.dp))
+                        Text(
+                            text = "Generate QR for students boarding at this stop.",
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.Medium,
+                            color = NeumorphTextSecondary,
+                            lineHeight = 16.sp
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                NeumorphismButton(
+                    text = "Generate QR",
+                    onClick = {
+                        qrBitmap = generateQRCode(content = "busId:$busId")
+                    },
+                    modifier = Modifier.fillMaxWidth()
+                )
+            } else {
+                Text(
+                    text = "Student Scan Code",
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NeumorphTextPrimary
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Bus ID: $busId",
+                    fontSize = 12.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = NeumorphAccentPrimary,
+                    letterSpacing = 1.sp
+                )
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Box(
+                    modifier = Modifier
+                        .size(220.dp)
+                        .neumorphicInset(cornerRadius = 24.dp, elevation = 6.dp, blur = 12.dp)
+                        .background(NeumorphBgPrimary, RoundedCornerShape(24.dp)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(180.dp)
+                            .background(Color.White, RoundedCornerShape(12.dp))
+                            .padding(12.dp),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(
+                            bitmap = qrBitmap!!.asImageBitmap(),
+                            contentDescription = "Generated QR Code",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Fit
+                        )
+                    }
+                }
+
+                Spacer(modifier = Modifier.height(20.dp))
+
+                Text(
+                    text = "Students scan this code to mark attendance before boarding.",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = NeumorphTextSecondary,
+                    textAlign = TextAlign.Center,
+                    lineHeight = 18.sp,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
+
+                Spacer(modifier = Modifier.height(24.dp))
+
+                NeumorphismPill(
+                    label = "LIVE",
+                    onClick = {}
+                )
+            }
+        }
+    }
+}
+
+private fun generateQRCode(content: String): Bitmap? {
+    if (content.isBlank()) return null
+    return try {
+        val size = 512
+        val bitMatrix = QRCodeWriter().encode(content, BarcodeFormat.QR_CODE, size, size)
+        val width = bitMatrix.width
+        val height = bitMatrix.height
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.RGB_565)
+        for (x in 0 until width) {
+            for (y in 0 until height) {
+                bitmap.setPixel(
+                    x,
+                    y,
+                    if (bitMatrix.get(x, y)) android.graphics.Color.BLACK else android.graphics.Color.WHITE
+                )
+            }
+        }
+        bitmap
+    } catch (e: Exception) {
+        null
+    }
+}
 
 @Composable
 private fun MembersTabContent(
@@ -334,7 +611,6 @@ private fun MembersTabContent(
             contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 120.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            // Group by status: Waiting To Board first, then Boarded
             val waiting = students.filter { it.status == StudentStatus.WAITING_TO_BOARD }
             val boarded = students.filter { it.status == StudentStatus.BOARDED }
 
@@ -510,7 +786,6 @@ private fun HubNavItem(
             )
             .padding(8.dp)
     ) {
-        // Soft indicator container for selected tab to match Admin/Driver
         Box(
             modifier = Modifier
                 .size(36.dp)
@@ -527,9 +802,7 @@ private fun HubNavItem(
                 modifier = Modifier.size(20.dp)
             )
         }
-
         Spacer(modifier = Modifier.height(2.dp))
-
         Text(
             text = label,
             fontSize = 9.sp,
@@ -586,43 +859,6 @@ private fun BusOpsDriverProfile(driverName: String, busNumber: String, shiftInfo
 }
 
 @Composable
-private fun BusOpsStartTripButton(onClick: () -> Unit) {
-    Box(
-        modifier = Modifier
-            .size(200.dp)
-            .neumorphic(cornerRadius = 100.dp, elevation = 10.dp, blur = 20.dp)
-            .background(NeumorphSurface, CircleShape)
-            .bounceClick { onClick() },
-        contentAlignment = Alignment.Center
-    ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .neumorphicInset(cornerRadius = 30.dp, blur = 8.dp)
-                    .background(NeumorphBgPrimary, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_chevron_right),
-                    contentDescription = "Start Trip",
-                    tint = NeumorphAccentPrimary,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = "START TRIP",
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                color = NeumorphTextPrimary,
-                letterSpacing = 1.sp
-            )
-        }
-    }
-}
-
-@Composable
 private fun BusOpsRouteInfo(routeInfo: String) {
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -652,53 +888,5 @@ private fun BusOpsRouteInfo(routeInfo: String) {
             textAlign = TextAlign.Center,
             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
         )
-    }
-}
-
-@Composable
-private fun BusOpsManagementCard(
-    icon: Int,
-    title: String,
-    modifier: Modifier = Modifier,
-    onClick: () -> Unit = {}
-) {
-    NeumorphismCard(
-        modifier = modifier
-            .height(120.dp)
-            .bounceClick { onClick() },
-        cornerRadius = 20.dp,
-        contentPadding = PaddingValues(0.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .neumorphicInset(cornerRadius = 24.dp, blur = 8.dp)
-                    .background(NeumorphBgPrimary, CircleShape),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    painter = painterResource(id = icon),
-                    contentDescription = title,
-                    tint = NeumorphAccentPrimary,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-            Spacer(modifier = Modifier.height(12.dp))
-            Text(
-                text = title,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = NeumorphTextPrimary,
-                textAlign = TextAlign.Center
-            )
-        }
     }
 }

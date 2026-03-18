@@ -42,13 +42,9 @@ class SettingsViewModel(
         loadDriverData()
     }
 
-    /**
-     * Load current driver info to pre-fill the settings form.
-     */
     private fun loadDriverData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true)
-
             try {
                 val driverInfo = repository.getCurrentDriverInfo()
                 if (driverInfo != null) {
@@ -90,10 +86,6 @@ class SettingsViewModel(
         _uiState.value = _uiState.value.copy(confirmPassword = password, successMessage = null, errorMessage = null)
     }
 
-    /**
-     * Update driver name and phone in Firestore.
-     * Syncs to bus document if driver is active.
-     */
     fun updateProfile() {
         val state = _uiState.value
         val uid = state.driverInfo?.uid ?: return
@@ -110,10 +102,8 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isUpdatingProfile = true, successMessage = null, errorMessage = null)
-
             when (val result = repository.updateDriverProfile(uid, state.name, state.phone)) {
                 is DriverResult.Success -> {
-                    // Refresh driver info after update
                     val updatedInfo = repository.getCurrentDriverInfo()
                     _uiState.value = _uiState.value.copy(
                         isUpdatingProfile = false,
@@ -131,9 +121,6 @@ class SettingsViewModel(
         }
     }
 
-    /**
-     * Change driver password via FirebaseAuth.
-     */
     fun changePassword() {
         val state = _uiState.value
 
@@ -141,12 +128,10 @@ class SettingsViewModel(
             _uiState.value = state.copy(errorMessage = "Please enter a new password")
             return
         }
-
         if (state.newPassword.length < 6) {
             _uiState.value = state.copy(errorMessage = "Password must be at least 6 characters")
             return
         }
-
         if (state.newPassword != state.confirmPassword) {
             _uiState.value = state.copy(errorMessage = "Passwords do not match")
             return
@@ -154,7 +139,6 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isChangingPassword = true, successMessage = null, errorMessage = null)
-
             when (val result = repository.changeDriverPassword(state.newPassword)) {
                 is DriverResult.Success -> {
                     _uiState.value = _uiState.value.copy(

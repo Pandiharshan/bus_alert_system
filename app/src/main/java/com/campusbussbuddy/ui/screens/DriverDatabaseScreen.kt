@@ -159,7 +159,7 @@ fun DriverDatabaseScreen(
                 // Drivers List
                 LazyColumn(
                     modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 100.dp),
+                    contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 120.dp),
                     verticalArrangement = Arrangement.spacedBy(20.dp)
                 ) {
                         items(filteredDrivers) { driver ->

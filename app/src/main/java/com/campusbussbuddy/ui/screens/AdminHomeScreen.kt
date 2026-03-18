@@ -100,7 +100,7 @@ fun AdminHomeScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(bottom = 100.dp), // space for fixed bottom nav
+                .padding(bottom = 120.dp), // space for fixed bottom nav
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Spacer(modifier = Modifier.height(48.dp))
@@ -185,6 +185,15 @@ fun AdminHomeScreen(
 // ─── Top Header Section ───────────────────────────────────────────────────────
 @Composable
 private fun TopHeaderSection() {
+    var adminName by remember { mutableStateOf("Admin") }
+
+    LaunchedEffect(Unit) {
+        val adminInfo = FirebaseManager.getAdminInfo()
+        if (adminInfo != null) {
+            adminName = adminInfo.name
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -219,7 +228,7 @@ private fun TopHeaderSection() {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text          = "Pandiharshan",
+            text          = adminName,
             fontSize      = 26.sp,
             fontWeight    = FontWeight.ExtraBold,
             color         = NeumorphTextPrimary,
