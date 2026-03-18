@@ -64,7 +64,7 @@ fun NeumorphismPill(
                 }
                 true
             }
-            .padding(horizontal = 18.dp, vertical = 9.dp)
+            .padding(horizontal = 14.dp, vertical = 9.dp)
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (iconRes != null) {
@@ -81,7 +81,8 @@ fun NeumorphismPill(
                 fontSize      = 10.sp,
                 fontWeight    = FontWeight.Bold,
                 color         = NeumorphTextSecondary,
-                letterSpacing = 1.5.sp
+                letterSpacing = 1.5.sp,
+                maxLines      = 1
             )
         }
     }

@@ -1,30 +1,33 @@
 package com.campusbussbuddy.ui.screens
 
-import android.util.Log
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -35,6 +38,7 @@ fun AddBusScreen(
     var busNumber by remember { mutableStateOf("") }
     var capacity by remember { mutableStateOf("") }
     var password by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
@@ -42,142 +46,180 @@ fun AddBusScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     
-    GlassBackground {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top Bar
-            TopBar(
-                onBackClick = onBackClick
-            )
+    NeumorphismScreenContainer {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Embedded TopBar utilizing AppLabelPill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_chevron_left,
+                    onClick = onBackClick,
+                    size = 44.dp,
+                    iconSize = 24.dp,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                
+                AppLabelPill(
+                    icon = R.drawable.ic_directions_bus_vector,
+                    title = "Add New Bus"
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
             
             // Form Content
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Bus Icon
+                // Bus Icon (Neumorphic Style)
                 Box(
                     modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFB8D4D1)),
+                        .size(120.dp)
+                        .neumorphic(cornerRadius = 60.dp, elevation = 6.dp, blur = 12.dp)
+                        .background(NeumorphSurface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_directions_bus_vector),
                         contentDescription = "Bus",
-                        tint = Color(0xFF6B9090),
-                        modifier = Modifier.size(70.dp)
+                        tint = NeumorphAccentPrimary,
+                        modifier = Modifier.size(56.dp)
                     )
                 }
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 // Form Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 0.dp,
-                            shape = RoundedCornerShape(20.dp)
-                        ),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFD9E8E6)
-                    ),
-                    border = BorderStroke(0.dp, Color.Transparent)
+                NeumorphismCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    cornerRadius = 24.dp,
+                    contentPadding = PaddingValues(top = 32.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp),
+                        horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         // Bus Number
-                        AddField(
+                        NeumorphismTextField(
                             value = busNumber,
                             onValueChange = { 
                                 busNumber = it
                                 errorMessage = null
                             },
                             placeholder = "Bus Number",
-                            icon = R.drawable.ic_directions_bus_vector,
-                            keyboardType = KeyboardType.Number
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                    contentDescription = null,
+                                    tint = NeumorphTextSecondary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            enabled = !isLoading
                         )
                         
                         // Capacity
-                        AddField(
+                        NeumorphismTextField(
                             value = capacity,
                             onValueChange = { 
                                 capacity = it
                                 errorMessage = null
                             },
                             placeholder = "Capacity",
-                            icon = R.drawable.ic_person,
-                            keyboardType = KeyboardType.Number
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_person),
+                                    contentDescription = null,
+                                    tint = NeumorphTextSecondary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                            enabled = !isLoading
                         )
                         
                         // Password
-                        AddField(
+                        NeumorphismTextField(
                             value = password,
                             onValueChange = { 
                                 password = it
                                 errorMessage = null
                             },
                             placeholder = "Bus Password",
-                            icon = R.drawable.ic_visibility_off,
-                            keyboardType = KeyboardType.Password
+                            leadingIcon = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_lock),
+                                    contentDescription = null,
+                                    tint = NeumorphTextSecondary,
+                                    modifier = Modifier.size(20.dp)
+                                )
+                            },
+                            trailingIcon = {
+                                IconButton(onClick = { isPasswordVisible = !isPasswordVisible }) {
+                                    Icon(
+                                        painter = painterResource(
+                                            id = if (isPasswordVisible) R.drawable.ic_visibility
+                                                 else R.drawable.ic_visibility_off
+                                        ),
+                                        contentDescription = null,
+                                        tint = NeumorphTextSecondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                }
+                            },
+                            visualTransformation = if (isPasswordVisible) VisualTransformation.None
+                                                   else PasswordVisualTransformation(),
+                            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+                            enabled = !isLoading
                         )
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 
-                // Error Message
-                if (errorMessage != null) {
+                // Messages
+                AnimatedVisibility(visible = errorMessage != null) {
                     Text(
-                        text = errorMessage!!,
+                        text = errorMessage ?: "",
                         fontSize = 13.sp,
-                        color = Color(0xFFD32F2F)
+                        color = Color(0xFFE53935),
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
-                // Success Message
-                if (successMessage != null) {
+                AnimatedVisibility(visible = successMessage != null) {
                     Text(
-                        text = successMessage!!,
+                        text = successMessage ?: "",
                         fontSize = 13.sp,
-                        color = Color(0xFF4CAF50)
+                        color = Color(0xFF4CAF50),
+                        modifier = Modifier.padding(bottom = 16.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
-                
-                Spacer(modifier = Modifier.height(16.dp))
                 
                 // Create Bus Button
-                Button(
+                NeumorphismButton(
+                    text = "Add Bus",
+                    isLoading = isLoading,
                     onClick = {
+                        if (isLoading) return@NeumorphismButton
                         when {
-                            busNumber.isEmpty() -> {
-                                errorMessage = "Please enter bus number"
-                            }
-                            capacity.isEmpty() -> {
-                                errorMessage = "Please enter capacity"
-                            }
-                            password.isEmpty() -> {
-                                errorMessage = "Please enter bus password"
-                            }
-                            capacity.toIntOrNull() == null -> {
-                                errorMessage = "Capacity must be a valid number"
-                            }
-                            busNumber.toIntOrNull() == null -> {
-                                errorMessage = "Bus number must be a valid number"
-                            }
+                            busNumber.isEmpty() -> { errorMessage = "Please enter bus number" }
+                            capacity.isEmpty() -> { errorMessage = "Please enter capacity" }
+                            password.isEmpty() -> { errorMessage = "Please enter bus password" }
+                            capacity.toIntOrNull() == null -> { errorMessage = "Capacity must be a valid number" }
+                            busNumber.toIntOrNull() == null -> { errorMessage = "Bus number must be a valid number" }
                             else -> {
                                 errorMessage = null
                                 isLoading = true
@@ -192,7 +234,6 @@ fun AddBusScreen(
                                         
                                         when (result) {
                                             is com.campusbussbuddy.firebase.BusResult.Success -> {
-                                                Log.d("AddBusScreen", "Bus added successfully")
                                                 successMessage = "Bus added successfully!"
                                                 kotlinx.coroutines.delay(1000)
                                                 onBusAdded()
@@ -203,124 +244,17 @@ fun AddBusScreen(
                                             }
                                         }
                                     } catch (e: Exception) {
-                                        Log.e("AddBusScreen", "Failed to add bus", e)
                                         errorMessage = "Failed to add bus: ${e.message}"
                                         isLoading = false
                                     }
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        contentColor = Color.White
-                    ),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text = "Add Bus",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
                     }
-                }
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
-    }
-}
-
-@Composable
-private fun AddField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    icon: Int,
-    keyboardType: KeyboardType = KeyboardType.Text
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 14.sp
-            )
-        },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = placeholder,
-                tint = Color(0xFF6B9090),
-                modifier = Modifier.size(20.dp)
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
-        shape = RoundedCornerShape(26.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White.copy(alpha = 0.8f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.8f),
-            focusedTextColor = Color(0xFF2E2E2E),
-            unfocusedTextColor = Color(0xFF2E2E2E),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal
-        ),
-        singleLine = true,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-    )
-}
-
-@Composable
-private fun TopBar(
-    onBackClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Back button - using chevron left icon
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2C3E3E),
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // Title
-        Text(
-            text = "Add New Bus",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)
-        )
     }
 }

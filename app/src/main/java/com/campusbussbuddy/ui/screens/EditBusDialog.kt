@@ -1,18 +1,23 @@
 package com.campusbussbuddy.ui.screens
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -24,6 +29,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
+import com.campusbussbuddy.ui.theme.NeumorphAccentPrimary
+import com.campusbussbuddy.ui.theme.NeumorphSurface
+import com.campusbussbuddy.ui.theme.NeumorphTextPrimary
+import com.campusbussbuddy.ui.theme.NeumorphTextSecondary
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.theme.*
 
 @Composable
 fun EditBusDialog(
@@ -34,164 +46,122 @@ fun EditBusDialog(
     var busNumber by remember { mutableStateOf(bus.busNumber.toString()) }
     var capacity by remember { mutableStateOf(bus.capacity.toString()) }
     
-    val scrollState = rememberScrollState()
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(300), label = "a")
+    val scale by animateFloatAsState(if (visible) 1f else 0.88f, tween(300), label = "s")
     
+    val scrollState = rememberScrollState()
+
     Dialog(
-        onDismissRequest = onDismiss,
-        properties = DialogProperties(usePlatformDefaultWidth = false)
+        onDismissRequest = { visible = false; onDismiss() },
+        properties = DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
     ) {
-        // Full screen dialog with teal gradient background
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(
-                    brush = androidx.compose.ui.graphics.Brush.verticalGradient(
-                        colors = listOf(
-                            Color(0xFFB8D4D1),
-                            Color(0xFF9EC5C0),
-                            Color(0xFF8AB8B3)
-                        )
-                    )
-                ),
+                .background(Color.Black.copy(alpha = 0.45f * alpha))
+                .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            Card(
+            Box(
                 modifier = Modifier
-                    .fillMaxWidth(0.92f)
-                    .fillMaxHeight(0.70f)
-                    .shadow(
-                        elevation = 0.dp,
-                        shape = RoundedCornerShape(28.dp)
-                    ),
-                shape = RoundedCornerShape(28.dp),
-                colors = CardDefaults.cardColors(
-                    containerColor = Color.White.copy(alpha = 0.95f)
-                ),
-                border = BorderStroke(0.dp, Color.Transparent)
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(scale)
+                    .alpha(alpha)
+                    .neumorphic(
+                        cornerRadius = 24.dp,
+                        elevation = 4.dp,
+                        blur = 6.dp,
+                        lightShadowColor = Color.Transparent,
+                        darkShadowColor = Color.Black.copy(alpha = 0.15f)
+                    )
+                    .background(NeumorphSurface, RoundedCornerShape(24.dp))
+                    .clickable(remember { MutableInteractionSource() }, null) { } // prevent clicks from closing
             ) {
+                // Subtle purple bottom accent (same as Sign In button)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.15f))
+                            ),
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                )
+
                 Column(
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxWidth().padding(28.dp).verticalScroll(scrollState),
+                    horizontalAlignment = Alignment.CenterHorizontally
                 ) {
-                    // Header with close button
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFD9E8E6))
-                            .padding(horizontal = 20.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Edit Bus",
-                            fontSize = 20.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color(0xFF1A1A1A)
-                        )
-                        
-                        IconButton(
-                            onClick = onDismiss,
-                            modifier = Modifier.size(36.dp)
-                        ) {
+                    Text(
+                        text = "Edit Bus",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NeumorphTextPrimary
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    NeumorphismTextField(
+                        value = busNumber,
+                        onValueChange = { busNumber = it },
+                        placeholder = "Bus Number",
+                        leadingIcon = {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_remove),
-                                contentDescription = "Close",
-                                tint = Color(0xFF3A3A3A),
-                                modifier = Modifier.size(24.dp)
+                                painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                contentDescription = "Bus Number",
+                                tint = NeumorphTextSecondary,
+                                modifier = Modifier.size(20.dp)
                             )
-                        }
-                    }
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
                     
-                    // Content
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    NeumorphismTextField(
+                        value = capacity,
+                        onValueChange = { capacity = it },
+                        placeholder = "Capacity",
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_person),
+                                contentDescription = "Capacity",
+                                tint = NeumorphTextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        },
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = "Note: Update bus number and capacity as needed.",
+                        fontSize = 12.sp,
+                        color = NeumorphTextSecondary,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 16.sp,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+
+                    Spacer(modifier = Modifier.height(32.dp))
+
                     Column(
-                        modifier = Modifier
-                            .weight(1f)
-                            .verticalScroll(scrollState)
-                            .padding(20.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        
-                        // Form Fields in glass card
-                        Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .shadow(
-                                    elevation = 0.dp,
-                                    shape = RoundedCornerShape(20.dp)
-                                ),
-                            shape = RoundedCornerShape(20.dp),
-                            colors = CardDefaults.cardColors(
-                                containerColor = Color(0xFFD9E8E6)
-                            ),
-                            border = BorderStroke(0.dp, Color.Transparent)
-                        ) {
-                            Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
-                                verticalArrangement = Arrangement.spacedBy(14.dp)
-                            ) {
-                                // Bus Number
-                                EditField(
-                                    value = busNumber,
-                                    onValueChange = { busNumber = it },
-                                    placeholder = "Bus Number",
-                                    icon = R.drawable.ic_directions_bus_vector,
-                                    keyboardType = KeyboardType.Number
-                                )
-                                
-                                // Capacity
-                                EditField(
-                                    value = capacity,
-                                    onValueChange = { capacity = it },
-                                    placeholder = "Capacity",
-                                    icon = R.drawable.ic_person,
-                                    keyboardType = KeyboardType.Number
-                                )
-                            }
+                        Box(modifier = Modifier.fillMaxWidth().height(48.dp).clickable { visible = false; onDismiss() }, contentAlignment = Alignment.Center) {
+                            Text("Cancel", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = NeumorphTextSecondary)
                         }
                         
-                        Spacer(modifier = Modifier.height(16.dp))
-                        
-                        // Info Note
-                        Text(
-                            text = "Note: Update bus number and capacity as needed.",
-                            fontSize = 12.sp,
-                            color = Color(0xFF5A7070),
-                            textAlign = TextAlign.Center,
-                            lineHeight = 16.sp
-                        )
-                    }
-                    
-                    // Footer Buttons
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .background(Color(0xFFD9E8E6))
-                            .padding(20.dp),
-                        horizontalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        // Cancel Button
-                        OutlinedButton(
-                            onClick = onDismiss,
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(50.dp),
-                            shape = RoundedCornerShape(25.dp),
-                            colors = ButtonDefaults.outlinedButtonColors(
-                                contentColor = Color(0xFF3A3A3A)
-                            ),
-                            border = BorderStroke(1.5.dp, Color(0xFF8AAFA8))
-                        ) {
-                            Text(
-                                text = "Cancel",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
-                        }
-                        
-                        // Save Button
-                        Button(
+                        NeumorphismButton(
+                            text = "Save Changes",
                             onClick = {
                                 val updatedBus = bus.copy(
                                     busNumber = busNumber.toIntOrNull() ?: bus.busNumber,
@@ -199,79 +169,11 @@ fun EditBusDialog(
                                 )
                                 onSave(updatedBus)
                             },
-                            modifier = Modifier
-                                .weight(1f)
-                                .height(50.dp),
-                            shape = RoundedCornerShape(25.dp),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4CAF50),
-                                disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.5f)
-                            ),
-                            enabled = busNumber.isNotBlank() && capacity.isNotBlank()
-                        ) {
-                            Text(
-                                text = "Save",
-                                fontSize = 15.sp,
-                                fontWeight = FontWeight.SemiBold,
-                                color = Color.White
-                            )
-                        }
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
             }
         }
     }
-}
-
-@Composable
-private fun EditField(
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    icon: Int,
-    enabled: Boolean = true,
-    keyboardType: KeyboardType = KeyboardType.Text
-) {
-    OutlinedTextField(
-        value = value,
-        onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 14.sp
-            )
-        },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = icon),
-                contentDescription = placeholder,
-                tint = if (enabled) Color(0xFF6B9090) else Color(0xFF9AAFAF),
-                modifier = Modifier.size(20.dp)
-            )
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
-        shape = RoundedCornerShape(26.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            disabledBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White.copy(alpha = 0.8f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.8f),
-            disabledContainerColor = Color.White.copy(alpha = 0.5f),
-            focusedTextColor = Color(0xFF2E2E2E),
-            unfocusedTextColor = Color(0xFF2E2E2E),
-            disabledTextColor = Color(0xFF7A7A7A),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal
-        ),
-        singleLine = true,
-        enabled = enabled,
-        keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
-    )
 }

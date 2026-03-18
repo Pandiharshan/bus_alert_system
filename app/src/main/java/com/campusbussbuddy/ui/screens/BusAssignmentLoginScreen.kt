@@ -1,18 +1,16 @@
 package com.campusbussbuddy.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -25,8 +23,14 @@ import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusAuthResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.GlassBackground
-import com.campusbussbuddy.ui.components.*
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -42,7 +46,7 @@ fun BusAssignmentLoginScreen(
     
     val scope = rememberCoroutineScope()
     
-    GlassBackground {
+    NeumorphismScreenContainer {
         Column(
             modifier = Modifier
                 .fillMaxSize()
@@ -50,53 +54,54 @@ fun BusAssignmentLoginScreen(
                 .padding(horizontal = 24.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Spacer(modifier = Modifier.height(40.dp))
+            Spacer(modifier = Modifier.height(48.dp))
             
-            // Back Button - Top Left (reusable component)
-            Row(
+            // Top Bar
+            Box(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                contentAlignment = Alignment.Center
             ) {
-                BackButtonCircle(onBackClick = onBackClick)
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_chevron_left,
+                    onClick = onBackClick,
+                    size = 44.dp,
+                    iconSize = 24.dp,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                
+                AppLabelPill(
+                    icon = R.drawable.ic_directions_bus_vector,
+                    title = "Bus Login"
+                )
             }
             
-            Spacer(modifier = Modifier.height(80.dp))
+            Spacer(modifier = Modifier.height(64.dp))
             
             // Bus Icon Circle
             Box(
                 modifier = Modifier
                     .size(120.dp)
-                    .shadow(
-                        elevation = 8.dp,
-                        shape = CircleShape,
-                        ambientColor = Color.Black.copy(alpha = 0.08f),
-                        spotColor = Color.Black.copy(alpha = 0.08f)
-                    )
-                    .background(
-                        Color.White.copy(alpha = 0.25f),
-                        CircleShape
-                    )
-                    .border(
-                        2.dp,
-                        Color.White.copy(alpha = 0.40f),
-                        CircleShape
-                    ),
+                    .neumorphic(cornerRadius = 60.dp, elevation = 6.dp, blur = 12.dp)
+                    .background(NeumorphSurface, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 Icon(
                     painter = painterResource(id = R.drawable.ic_directions_bus_vector),
                     contentDescription = "Bus",
-                    tint = Color(0xFF2A2A2A),
-                    modifier = Modifier.size(48.dp)
+                    tint = NeumorphAccentPrimary,
+                    modifier = Modifier.size(56.dp)
                 )
             }
             
             Spacer(modifier = Modifier.height(32.dp))
             
             // Title
-            SectionTitle(
-                text = "Bus Assignment Login",
-                fontSize = 28
+            Text(
+                text = "Bus Assignment",
+                fontSize = 28.sp,
+                fontWeight = FontWeight.Bold,
+                color = NeumorphTextPrimary,
+                textAlign = TextAlign.Center
             )
             
             Spacer(modifier = Modifier.height(8.dp))
@@ -106,15 +111,19 @@ fun BusAssignmentLoginScreen(
                 text = "Enter bus credentials to start operations",
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Medium,
-                color = Color(0xFF4A5F5F),
+                color = NeumorphTextSecondary,
                 textAlign = TextAlign.Center,
                 lineHeight = 20.sp
             )
             
             Spacer(modifier = Modifier.height(40.dp))
             
-            // Login Card (reusable glass card)
-            GlassCardContainer {
+            // Login Card
+            NeumorphismCard(
+                modifier = Modifier.fillMaxWidth(),
+                cornerRadius = 24.dp,
+                contentPadding = PaddingValues(top = 32.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
+            ) {
                 Column(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalAlignment = Alignment.CenterHorizontally
@@ -148,26 +157,30 @@ fun BusAssignmentLoginScreen(
                     )
                     
                     // Error Message
-                    if (errorMessage != null) {
-                        Spacer(modifier = Modifier.height(12.dp))
-                        Text(
-                            text = errorMessage!!,
-                            fontSize = 13.sp,
-                            color = Color(0xFFE53935),
-                            textAlign = TextAlign.Center,
-                            modifier = Modifier.fillMaxWidth()
-                        )
+                    AnimatedVisibility(visible = errorMessage != null) {
+                        Column {
+                            Spacer(modifier = Modifier.height(16.dp))
+                            Text(
+                                text = errorMessage ?: "",
+                                fontSize = 13.sp,
+                                color = Color(0xFFE53935),
+                                textAlign = TextAlign.Center,
+                                modifier = Modifier.fillMaxWidth()
+                            )
+                        }
                     }
                     
-                    Spacer(modifier = Modifier.height(24.dp))
+                    Spacer(modifier = Modifier.height(32.dp))
                     
-                    // Enter Bus Button (reusable action button)
-                    PrimaryActionButton(
-                        text = if (isLoading) "" else "Enter Bus",
+                    // Enter Bus Button
+                    NeumorphismButton(
+                        text = "Enter Bus",
+                        isLoading = isLoading,
                         onClick = {
+                            if (isLoading) return@NeumorphismButton
                             if (busNumber.isBlank() || busPassword.isBlank()) {
                                 errorMessage = "Please fill in all fields"
-                                return@PrimaryActionButton
+                                return@NeumorphismButton
                             }
                             
                             scope.launch {
@@ -194,16 +207,6 @@ fun BusAssignmentLoginScreen(
                             }
                         }
                     )
-                    
-                    // Show loading indicator over the button when loading
-                    if (isLoading) {
-                        Spacer(modifier = Modifier.height(8.dp))
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(20.dp),
-                            color = Color(0xFF4CAF50),
-                            strokeWidth = 2.dp
-                        )
-                    }
                 }
             }
             
@@ -221,44 +224,18 @@ private fun BusTextField(
     keyboardType: KeyboardType = KeyboardType.Text,
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    NeumorphismTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-        },
+        placeholder = placeholder,
         leadingIcon = {
             Icon(
                 painter = painterResource(id = leadingIcon),
-                contentDescription = null,
-                tint = Color(0xFF6B9090),
+                contentDescription = placeholder,
+                tint = NeumorphTextSecondary,
                 modifier = Modifier.size(20.dp)
             )
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(54.dp),
-        shape = RoundedCornerShape(27.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF6B9A92).copy(alpha = 0.30f),
-            unfocusedBorderColor = Color.White.copy(alpha = 0.40f),
-            focusedContainerColor = Color.White.copy(alpha = 0.6f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.6f),
-            focusedTextColor = Color(0xFF2A2A2A),
-            unfocusedTextColor = Color(0xFF2A2A2A),
-            cursorColor = Color(0xFF6B9A92)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 0.2.sp
-        ),
-        singleLine = true,
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )
@@ -273,22 +250,15 @@ private fun BusPasswordField(
     onVisibilityToggle: () -> Unit,
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    NeumorphismTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Medium
-            )
-        },
+        placeholder = placeholder,
         leadingIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_visibility_off),
-                contentDescription = null,
-                tint = Color(0xFF6B9090),
+                painter = painterResource(id = R.drawable.ic_lock),
+                contentDescription = "Password",
+                tint = NeumorphTextSecondary,
                 modifier = Modifier.size(20.dp)
             )
         },
@@ -300,7 +270,7 @@ private fun BusPasswordField(
                         else R.drawable.ic_visibility_off
                     ),
                     contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                    tint = Color(0xFF6B9090),
+                    tint = NeumorphTextSecondary,
                     modifier = Modifier.size(20.dp)
                 )
             }
@@ -308,25 +278,6 @@ private fun BusPasswordField(
         visualTransformation = if (isPasswordVisible) VisualTransformation.None 
         else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(54.dp),
-        shape = RoundedCornerShape(27.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color(0xFF6B9A92).copy(alpha = 0.30f),
-            unfocusedBorderColor = Color.White.copy(alpha = 0.40f),
-            focusedContainerColor = Color.White.copy(alpha = 0.6f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.6f),
-            focusedTextColor = Color(0xFF2A2A2A),
-            unfocusedTextColor = Color(0xFF2A2A2A),
-            cursorColor = Color(0xFF6B9A92)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 0.2.sp
-        ),
-        singleLine = true,
         enabled = enabled
     )
 }

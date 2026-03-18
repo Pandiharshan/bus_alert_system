@@ -1,30 +1,36 @@
 package com.campusbussbuddy.ui.screens
 
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.StudentData
 import com.campusbussbuddy.firebase.StudentResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,6 +43,7 @@ fun AddStudentScreen(
     var password by remember { mutableStateOf("") }
     var busId by remember { mutableStateOf("") }
     var stop by remember { mutableStateOf("") }
+    var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
@@ -44,286 +51,266 @@ fun AddStudentScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     
-    GlassBackground {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top Bar
-            TopBar(
-                onBackClick = onBackClick
-            )
+    NeumorphismScreenContainer {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Embedded TopBar utilizing AppLabelPill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_chevron_left,
+                    onClick = onBackClick,
+                    size = 44.dp,
+                    iconSize = 24.dp,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                
+                AppLabelPill(
+                    icon = R.drawable.ic_student,
+                    title = "Add New Student"
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
             
             // Form Content
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Student Icon
+                // Student Icon (Neumorphic Style)
                 Box(
                     modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(Color(0xFFB8D4D1)),
+                        .size(120.dp)
+                        .neumorphic(cornerRadius = 60.dp, elevation = 6.dp, blur = 12.dp)
+                        .background(NeumorphSurface, CircleShape),
                     contentAlignment = Alignment.Center
                 ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.ic_person),
+                        painter = painterResource(id = R.drawable.ic_student),
                         contentDescription = "Student",
-                        tint = Color(0xFF6B9090),
-                        modifier = Modifier.size(70.dp)
+                        tint = NeumorphAccentPrimary,
+                        modifier = Modifier.size(56.dp)
                     )
                 }
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
                 // Form Card
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 0.dp,
-                            shape = RoundedCornerShape(20.dp)
-                        ),
-                    shape = RoundedCornerShape(20.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color(0xFFD9E8E6)
-                    ),
-                    border = BorderStroke(0.dp, Color.Transparent)
+                NeumorphismCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    cornerRadius = 24.dp,
+                    contentPadding = PaddingValues(top = 32.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        verticalArrangement = Arrangement.spacedBy(14.dp)
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         // Full Name
-                        AddField(
+                        FormField(
                             value = name,
                             onValueChange = { 
                                 name = it
                                 errorMessage = null
                             },
                             placeholder = "Full Name",
-                            icon = R.drawable.ic_person
+                            icon = R.drawable.ic_person,
+                            enabled = !isLoading
                         )
                         
                         // Username
-                        AddField(
+                        FormField(
                             value = username,
                             onValueChange = { 
                                 username = it
                                 errorMessage = null
                             },
                             placeholder = "Username",
-                            icon = R.drawable.ic_person
+                            icon = R.drawable.ic_person,
+                            enabled = !isLoading
                         )
                         
                         // Password
-                        AddField(
+                        PasswordField(
                             value = password,
                             onValueChange = { 
                                 password = it
                                 errorMessage = null
                             },
                             placeholder = "Password",
-                            icon = R.drawable.ic_visibility_off,
-                            keyboardType = KeyboardType.Password
+                            isPasswordVisible = isPasswordVisible,
+                            onVisibilityToggle = { isPasswordVisible = !isPasswordVisible },
+                            enabled = !isLoading
                         )
                         
                         // Bus ID
-                        AddField(
+                        FormField(
                             value = busId,
                             onValueChange = { 
                                 busId = it
                                 errorMessage = null
                             },
-                            placeholder = "Bus ID",
-                            icon = R.drawable.ic_directions_bus_vector
+                            placeholder = "Bus ID (e.g., B-101)",
+                            icon = R.drawable.ic_directions_bus_vector,
+                            enabled = !isLoading
                         )
                         
                         // Bus Stop
-                        AddField(
+                        FormField(
                             value = stop,
                             onValueChange = { 
                                 stop = it
                                 errorMessage = null
                             },
                             placeholder = "Bus Stop",
-                            icon = R.drawable.ic_pin_drop
+                            icon = R.drawable.ic_pin_drop,
+                            enabled = !isLoading
                         )
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
                 
                 // Error Message
-                if (errorMessage != null) {
+                AnimatedVisibility(visible = errorMessage != null) {
                     Text(
-                        text = errorMessage!!,
+                        text = errorMessage ?: "",
                         fontSize = 13.sp,
-                        color = Color(0xFFD32F2F)
+                        color = Color(0xFFE53935),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
                 // Success Message
-                if (successMessage != null) {
+                AnimatedVisibility(visible = successMessage != null) {
                     Text(
-                        text = successMessage!!,
+                        text = successMessage ?: "",
                         fontSize = 13.sp,
-                        color = Color(0xFF4CAF50)
+                        color = Color(0xFF4CAF50),
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                     )
-                    Spacer(modifier = Modifier.height(8.dp))
                 }
                 
-                Spacer(modifier = Modifier.height(16.dp))
-                
                 // Create Student Button
-                Button(
+                NeumorphismButton(
+                    text = "Add Student",
+                    isLoading = isLoading,
                     onClick = {
-                        scope.launch {
-                            isLoading = true
-                            errorMessage = null
-                            successMessage = null
-                            
-                            val studentData = StudentData(
-                                name = name.trim(),
-                                username = username.trim(),
-                                busId = busId.trim(),
-                                stop = stop.trim()
-                            )
-                            
-                            when (val result = FirebaseManager.createStudentAccount(
-                                studentData = studentData,
-                                password = password
-                            )) {
-                                is StudentResult.Success -> {
-                                    isLoading = false
-                                    successMessage = "Student account created successfully!"
-                                    kotlinx.coroutines.delay(1000)
-                                    onStudentAdded()
-                                }
-                                is StudentResult.Error -> {
-                                    isLoading = false
-                                    errorMessage = result.message
+                        if (isLoading) return@NeumorphismButton
+                        if (name.isBlank() || username.isBlank() || password.isBlank() || 
+                            busId.isBlank() || stop.isBlank()) {
+                            errorMessage = "Please fill in all fields"
+                        } else {
+                            scope.launch {
+                                isLoading = true
+                                errorMessage = null
+                                successMessage = null
+                                
+                                val studentData = StudentData(
+                                    name = name.trim(),
+                                    username = username.trim(),
+                                    busId = busId.trim(),
+                                    stop = stop.trim()
+                                )
+                                
+                                when (val result = FirebaseManager.createStudentAccount(
+                                    studentData = studentData,
+                                    password = password
+                                )) {
+                                    is StudentResult.Success -> {
+                                        successMessage = "Student account created successfully!"
+                                        kotlinx.coroutines.delay(1000)
+                                        onStudentAdded()
+                                    }
+                                    is StudentResult.Error -> {
+                                        errorMessage = result.message
+                                        isLoading = false
+                                    }
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        contentColor = Color.White
-                    ),
-                    enabled = !isLoading && name.isNotBlank() && username.isNotBlank() 
-                            && password.isNotBlank() && busId.isNotBlank() && stop.isNotBlank()
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text = "Add Student",
-                            fontSize = 15.sp,
-                            fontWeight = FontWeight.SemiBold
-                        )
                     }
-                }
+                )
+                
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
 }
 
 @Composable
-private fun AddField(
+private fun FormField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
     icon: Int,
+    enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    OutlinedTextField(
+    NeumorphismTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 14.sp
-            )
-        },
+        placeholder = placeholder,
         leadingIcon = {
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = placeholder,
-                tint = Color(0xFF6B9090),
+                tint = NeumorphTextSecondary,
                 modifier = Modifier.size(20.dp)
             )
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(52.dp),
-        shape = RoundedCornerShape(26.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White.copy(alpha = 0.8f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.8f),
-            focusedTextColor = Color(0xFF2E2E2E),
-            unfocusedTextColor = Color(0xFF2E2E2E),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Normal
-        ),
-        singleLine = true,
+        enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )
 }
 
 @Composable
-private fun TopBar(
-    onBackClick: () -> Unit
+private fun PasswordField(
+    value: String,
+    onValueChange: (String) -> Unit,
+    placeholder: String,
+    isPasswordVisible: Boolean,
+    onVisibilityToggle: () -> Unit,
+    enabled: Boolean = true
 ) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Back button - using chevron left icon
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp)
-        ) {
+    NeumorphismTextField(
+        value = value,
+        onValueChange = onValueChange,
+        placeholder = placeholder,
+        leadingIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2C3E3E),
-                modifier = Modifier.size(32.dp)
+                painter = painterResource(id = R.drawable.ic_lock),
+                contentDescription = "Password",
+                tint = NeumorphTextSecondary,
+                modifier = Modifier.size(20.dp)
             )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // Title
-        Text(
-            text = "Add New Student",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)
-        )
-    }
+        },
+        trailingIcon = {
+            IconButton(onClick = onVisibilityToggle) {
+                Icon(
+                    painter = painterResource(
+                        id = if (isPasswordVisible) R.drawable.ic_visibility 
+                        else R.drawable.ic_visibility_off
+                    ),
+                    contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
+                    tint = NeumorphTextSecondary,
+                    modifier = Modifier.size(20.dp)
+                )
+            }
+        },
+        visualTransformation = if (isPasswordVisible) VisualTransformation.None 
+        else PasswordVisualTransformation(),
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+        enabled = enabled
+    )
 }

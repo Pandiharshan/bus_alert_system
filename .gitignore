@@ -30,6 +30,17 @@ proguard/
 # Log Files
 *.log
 
+# Build and error logs (temporary files)
+build_*.txt
+build_*.log
+*_output*.txt
+*_error*.txt
+status_out.txt
+diff.txt
+
+# Kotlin error logs
+.kotlin/errors/*.log
+
 # Android Studio Navigation editor temp files
 .navigation/
 

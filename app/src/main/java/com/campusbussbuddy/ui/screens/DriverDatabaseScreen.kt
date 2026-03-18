@@ -21,6 +21,7 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
@@ -40,6 +41,15 @@ import com.campusbussbuddy.firebase.DriverInfo
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import androidx.compose.ui.draw.alpha
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Warning
 import kotlinx.coroutines.launch
 
 @Composable
@@ -81,47 +91,77 @@ fun DriverDatabaseScreen(
         }
     }
     
-    // Use same background as UnifiedLoginScreen
-    GlassBackground {
-        Box(modifier = Modifier.fillMaxSize()) {
-            Column(
-                modifier = Modifier.fillMaxSize()
+    NeumorphismScreenContainer {
+        Column(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Embedded TopBar utilizing AppLabelPill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center
             ) {
-                // Top Bar
-                TopBar(
-                    onBackClick = onBackClick
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_chevron_left,
+                    onClick = onBackClick,
+                    size = 44.dp,
+                    iconSize = 24.dp,
+                    modifier = Modifier.align(Alignment.CenterStart)
                 )
                 
-                // Search Bar
-                SearchBar(
-                    searchQuery = searchQuery,
-                    onSearchQueryChange = { searchQuery = it },
-                    modifier = Modifier.padding(horizontal = 20.dp, vertical = 12.dp)
+                AppLabelPill(
+                    icon = R.drawable.ic_group,
+                    title = "Driver Database"
                 )
-                
-                if (isLoading) {
-                    // Loading State
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        CircularProgressIndicator(
-                            color = Color(0xFF5A9A8A)
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
+            
+            // Search Bar
+            Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                NeumorphismTextField(
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
+                    placeholder = "Search drivers...",
+                    leadingIcon = {
+                        Icon(
+                            painter = painterResource(id = R.drawable.ic_group),
+                            contentDescription = "Search",
+                            tint = NeumorphTextSecondary,
+                            modifier = Modifier.size(20.dp)
                         )
                     }
-                } else if (filteredDrivers.isEmpty()) {
-                    // Empty State
-                    EmptyState(
-                        isSearching = searchQuery.isNotBlank(),
-                        onAddClick = onAddDriverClick
+                )
+            }
+                
+            Spacer(modifier = Modifier.height(24.dp))
+            
+            if (isLoading) {
+                // Loading State
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator(
+                        color = NeumorphAccentPrimary
                     )
-                } else {
-                    // Drivers List
-                    LazyColumn(
-                        modifier = Modifier.fillMaxSize(),
-                        contentPadding = PaddingValues(start = 20.dp, end = 20.dp, top = 12.dp, bottom = 80.dp),
-                        verticalArrangement = Arrangement.spacedBy(16.dp)
-                    ) {
+                }
+            } else if (filteredDrivers.isEmpty()) {
+                // Empty State
+                EmptyState(
+                    isSearching = searchQuery.isNotBlank(),
+                    onAddClick = onAddDriverClick
+                )
+            } else {
+                // Drivers List
+                LazyColumn(
+                    modifier = Modifier.fillMaxSize(),
+                    contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 100.dp),
+                    verticalArrangement = Arrangement.spacedBy(20.dp)
+                ) {
                         items(filteredDrivers) { driver ->
                             DriverCard(
                                 driver = driver,
@@ -139,33 +179,27 @@ fun DriverDatabaseScreen(
                 }
             }
             
-            // Floating Add Button (bottom right) - with group/add person icon
-            FloatingActionButton(
-                onClick = onAddDriverClick,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(28.dp)
-                    .size(64.dp),
-                containerColor = Color(0xFF6B9A92),
-                contentColor = Color.White,
-                shape = CircleShape
-            ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_group),
-                        contentDescription = "Add Driver",
-                        modifier = Modifier.size(24.dp)
-                    )
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = "Add",
-                        modifier = Modifier.size(20.dp).offset(x = (-4).dp)
-                    )
-                }
-            }
+        // Floating Add Button
+        Box(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .padding(24.dp)
+                .size(64.dp)
+                .neumorphic(cornerRadius = 32.dp, elevation = 8.dp, blur = 16.dp)
+                .background(NeumorphSurface, CircleShape)
+                .clickable(
+                    interactionSource = remember { MutableInteractionSource() },
+                    indication = null,
+                    onClick = onAddDriverClick
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = R.drawable.ic_add),
+                contentDescription = "Add",
+                tint = NeumorphAccentPrimary,
+                modifier = Modifier.size(28.dp)
+            )
         }
         
         // Edit Driver Dialog
@@ -235,53 +269,6 @@ fun DriverDatabaseScreen(
 }
 
 @Composable
-private fun SearchBar(
-    searchQuery: String,
-    onSearchQueryChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    OutlinedTextField(
-        value = searchQuery,
-        onValueChange = onSearchQueryChange,
-        modifier = modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        placeholder = {
-            Text(
-                text = "Search drivers...",
-                color = Color(0xFF7A9B9B),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Normal
-            )
-        },
-        leadingIcon = {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_person),
-                contentDescription = "Search",
-                tint = Color(0xFF6B9090),
-                modifier = Modifier.size(24.dp)
-            )
-        },
-        shape = RoundedCornerShape(28.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color(0xFFD9E8E6),
-            unfocusedContainerColor = Color(0xFFD9E8E6),
-            focusedTextColor = Color(0xFF2C3E3E),
-            unfocusedTextColor = Color(0xFF2C3E3E),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Normal,
-            color = Color(0xFF2C3E3E)
-        ),
-        singleLine = true
-    )
-}
-
-@Composable
 private fun EmptyState(
     isSearching: Boolean,
     onAddClick: () -> Unit
@@ -294,55 +281,49 @@ private fun EmptyState(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(32.dp)
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_group),
-                contentDescription = if (isSearching) "No Results" else "No Drivers",
-                modifier = Modifier.size(80.dp),
-                tint = Color(0xFF8AAFA8)
-            )
+            Box(
+                modifier = Modifier
+                    .size(100.dp)
+                    .neumorphicInset(cornerRadius = 50.dp, blur = 12.dp)
+                    .background(NeumorphBgPrimary, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_group),
+                    contentDescription = if (isSearching) "No Results" else "No Drivers",
+                    modifier = Modifier.size(48.dp),
+                    tint = NeumorphTextSecondary
+                )
+            }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             
             Text(
                 text = if (isSearching) "No Drivers Found" else "No Drivers Yet",
                 fontSize = 20.sp,
-                fontWeight = FontWeight.SemiBold,
-                color = Color(0xFF3A4F4F)
+                fontWeight = FontWeight.Bold,
+                color = NeumorphTextPrimary,
+                textAlign = TextAlign.Center
             )
             
             Spacer(modifier = Modifier.height(8.dp))
             
             Text(
                 text = if (isSearching) "Try a different search term" else "Add your first driver to get started",
-                fontSize = 14.sp,
-                fontWeight = FontWeight.Normal,
-                color = Color(0xFF5A7070),
+                fontSize = 15.sp,
+                fontWeight = FontWeight.Medium,
+                color = NeumorphTextSecondary,
                 textAlign = TextAlign.Center
             )
             
             if (!isSearching) {
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
                 
-                Button(
+                NeumorphismButton(
+                    text = "Add Driver",
                     onClick = onAddClick,
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF5A9A8A)
-                    ),
-                    shape = RoundedCornerShape(24.dp),
-                    modifier = Modifier.height(48.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_add),
-                        contentDescription = "Add",
-                        modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Add Driver",
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
+                    modifier = Modifier.fillMaxWidth()
+                )
             }
         }
     }
@@ -356,18 +337,8 @@ private fun DriverCard(
 ) {
     val context = LocalContext.current
     
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = 0.dp,
-                shape = RoundedCornerShape(20.dp)
-            ),
-        shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = Color(0xFFD9E8E6)
-        ),
-        border = BorderStroke(0.dp, Color.Transparent)
+    NeumorphismCard(
+        modifier = Modifier.fillMaxWidth()
     ) {
         Row(
             modifier = Modifier
@@ -375,54 +346,56 @@ private fun DriverCard(
                 .padding(horizontal = 16.dp, vertical = 16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Driver Photo - circular with light teal background
+            // Driver Photo
             Box(
                 modifier = Modifier
-                    .size(70.dp)
-                    .clip(CircleShape)
-                    .background(Color(0xFFB8D4D1)),
+                    .size(64.dp)
+                    .neumorphicInset(cornerRadius = 32.dp, blur = 8.dp)
+                    .background(NeumorphSurface, CircleShape),
                 contentAlignment = Alignment.Center
             ) {
                 val photoUrl = driver.photoUrl.trim()
                 
                 if (photoUrl.isNotEmpty() && photoUrl.isNotBlank()) {
-                    SubcomposeAsyncImage(
-                        model = ImageRequest.Builder(context)
-                            .data(photoUrl)
-                            .crossfade(true)
-                            .memoryCacheKey(photoUrl)
-                            .diskCacheKey(photoUrl)
-                            .build(),
-                        contentDescription = "Driver Photo",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop,
-                        loading = {
-                            Box(
-                                modifier = Modifier.fillMaxSize(),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                CircularProgressIndicator(
-                                    modifier = Modifier.size(24.dp),
-                                    color = Color(0xFF5A9A8A),
-                                    strokeWidth = 2.dp
+                    Box(modifier = Modifier.fillMaxSize().padding(4.dp).clip(CircleShape)) {
+                        SubcomposeAsyncImage(
+                            model = ImageRequest.Builder(context)
+                                .data(photoUrl)
+                                .crossfade(true)
+                                .memoryCacheKey(photoUrl)
+                                .diskCacheKey(photoUrl)
+                                .build(),
+                            contentDescription = "Driver Photo",
+                            modifier = Modifier.fillMaxSize(),
+                            contentScale = ContentScale.Crop,
+                            loading = {
+                                Box(
+                                    modifier = Modifier.fillMaxSize(),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    CircularProgressIndicator(
+                                        modifier = Modifier.size(20.dp),
+                                        color = NeumorphAccentPrimary,
+                                        strokeWidth = 2.dp
+                                    )
+                                }
+                            },
+                            error = {
+                                Icon(
+                                    painter = painterResource(id = R.drawable.ic_person),
+                                    contentDescription = "Default",
+                                    modifier = Modifier.size(28.dp),
+                                    tint = NeumorphAccentPrimary
                                 )
                             }
-                        },
-                        error = {
-                            Icon(
-                                painter = painterResource(id = R.drawable.ic_person),
-                                contentDescription = "Default",
-                                modifier = Modifier.size(36.dp),
-                                tint = Color(0xFF6B9090)
-                            )
-                        }
-                    )
+                        )
+                    }
                 } else {
                     Icon(
                         painter = painterResource(id = R.drawable.ic_person),
                         contentDescription = "Default",
-                        modifier = Modifier.size(36.dp),
-                        tint = Color(0xFF6B9090)
+                        modifier = Modifier.size(28.dp),
+                        tint = NeumorphAccentPrimary
                     )
                 }
             }
@@ -433,115 +406,69 @@ private fun DriverCard(
             Column(
                 modifier = Modifier.weight(1f)
             ) {
-                // Name - bold, larger
+                // Name
                 Text(
                     text = driver.name,
-                    fontSize = 19.sp,
+                    fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A1A),
-                    letterSpacing = 0.sp
+                    color = NeumorphTextPrimary
                 )
                 
-                Spacer(modifier = Modifier.height(2.dp))
+                Spacer(modifier = Modifier.height(4.dp))
                 
-                // Username with @
+                // Username
                 Text(
                     text = "@${driver.username}",
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF4A5F5F)
-                )
-                
-                Spacer(modifier = Modifier.height(1.dp))
-                
-                // Phone number
-                Text(
-                    text = driver.phone,
-                    fontSize = 15.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF4A5F5F)
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = NeumorphTextSecondary
                 )
                 
                 Spacer(modifier = Modifier.height(2.dp))
                 
-                // Bus ID - bold
+                // Phone
+                Text(
+                    text = driver.phone,
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = NeumorphTextSecondary
+                )
+                
+                Spacer(modifier = Modifier.height(4.dp))
+                
+                // Bus ID
                 Text(
                     text = "Bus ID: ${if (driver.assignedBusId.isNotEmpty()) driver.assignedBusId else "Not assigned"}",
-                    fontSize = 15.sp,
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
-                    color = Color(0xFF1A1A1A)
+                    color = NeumorphTextPrimary
                 )
             }
             
-            // Action Buttons - stacked vertically on the right
+            // Action Buttons
             Column(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                // Edit Button (settings icon)
-                IconButton(
+                // Edit Button
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_settings,
                     onClick = onEditClick,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_settings),
-                        contentDescription = "Edit Driver",
-                        tint = Color(0xFF2A2A2A),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                    size = 40.dp,
+                    iconSize = 20.dp,
+                    unselectedTint = NeumorphTextPrimary
+                )
                 
-                // Delete Button (trash/remove icon)
-                IconButton(
+                // Delete Button
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_remove,
                     onClick = onDeleteClick,
-                    modifier = Modifier.size(40.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.ic_remove),
-                        contentDescription = "Delete Driver",
-                        tint = Color(0xFF2A2A2A),
-                        modifier = Modifier.size(24.dp)
-                    )
-                }
+                    size = 40.dp,
+                    iconSize = 20.dp,
+                    unselectedTint = Color(0xFFE53935)
+                )
             }
         }
-    }
-}
-
-@Composable
-private fun TopBar(
-    onBackClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Back button - using chevron left icon
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2C3E3E),
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        // Title
-        Text(
-            text = "Driver Management",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A)
-        )
     }
 }
 
@@ -553,79 +480,131 @@ private fun DeleteConfirmationDialog(
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
-        onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = "Delete Driver?",
-                fontWeight = FontWeight.Bold
-            )
-        },
-        text = {
-            Column {
-                Text(
-                    text = "Are you sure you want to permanently delete $driverName?",
-                    fontSize = 14.sp
+    var visible by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) { visible = true }
+    val alpha by androidx.compose.animation.core.animateFloatAsState(if (visible) 1f else 0f, androidx.compose.animation.core.tween(300), label = "a")
+    val scale by androidx.compose.animation.core.animateFloatAsState(if (visible) 1f else 0.88f, androidx.compose.animation.core.tween(300), label = "s")
+
+    androidx.compose.ui.window.Dialog(
+        onDismissRequest = { if (!isDeleting) { visible = false; onDismiss() } },
+        properties = androidx.compose.ui.window.DialogProperties(dismissOnBackPress = true, dismissOnClickOutside = true, usePlatformDefaultWidth = false)
+    ) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.Black.copy(alpha = 0.45f * alpha))
+                .clickable(remember { MutableInteractionSource() }, null) { if (!isDeleting) { visible = false; onDismiss() } },
+            contentAlignment = Alignment.Center
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(32.dp)
+                    .scale(scale)
+                    .alpha(alpha)
+                    .neumorphic(
+                        cornerRadius = 24.dp,
+                        elevation = 8.dp,
+                        blur = 16.dp
+                    )
+                    .background(NeumorphSurface, RoundedCornerShape(24.dp))
+                    .clickable(remember { MutableInteractionSource() }, null) { } // prevent clicks from closing
+            ) {
+                // Subtle purple bottom accent
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(8.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            brush = androidx.compose.ui.graphics.Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.15f))
+                            ),
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
                 )
-                
-                Spacer(modifier = Modifier.height(12.dp))
-                
-                Text(
-                    text = "This will remove:",
-                    fontSize = 13.sp,
-                    fontWeight = FontWeight.SemiBold,
-                    color = Color(0xFF666666)
-                )
-                
-                Spacer(modifier = Modifier.height(4.dp))
-                
-                Text(
-                    text = "• Driver profile from database\n• Driver photo from storage\n• Bus assignment\n• Authentication account",
-                    fontSize = 12.sp,
-                    color = Color(0xFF888888),
-                    lineHeight = 18.sp
-                )
-                
-                if (errorMessage != null) {
+
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(64.dp)
+                            .neumorphicInset(cornerRadius = 32.dp, blur = 12.dp)
+                            .background(NeumorphBgPrimary, CircleShape),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Warning,
+                            contentDescription = "Warning",
+                            tint = Color(0xFFE53935), // Red warning color
+                            modifier = Modifier.size(32.dp)
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
+                    
+                    Text(
+                        text = "Delete Driver?",
+                        fontSize = 22.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NeumorphTextPrimary,
+                        textAlign = TextAlign.Center
+                    )
+                    
                     Spacer(modifier = Modifier.height(12.dp))
+                    
                     Text(
-                        text = errorMessage,
+                        text = "Are you sure you want to permanently delete $driverName?",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextSecondary,
+                        textAlign = TextAlign.Center
+                    )
+                    
+                    Spacer(modifier = Modifier.height(8.dp))
+                    
+                    if (errorMessage != null) {
+                        Text(
+                            text = errorMessage,
+                            fontSize = 12.sp,
+                            color = Color(0xFFD32F2F),
+                            textAlign = TextAlign.Center
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                    }
+                    
+                    Text(
+                        text = "This will remove:\n• Driver profile\n• Driver photo\n• Bus assignment\n• Authentication account",
                         fontSize = 12.sp,
-                        color = Color(0xFFD32F2F)
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextSecondary,
+                        textAlign = TextAlign.Center,
+                        lineHeight = 18.sp
                     )
+                    
+                    Spacer(modifier = Modifier.height(32.dp))
+                    
+                    Column(
+                        modifier = Modifier.fillMaxWidth(),
+                        verticalArrangement = Arrangement.spacedBy(16.dp)
+                    ) {
+                        Box(modifier = Modifier.fillMaxWidth().height(56.dp).clickable { if (!isDeleting) onDismiss() }, contentAlignment = Alignment.Center) {
+                            Text("Cancel", fontSize = 16.sp, fontWeight = FontWeight.SemiBold, color = NeumorphTextSecondary)
+                        }
+                        
+                        // Delete Button
+                        NeumorphismButton(
+                            text = if (isDeleting) "Deleting..." else "Delete Permanently",
+                            onClick = { if (!isDeleting) onConfirm() },
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
-            }
-        },
-        confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                enabled = !isDeleting
-            ) {
-                if (isDeleting) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(16.dp),
-                        strokeWidth = 2.dp,
-                        color = Color(0xFFD32F2F)
-                    )
-                } else {
-                    Text(
-                        text = "Delete",
-                        color = Color(0xFFD32F2F),
-                        fontWeight = FontWeight.SemiBold
-                    )
-                }
-            }
-        },
-        dismissButton = {
-            TextButton(
-                onClick = onDismiss,
-                enabled = !isDeleting
-            ) {
-                Text(
-                    text = "Cancel",
-                    color = Color(0xFF666666)
-                )
             }
         }
-    )
+    }
 }

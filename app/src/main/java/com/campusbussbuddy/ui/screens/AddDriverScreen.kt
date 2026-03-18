@@ -3,24 +3,19 @@ package com.campusbussbuddy.ui.screens
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.*
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
@@ -36,7 +31,14 @@ import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverResult
 import com.campusbussbuddy.firebase.FirebaseManager
-import com.campusbussbuddy.ui.theme.GlassBackground
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismIconButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
 
 @Composable
@@ -58,38 +60,58 @@ fun AddDriverScreen(
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
     
-    // Photo picker launcher
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
     ) { uri: Uri? ->
         photoUri = uri
     }
     
-    // Use same background as UnifiedLoginScreen
-    GlassBackground {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            // Top Bar
-            TopBar(onBackClick = onBackClick)
+    NeumorphismScreenContainer {
+        Column(modifier = Modifier.fillMaxSize()) {
+            Spacer(modifier = Modifier.height(48.dp))
+
+            // Embedded TopBar utilizing AppLabelPill
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 24.dp),
+                contentAlignment = Alignment.Center
+            ) {
+                NeumorphismIconButton(
+                    iconRes = R.drawable.ic_chevron_left,
+                    onClick = onBackClick,
+                    size = 44.dp,
+                    iconSize = 24.dp,
+                    modifier = Modifier.align(Alignment.CenterStart)
+                )
+                
+                AppLabelPill(
+                    icon = R.drawable.ic_person,
+                    title = "Add New Driver"
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(32.dp))
             
             // Main Content
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
+                    .fillMaxWidth()
                     .verticalScroll(scrollState)
-                    .padding(horizontal = 20.dp, vertical = 16.dp),
+                    .padding(horizontal = 24.dp, vertical = 16.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 
-                // Photo Upload Section - centered circular
+                // Photo Upload Section
                 Box(
                     modifier = Modifier
-                        .size(140.dp)
-                        .clip(CircleShape)
-                        .background(Color.White.copy(alpha = 0.3f))
-                        .border(2.dp, Color.White.copy(alpha = 0.5f), CircleShape)
-                        .clickable { photoPickerLauncher.launch("image/*") },
+                        .size(120.dp)
+                        .neumorphic(cornerRadius = 60.dp, elevation = 6.dp, blur = 12.dp)
+                        .background(NeumorphSurface, CircleShape)
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = null
+                        ) { photoPickerLauncher.launch("image/*") },
                     contentAlignment = Alignment.Center
                 ) {
                     if (photoUri != null) {
@@ -103,41 +125,31 @@ fun AddDriverScreen(
                         Icon(
                             painter = painterResource(id = R.drawable.ic_person),
                             contentDescription = "Add Photo",
-                            modifier = Modifier.size(60.dp),
-                            tint = Color(0xFF6B9090)
+                            modifier = Modifier.size(56.dp),
+                            tint = NeumorphAccentPrimary
                         )
                     }
                 }
                 
-                Spacer(modifier = Modifier.height(12.dp))
+                Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
                     text = if (photoUri != null) "Tap to change photo" else "Tap to add photo",
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Normal,
-                    color = Color(0xFF5A7070)
+                    fontWeight = FontWeight.Medium,
+                    color = NeumorphTextSecondary
                 )
                 
                 Spacer(modifier = Modifier.height(32.dp))
                 
-                // Form Card with glass effect
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .shadow(
-                            elevation = 0.dp,
-                            shape = RoundedCornerShape(28.dp)
-                        ),
-                    shape = RoundedCornerShape(28.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = Color.White.copy(alpha = 0.25f)
-                    ),
-                    border = BorderStroke(1.dp, Color.White.copy(alpha = 0.3f))
+                // Form Card
+                NeumorphismCard(
+                    modifier = Modifier.fillMaxWidth(),
+                    cornerRadius = 24.dp,
+                    contentPadding = PaddingValues(top = 32.dp, bottom = 32.dp, start = 24.dp, end = 24.dp)
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(20.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         verticalArrangement = Arrangement.spacedBy(16.dp)
                     ) {
                         // Full Name Field
@@ -204,99 +216,73 @@ fun AddDriverScreen(
                     }
                 }
                 
+                Spacer(modifier = Modifier.height(24.dp))
+                
                 // Error Message
-                if (errorMessage != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                AnimatedVisibility(visible = errorMessage != null) {
                     Text(
-                        text = errorMessage!!,
+                        text = errorMessage ?: "",
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
-                        color = Color(0xFFD32F2F),
+                        color = Color(0xFFE53935),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                     )
                 }
                 
                 // Success Message
-                if (successMessage != null) {
-                    Spacer(modifier = Modifier.height(16.dp))
+                AnimatedVisibility(visible = successMessage != null) {
                     Text(
-                        text = successMessage!!,
+                        text = successMessage ?: "",
                         fontSize = 13.sp,
-                        fontWeight = FontWeight.Normal,
                         color = Color(0xFF4CAF50),
                         textAlign = TextAlign.Center,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth().padding(bottom = 16.dp)
                     )
                 }
                 
-                Spacer(modifier = Modifier.height(32.dp))
-                
-                // Create Driver Button - bright green
-                Button(
+                // Create Driver Button
+                NeumorphismButton(
+                    text = "Add Driver",
+                    isLoading = isLoading,
                     onClick = {
+                        if (isLoading) return@NeumorphismButton
                         if (name.isBlank() || username.isBlank() || password.isBlank() || 
                             phone.isBlank() || assignedBusId.isBlank()) {
                             errorMessage = "Please fill in all fields"
-                            return@Button
-                        }
-                        scope.launch {
-                            isLoading = true
-                            errorMessage = null
-                            successMessage = null
-                            
-                            val driverData = DriverData(
-                                name = name.trim(),
-                                username = username.trim(),
-                                phone = phone.trim(),
-                                assignedBusId = assignedBusId.trim()
-                            )
-                            
-                            when (val result = FirebaseManager.createDriverAccount(
-                                driverData = driverData,
-                                password = password,
-                                photoUri = photoUri
-                            )) {
-                                is DriverResult.Success -> {
-                                    isLoading = false
-                                    successMessage = "Driver account created successfully!"
-                                    kotlinx.coroutines.delay(1000)
-                                    onDriverAdded()
-                                }
-                                is DriverResult.Error -> {
-                                    isLoading = false
-                                    errorMessage = result.message
+                        } else {
+                            scope.launch {
+                                isLoading = true
+                                errorMessage = null
+                                successMessage = null
+                                
+                                val driverData = DriverData(
+                                    name = name.trim(),
+                                    username = username.trim(),
+                                    phone = phone.trim(),
+                                    assignedBusId = assignedBusId.trim()
+                                )
+                                
+                                when (val result = FirebaseManager.createDriverAccount(
+                                    driverData = driverData,
+                                    password = password,
+                                    photoUri = photoUri
+                                )) {
+                                    is DriverResult.Success -> {
+                                        successMessage = "Driver account created successfully!"
+                                        kotlinx.coroutines.delay(1000)
+                                        onDriverAdded()
+                                    }
+                                    is DriverResult.Error -> {
+                                        errorMessage = result.message
+                                        isLoading = false
+                                    }
                                 }
                             }
                         }
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = Color(0xFF4CAF50),
-                        disabledContainerColor = Color(0xFF4CAF50).copy(alpha = 0.5f)
-                    ),
-                    shape = RoundedCornerShape(28.dp),
-                    enabled = !isLoading
-                ) {
-                    if (isLoading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = Color.White,
-                            strokeWidth = 2.dp
-                        )
-                    } else {
-                        Text(
-                            text = "Add Driver",
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Bold,
-                            color = Color.White
-                        )
                     }
-                }
+                )
                 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(32.dp))
             }
         }
     }
@@ -311,43 +297,18 @@ private fun FormField(
     enabled: Boolean = true,
     keyboardType: KeyboardType = KeyboardType.Text
 ) {
-    OutlinedTextField(
+    NeumorphismTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 15.sp
-            )
-        },
+        placeholder = placeholder,
         leadingIcon = {
             Icon(
                 painter = painterResource(id = icon),
                 contentDescription = placeholder,
-                tint = Color(0xFF6B9090),
-                modifier = Modifier.size(22.dp)
+                tint = NeumorphTextSecondary,
+                modifier = Modifier.size(20.dp)
             )
         },
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(28.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White.copy(alpha = 0.7f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
-            focusedTextColor = Color(0xFF2E2E2E),
-            unfocusedTextColor = Color(0xFF2E2E2E),
-            disabledTextColor = Color(0xFF2E2E2E),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Normal
-        ),
-        singleLine = true,
         enabled = enabled,
         keyboardOptions = KeyboardOptions(keyboardType = keyboardType)
     )
@@ -362,22 +323,16 @@ private fun PasswordField(
     onVisibilityToggle: () -> Unit,
     enabled: Boolean = true
 ) {
-    OutlinedTextField(
+    NeumorphismTextField(
         value = value,
         onValueChange = onValueChange,
-        placeholder = {
-            Text(
-                text = placeholder,
-                color = Color(0xFF7A9B9B),
-                fontSize = 15.sp
-            )
-        },
+        placeholder = placeholder,
         leadingIcon = {
             Icon(
-                painter = painterResource(id = R.drawable.ic_visibility_off),
+                painter = painterResource(id = R.drawable.ic_lock),
                 contentDescription = "Password",
-                tint = Color(0xFF6B9090),
-                modifier = Modifier.size(22.dp)
+                tint = NeumorphTextSecondary,
+                modifier = Modifier.size(20.dp)
             )
         },
         trailingIcon = {
@@ -388,68 +343,14 @@ private fun PasswordField(
                         else R.drawable.ic_visibility_off
                     ),
                     contentDescription = if (isPasswordVisible) "Hide Password" else "Show Password",
-                    tint = Color(0xFF6B9090),
-                    modifier = Modifier.size(22.dp)
+                    tint = NeumorphTextSecondary,
+                    modifier = Modifier.size(20.dp)
                 )
             }
         },
         visualTransformation = if (isPasswordVisible) VisualTransformation.None 
         else PasswordVisualTransformation(),
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(56.dp),
-        shape = RoundedCornerShape(28.dp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = Color.Transparent,
-            unfocusedBorderColor = Color.Transparent,
-            focusedContainerColor = Color.White.copy(alpha = 0.7f),
-            unfocusedContainerColor = Color.White.copy(alpha = 0.7f),
-            focusedTextColor = Color(0xFF2E2E2E),
-            unfocusedTextColor = Color(0xFF2E2E2E),
-            cursorColor = Color(0xFF5A9A8A)
-        ),
-        textStyle = androidx.compose.ui.text.TextStyle(
-            fontSize = 15.sp,
-            fontWeight = FontWeight.Normal
-        ),
-        singleLine = true,
         enabled = enabled
     )
-}
-
-@Composable
-private fun TopBar(
-    onBackClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(64.dp)
-            .background(Color.Transparent)
-            .padding(horizontal = 20.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        IconButton(
-            onClick = onBackClick,
-            modifier = Modifier.size(40.dp)
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_chevron_left),
-                contentDescription = "Back",
-                tint = Color(0xFF2C3E3E),
-                modifier = Modifier.size(32.dp)
-            )
-        }
-        
-        Spacer(modifier = Modifier.width(16.dp))
-        
-        Text(
-            text = "Add Driver",
-            fontSize = 22.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF1A1A1A),
-            modifier = Modifier.weight(1f)
-        )
-    }
 }

@@ -12,6 +12,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.foundation.border
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
 import com.campusbussbuddy.ui.theme.*
 
 /**
@@ -34,6 +37,7 @@ fun NeumorphismCard(
     elevation: Dp = 8.dp,
     blur: Dp = 18.dp,
     widthFraction: Float = 1f,
+    showBorder: Boolean = false,
     contentAlignment: Alignment = Alignment.TopStart,
     contentPadding: PaddingValues = PaddingValues(24.dp),
     content: @Composable BoxScope.() -> Unit
@@ -43,6 +47,21 @@ fun NeumorphismCard(
             .fillMaxWidth(widthFraction)
             .neumorphic(cornerRadius = cornerRadius, elevation = elevation, blur = blur)
             .background(NeumorphSurface, RoundedCornerShape(cornerRadius))
+            .then(
+                if (showBorder) {
+                    Modifier.border(
+                        width = 1.5.dp,
+                        brush = Brush.verticalGradient(
+                            colorStops = arrayOf(
+                                0.0f  to Color.White.copy(alpha = 0.70f),
+                                0.50f to Color.White.copy(alpha = 0.20f),
+                                1.0f  to NeumorphAccentPrimary.copy(alpha = 0.80f)
+                            )
+                        ),
+                        shape = RoundedCornerShape(cornerRadius)
+                    )
+                } else Modifier
+            )
             .padding(contentPadding),
         contentAlignment = contentAlignment,
         content = content

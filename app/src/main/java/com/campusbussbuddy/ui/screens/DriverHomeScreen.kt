@@ -1,7 +1,8 @@
 package com.campusbussbuddy.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
@@ -12,7 +13,6 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -27,8 +27,13 @@ import coil.request.ImageRequest
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.DriverInfo
-import com.campusbussbuddy.ui.theme.GlassBackground
-import com.campusbussbuddy.ui.components.*
+import com.campusbussbuddy.ui.theme.*
+import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
+import com.campusbussbuddy.ui.neumorphism.buttons.NeumorphismButton
+import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismPill
+import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
+import com.campusbussbuddy.ui.theme.*
 import com.campusbussbuddy.ui.viewmodel.DriverViewModel
 
 @Composable
@@ -41,174 +46,143 @@ fun DriverHomeScreen(
     // Collect UI state from ViewModel (StateFlow → Compose State)
     val uiState by driverViewModel.uiState.collectAsState()
 
-    GlassBackground {
-        Box(modifier = Modifier.fillMaxSize()) {
-            when {
-                uiState.isLoading -> {
-                    // Loading State
-                    CircularProgressIndicator(
-                        modifier = Modifier.align(Alignment.Center),
-                        color = Color(0xFF6B9A92)
-                    )
-                }
+    NeumorphismScreenContainer {
+        when {
+            uiState.isLoading -> {
+                // Loading State
+                CircularProgressIndicator(
+                    modifier = Modifier.align(Alignment.Center),
+                    color = NeumorphAccentPrimary
+                )
+            }
 
-                uiState.errorMessage != null -> {
-                    // Error State
-                    Column(
+            uiState.errorMessage != null -> {
+                // Error State
+                Column(
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .padding(32.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
+                    Box(
                         modifier = Modifier
-                            .align(Alignment.Center)
-                            .padding(32.dp),
-                        horizontalAlignment = Alignment.CenterHorizontally
+                            .size(80.dp)
+                            .neumorphicInset(cornerRadius = 40.dp, blur = 12.dp)
+                            .background(NeumorphBgPrimary, CircleShape),
+                        contentAlignment = Alignment.Center
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.ic_notifications),
                             contentDescription = "Error",
-                            tint = Color(0xFF4A5F5F),
-                            modifier = Modifier.size(48.dp)
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        Text(
-                            text = uiState.errorMessage ?: "Something went wrong",
-                            fontSize = 14.sp,
-                            fontWeight = FontWeight.Medium,
-                            color = Color(0xFF4A5F5F),
-                            textAlign = TextAlign.Center
-                        )
-
-                        Spacer(modifier = Modifier.height(16.dp))
-
-                        PrimaryActionButton(
-                            text = "Retry",
-                            onClick = { driverViewModel.refresh() }
+                            tint = NeumorphTextSecondary,
+                            modifier = Modifier.size(40.dp)
                         )
                     }
-                }
 
-                else -> {
-                    // Success State — show driver portal
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    Text(
+                        text = uiState.errorMessage ?: "Something went wrong",
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = NeumorphTextPrimary,
+                        textAlign = TextAlign.Center
+                    )
+
+                    Spacer(modifier = Modifier.height(24.dp))
+
+                    NeumorphismButton(
+                        text = "Retry",
+                        onClick = { driverViewModel.refresh() },
+                        modifier = Modifier.fillMaxWidth(0.6f)
+                    )
+                }
+            }
+
+            else -> {
+                // Success State — show driver portal
+                Column(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = 24.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     Column(
                         modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
-                            .padding(horizontal = 24.dp),
+                            .weight(1f)
+                            .fillMaxWidth()
+                            .verticalScroll(rememberScrollState()),
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
-                        Spacer(modifier = Modifier.height(32.dp))
+                        Spacer(modifier = Modifier.height(48.dp))
 
-                        // Top Label Pill - "CAMPUS TRANSPORT SYSTEM"
-                        TopLabelPill()
-
-                        Spacer(modifier = Modifier.height(32.dp))
-
-                        // Profile Photo — loaded from Firebase photoUrl
-                        DriverProfilePhoto(uiState.driverInfo)
-
-                        Spacer(modifier = Modifier.height(20.dp))
-
-                        // Driver Portal Title
-                        SectionTitle(
-                            text = "Driver Portal",
-                            fontSize = 32
+                        // Top Label Pill
+                        AppLabelPill(
+                            icon = R.drawable.ic_directions_bus_vector,
+                            title = "Campus Transport System"
                         )
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(48.dp))
 
-                        // Shift Status — dynamic from Firebase
+                        // Profile Photo
+                        DriverProfilePhoto(uiState.driverInfo)
+
+                        Spacer(modifier = Modifier.height(24.dp))
+
+                        // Driver Portal Title
+                        Text(
+                            text = "Driver Portal",
+                            fontSize = 32.sp,
+                            fontWeight = FontWeight.Bold,
+                            color = NeumorphTextPrimary
+                        )
+
+                        Spacer(modifier = Modifier.height(8.dp))
+
+                        // Shift Status
                         val shiftText = if (uiState.driverInfo?.shift?.isNotEmpty() == true) {
                             uiState.driverInfo!!.shift.uppercase()
                         } else {
                             "SHIFT ACTIVE"
                         }
-                        SectionSubtitle(text = shiftText)
+                        
+                        NeumorphismPill(
+                            label = shiftText,
+                            onClick = {},
+                            modifier = Modifier.padding(vertical = 4.dp)
+                        )
 
                         Spacer(modifier = Modifier.height(32.dp))
 
-                        // Assigned Bus Card — dynamic from Firebase
+                        // Assigned Bus Card
                         AssignedBusCard(
                             driverInfo = uiState.driverInfo,
                             busInfo = uiState.busInfo
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
+                        Spacer(modifier = Modifier.height(32.dp))
 
-                        // Bus Login Button (reusable action button)
-                        PrimaryActionButton(
+                        // Bus Login Button
+                        NeumorphismButton(
                             text = "Bus Login",
                             onClick = onBusLoginClick,
-                            iconRes = R.drawable.ic_directions_bus_vector
+                            modifier = Modifier.fillMaxWidth()
                         )
 
-                        Spacer(modifier = Modifier.height(24.dp))
-
-                        // Bottom Navigation Bar (reusable component)
-                        BottomNavBar {
-                            BottomNavItem(
-                                icon = R.drawable.ic_home,
-                                label = "HOME",
-                                isSelected = true,
-                                onClick = { }
-                            )
-
-                            BottomNavItem(
-                                icon = R.drawable.ic_history,
-                                label = "HISTORY",
-                                onClick = { }
-                            )
-
-                            BottomNavItem(
-                                icon = R.drawable.ic_route,
-                                label = "ROUTES",
-                                onClick = { }
-                            )
-
-                            BottomNavItem(
-                                icon = R.drawable.ic_settings,
-                                label = "SETTINGS",
-                                onClick = onSettingsClick
-                            )
-                        }
-
+                        // Padding for scrollable content above bottom nav
                         Spacer(modifier = Modifier.height(24.dp))
                     }
+
+                    // Bottom Navigation Bar
+                    BottomNavBar(
+                        onHomeClick = {},
+                        onSettingsClick = onSettingsClick
+                    )
+                    
+                    Spacer(modifier = Modifier.height(24.dp))
                 }
             }
         }
-    }
-}
-
-@Composable
-private fun TopLabelPill() {
-    Row(
-        modifier = Modifier
-            .shadow(elevation = 0.dp, shape = RoundedCornerShape(50))
-            .background(
-                Color.White.copy(alpha = 0.55f),
-                RoundedCornerShape(50)
-            )
-            .border(
-                1.dp,
-                Color.White.copy(alpha = 0.7f),
-                RoundedCornerShape(50)
-            )
-            .padding(horizontal = 20.dp, vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Icon(
-            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-            contentDescription = null,
-            tint = Color(0xFF2d6464),
-            modifier = Modifier.size(18.dp)
-        )
-        Text(
-            text = "CAMPUS TRANSPORT SYSTEM",
-            fontSize = 12.sp,
-            fontWeight = FontWeight.Bold,
-            color = Color(0xFF0F172A),
-            letterSpacing = 0.5.sp
-        )
     }
 }
 
@@ -219,21 +193,8 @@ private fun DriverProfilePhoto(driverInfo: DriverInfo?) {
     Box(
         modifier = Modifier
             .size(140.dp)
-            .shadow(
-                elevation = 8.dp,
-                shape = CircleShape,
-                ambientColor = Color.Black.copy(alpha = 0.08f),
-                spotColor = Color.Black.copy(alpha = 0.08f)
-            )
-            .background(
-                Color.White.copy(alpha = 0.22f),
-                CircleShape
-            )
-            .border(
-                1.5.dp,
-                Color.White.copy(alpha = 0.50f),
-                CircleShape
-            ),
+            .neumorphicInset(cornerRadius = 70.dp, blur = 16.dp)
+            .background(NeumorphBgPrimary, CircleShape),
         contentAlignment = Alignment.Center
     ) {
         val photoUrl = driverInfo?.photoUrl?.trim() ?: ""
@@ -247,6 +208,7 @@ private fun DriverProfilePhoto(driverInfo: DriverInfo?) {
                 contentDescription = "Driver Profile Photo",
                 modifier = Modifier
                     .fillMaxSize()
+                    .padding(8.dp) // padding inside the inset to make it look like it's inside a well
                     .clip(CircleShape),
                 contentScale = ContentScale.Crop,
                 loading = {
@@ -256,7 +218,7 @@ private fun DriverProfilePhoto(driverInfo: DriverInfo?) {
                     ) {
                         CircularProgressIndicator(
                             modifier = Modifier.size(30.dp),
-                            color = Color(0xFF6B9A92),
+                            color = NeumorphAccentPrimary,
                             strokeWidth = 2.dp
                         )
                     }
@@ -266,7 +228,7 @@ private fun DriverProfilePhoto(driverInfo: DriverInfo?) {
                         painter = painterResource(id = R.drawable.ic_person),
                         contentDescription = "Default Profile",
                         modifier = Modifier.size(70.dp),
-                        tint = Color(0xFF6B9A92)
+                        tint = NeumorphTextSecondary
                     )
                 }
             )
@@ -275,7 +237,7 @@ private fun DriverProfilePhoto(driverInfo: DriverInfo?) {
                 painter = painterResource(id = R.drawable.ic_person),
                 contentDescription = "Default Profile",
                 modifier = Modifier.size(70.dp),
-                tint = Color(0xFF6B9A92)
+                tint = NeumorphTextSecondary
             )
         }
     }
@@ -298,66 +260,220 @@ private fun AssignedBusCard(
         else -> "North Campus Terminal"
     }
 
-    GlassCardContainer {
-        // Header Row
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+    NeumorphismCard(
+        modifier = Modifier.fillMaxWidth(),
+        cornerRadius = 24.dp,
+        contentPadding = PaddingValues(24.dp)
+    ) {
+        Column(
+            modifier = Modifier.fillMaxWidth()
         ) {
-            Column {
-                SectionSubtitle(text = "ASSIGNED BUS")
+            // Header Row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "ASSIGNED BUS",
+                        fontSize = 12.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NeumorphTextSecondary,
+                        letterSpacing = 1.sp
+                    )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
 
-                SectionTitle(
-                    text = busLabel,
-                    fontSize = 28
-                )
+                    Text(
+                        text = busLabel,
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = NeumorphTextPrimary
+                    )
+                }
+
+                // Bus Icon Circle
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .neumorphicInset(cornerRadius = 28.dp, blur = 8.dp)
+                        .background(NeumorphBgPrimary, CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                        contentDescription = "Bus",
+                        tint = NeumorphAccentPrimary,
+                        modifier = Modifier.size(28.dp)
+                    )
+                }
             }
 
-            // Bus Icon Circle
+            Spacer(modifier = Modifier.height(24.dp))
+
+            // Next Stop
+            InfoRow(
+                iconRes = R.drawable.ic_pin_drop,
+                label = "NEXT STOP",
+                value = routeName
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Departure Time
+            InfoRow(
+                iconRes = R.drawable.ic_history,
+                label = "DEPARTURE",
+                value = "14:30 PM (In 12 mins)"
+            )
+
+            Spacer(modifier = Modifier.height(20.dp))
+
+            // Alert Message Box
             Box(
                 modifier = Modifier
-                    .size(56.dp)
-                    .background(
-                        Color.White.copy(alpha = 0.6f),
-                        CircleShape
-                    ),
-                contentAlignment = Alignment.Center
+                    .fillMaxWidth()
+                    .neumorphicInset(cornerRadius = 16.dp, blur = 6.dp)
+                    .background(NeumorphBgPrimary, RoundedCornerShape(16.dp))
+                    .padding(16.dp)
             ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                    contentDescription = "Bus",
-                    tint = Color(0xFF2A2A2A),
-                    modifier = Modifier.size(28.dp)
+                Text(
+                    text = "\"Road closure on East Ave. Please use University Blvd detour for the next 2 hours.\"",
+                    fontSize = 13.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = NeumorphTextPrimary,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                 )
             }
         }
+    }
+}
 
-        Spacer(modifier = Modifier.height(20.dp))
+@Composable
+private fun InfoRow(iconRes: Int, label: String, value: String) {
+    Row(
+        modifier = Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Box(
+            modifier = Modifier
+                .size(40.dp)
+                .neumorphic(cornerRadius = 20.dp, elevation = 4.dp, blur = 8.dp)
+                .background(NeumorphBgPrimary, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter = painterResource(id = iconRes),
+                contentDescription = label,
+                tint = NeumorphTextPrimary,
+                modifier = Modifier.size(20.dp)
+            )
+        }
+        
+        Spacer(modifier = Modifier.width(16.dp))
+        
+        Column {
+            Text(
+                text = label, 
+                color = NeumorphTextSecondary, 
+                fontSize = 11.sp,
+                fontWeight = FontWeight.Bold,
+                letterSpacing = 0.5.sp
+            )
+            Text(
+                text = value, 
+                color = NeumorphTextPrimary, 
+                fontSize = 15.sp, 
+                fontWeight = FontWeight.SemiBold
+            )
+        }
+    }
+}
 
-        // Next Stop — dynamic route name from Firebase
-        InfoRow(
-            iconRes = R.drawable.ic_pin_drop,
-            label = "NEXT STOP",
-            value = routeName
+@Composable
+private fun BottomNavBar(
+    onHomeClick: () -> Unit,
+    onSettingsClick: () -> Unit
+) {
+    NeumorphismCard(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(72.dp),
+        cornerRadius = 24.dp,
+        contentPadding = PaddingValues(0.dp)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxSize(),
+            horizontalArrangement = Arrangement.SpaceEvenly,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            BottomNavItem(
+                icon = R.drawable.ic_home,
+                label = "HOME",
+                isSelected = true,
+                onClick = onHomeClick
+            )
+
+            BottomNavItem(
+                icon = R.drawable.ic_history,
+                label = "HISTORY",
+                isSelected = false,
+                onClick = { }
+            )
+
+            BottomNavItem(
+                icon = R.drawable.ic_route,
+                label = "ROUTES",
+                isSelected = false,
+                onClick = { }
+            )
+
+            BottomNavItem(
+                icon = R.drawable.ic_settings,
+                label = "SETTINGS",
+                isSelected = false,
+                onClick = onSettingsClick
+            )
+        }
+    }
+}
+
+@Composable
+private fun BottomNavItem(
+    icon: Int,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center,
+        modifier = Modifier
+            .clickable(
+                interactionSource = remember { MutableInteractionSource() },
+                indication = null,
+                onClick = onClick
+            )
+            .padding(8.dp)
+    ) {
+        val color = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary
+        
+        Icon(
+            painter = painterResource(id = icon),
+            contentDescription = label,
+            tint = color,
+            modifier = Modifier.size(24.dp)
         )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Departure Time
-        InfoRow(
-            iconRes = R.drawable.ic_history,
-            label = "DEPARTURE",
-            value = "14:30 PM (In 12 mins)"
-        )
-
-        Spacer(modifier = Modifier.height(16.dp))
-
-        // Alert Message Box
-        AlertMessageBox(
-            message = "\"Road closure on East Ave. Please use University Blvd detour for the next 2 hours.\""
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        Text(
+            text = label,
+            fontSize = 10.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color = color,
+            letterSpacing = 0.5.sp
         )
     }
 }

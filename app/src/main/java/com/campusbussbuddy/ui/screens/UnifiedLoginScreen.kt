@@ -133,7 +133,7 @@ private fun MainContent(
         Spacer(modifier = Modifier.height(28.dp))
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
             verticalAlignment     = Alignment.CenterVertically
         ) {
             NeumorphismPill("PRIVACY", iconRes = R.drawable.ic_lock, onClick = { onPrivacyPolicyClick() })
@@ -368,44 +368,37 @@ private fun DynamicLoginCard(
                 }
             )
 
-            Spacer(modifier = Modifier.height(20.dp))
-
-            Text(
-                text       = "Switch Role",
-                fontSize   = 12.sp,
-                fontWeight = FontWeight.SemiBold,
-                color      = NeumorphTextSecondary
-            )
-
-            Spacer(modifier = Modifier.height(14.dp))
+            Spacer(modifier = Modifier.height(32.dp))
 
             // ── Role Selector ─────────────────────────────────────────────────
             Box(
                 modifier = Modifier
-                    .widthIn(min = 220.dp, max = 252.dp)
-                    .height(64.dp)
-                    .neumorphicInset(cornerRadius = 32.dp, elevation = 5.dp, blur = 10.dp)
-                    .background(NeumorphSurface, RoundedCornerShape(32.dp))
-                    .padding(horizontal = 10.dp),
+                    .fillMaxWidth()
+                    .neumorphic(cornerRadius = 28.dp, elevation = 6.dp, blur = 12.dp)
+                    .background(NeumorphSurface, RoundedCornerShape(28.dp))
+                    .padding(horizontal = 16.dp, vertical = 10.dp),
                 contentAlignment = Alignment.Center
             ) {
                 Row(
                     modifier              = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween,
+                    horizontalArrangement = Arrangement.SpaceEvenly,
                     verticalAlignment     = Alignment.CenterVertically
                 ) {
-                    NeumorphismIconButton(
+                    RoleButton(
                         iconRes    = R.drawable.ic_directions_bus_vector,
+                        label      = "Driver",
                         isSelected = selectedRole == LoginRole.DRIVER,
                         onClick    = { onRoleChange(LoginRole.DRIVER) }
                     )
-                    NeumorphismIconButton(
+                    RoleButton(
                         iconRes    = R.drawable.ic_student,
+                        label      = "Student",
                         isSelected = selectedRole == LoginRole.STUDENT,
                         onClick    = { onRoleChange(LoginRole.STUDENT) }
                     )
-                    NeumorphismIconButton(
+                    RoleButton(
                         iconRes    = R.drawable.ic_admin_panel,
+                        label      = "Admin",
                         isSelected = selectedRole == LoginRole.ADMIN,
                         onClick    = { onRoleChange(LoginRole.ADMIN) }
                     )
@@ -416,6 +409,51 @@ private fun DynamicLoginCard(
 }
 
 
+
+@Composable
+private fun RoleButton(
+    iconRes: Int,
+    label: String,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier.bounceClick { onClick() }
+    ) {
+        Box(
+            modifier = Modifier
+                .size(44.dp)
+                .then(
+                    if (isSelected)
+                        Modifier.neumorphicInset(cornerRadius = 22.dp, elevation = 4.dp, blur = 8.dp)
+                    else
+                        Modifier.neumorphic(cornerRadius = 22.dp, elevation = 4.dp, blur = 8.dp)
+                )
+                .background(
+                    if (isSelected) Color(0xFFDCDCDC) else NeumorphSurface,
+                    CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                painter            = painterResource(id = iconRes),
+                contentDescription = label,
+                tint               = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
+                modifier           = Modifier.size(20.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text       = label,
+            fontSize   = 10.sp,
+            fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
+            color      = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary
+        )
+    }
+}
 
 // ─── Data Holder ─────────────────────────────────────────────────────────────
 private data class RoleData(
@@ -445,19 +483,40 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            NeumorphismCard(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(32.dp)
                     .scale(scale)
                     .alpha(alpha)
-                    .clickable(remember { MutableInteractionSource() }, null) { },
-                cornerRadius = 24.dp,
-                elevation = 6.dp,
-                blur = 12.dp,
-                contentPadding = PaddingValues(28.dp)
+                    .neumorphic(
+                        cornerRadius = 24.dp,
+                        elevation = 4.dp,
+                        blur = 6.dp,
+                        lightShadowColor = Color.Transparent,
+                        darkShadowColor = Color.Black.copy(alpha = 0.15f)
+                    )
+                    .background(NeumorphSurface, RoundedCornerShape(24.dp))
+                    .clickable(remember { MutableInteractionSource() }, null) { }
             ) {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                // Subtle purple bottom accent (same as Sign In button)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.15f))
+                            ),
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                )
+
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     NeumorphismHeader(title = "Privacy Policy", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Text(
@@ -492,19 +551,40 @@ private fun SupportDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            NeumorphismCard(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(32.dp)
                     .scale(scale)
                     .alpha(alpha)
-                    .clickable(remember { MutableInteractionSource() }, null) { },
-                cornerRadius = 24.dp,
-                elevation = 6.dp,
-                blur = 12.dp,
-                contentPadding = PaddingValues(28.dp)
+                    .neumorphic(
+                        cornerRadius = 24.dp,
+                        elevation = 4.dp,
+                        blur = 6.dp,
+                        lightShadowColor = Color.Transparent,
+                        darkShadowColor = Color.Black.copy(alpha = 0.15f)
+                    )
+                    .background(NeumorphSurface, RoundedCornerShape(24.dp))
+                    .clickable(remember { MutableInteractionSource() }, null) { }
             ) {
-                Column(Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                // Subtle purple bottom accent (same as Sign In button)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.15f))
+                            ),
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                )
+
+                Column(
+                    modifier = Modifier.fillMaxWidth().padding(28.dp),
+                    horizontalAlignment = Alignment.CenterHorizontally
+                ) {
                     NeumorphismHeader(title = "Support & Contact", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(10.dp)) {
@@ -531,28 +611,57 @@ private fun SupportDialog(onDismiss: () -> Unit) {
 
 @Composable
 private fun ContactItem(iconRes: Int, title: String, subtitle: String, onClick: () -> Unit) {
-    Row(
+    Box(
         modifier = Modifier
             .fillMaxWidth()
-            .shadow(2.dp, RoundedCornerShape(14.dp))
-            .background(Color(0xFFF5F9F8), RoundedCornerShape(14.dp))
-            .clip(RoundedCornerShape(14.dp))
-            .clickable(remember { MutableInteractionSource() }, rememberRipple(bounded = true)) { onClick() }
-            .padding(14.dp),
-        verticalAlignment = Alignment.CenterVertically
+            .neumorphic(cornerRadius = 18.dp, elevation = 4.dp, blur = 8.dp)
+            .background(NeumorphSurface, RoundedCornerShape(18.dp))
+            .bounceClick { onClick() }
     ) {
-        Box(
-            modifier         = Modifier.size(38.dp).background(BtnGreen.copy(alpha = 0.15f), CircleShape),
-            contentAlignment = Alignment.Center
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 14.dp),
+            verticalAlignment     = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(14.dp)
         ) {
-            Icon(painterResource(iconRes), null, tint = BtnGreen, modifier = Modifier.size(18.dp))
+            Box(
+                modifier = Modifier
+                    .size(38.dp)
+                    .neumorphic(cornerRadius = 19.dp, elevation = 3.dp, blur = 6.dp)
+                    .background(NeumorphSurface, CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter            = painterResource(id = iconRes),
+                    contentDescription = title,
+                    tint               = NeumorphAccentPrimary,
+                    modifier           = Modifier.size(18.dp)
+                )
+            }
+
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text       = title,
+                    fontSize   = 14.sp,
+                    fontWeight = FontWeight.Bold,
+                    color      = NeumorphTextPrimary
+                )
+                Text(
+                    text       = subtitle,
+                    fontSize   = 12.sp,
+                    fontWeight = FontWeight.Medium,
+                    color      = NeumorphTextSecondary
+                )
+            }
+
+            Icon(
+                painter            = painterResource(id = R.drawable.ic_chevron_right),
+                contentDescription = "Open",
+                tint               = NeumorphTextSecondary,
+                modifier           = Modifier.size(16.dp)
+            )
         }
-        Spacer(Modifier.width(14.dp))
-        Column(Modifier.weight(1f)) {
-            Text(title,    fontSize = 15.sp, fontWeight = FontWeight.SemiBold, color = NeumorphTextPrimary)
-            Text(subtitle, fontSize = 13.sp, color = NeumorphTextSecondary)
-        }
-        Icon(painterResource(R.drawable.ic_chevron_right), null, tint = Color(0xFFAAAAAA), modifier = Modifier.size(18.dp))
     }
 }
 
@@ -575,31 +684,49 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
-            NeumorphismCard(
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(32.dp)
                     .scale(scale)
                     .alpha(alpha)
-                    .clickable(remember { MutableInteractionSource() }, null) { },
-                cornerRadius = 24.dp,
-                elevation = 6.dp,
-                blur = 12.dp,
-                contentPadding = PaddingValues(28.dp)
+                    .neumorphic(
+                        cornerRadius = 24.dp,
+                        elevation = 4.dp,
+                        blur = 6.dp,
+                        lightShadowColor = Color.Transparent,
+                        darkShadowColor = Color.Black.copy(alpha = 0.15f)
+                    )
+                    .background(NeumorphSurface, RoundedCornerShape(24.dp))
+                    .clickable(remember { MutableInteractionSource() }, null) { }
             ) {
+                // Subtle purple bottom accent (same as Sign In button)
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(72.dp)
+                        .align(Alignment.BottomCenter)
+                        .background(
+                            brush = Brush.verticalGradient(
+                                colors = listOf(Color.Transparent, NeumorphAccentPrimary.copy(alpha = 0.15f))
+                            ),
+                            shape = RoundedCornerShape(bottomStart = 24.dp, bottomEnd = 24.dp)
+                        )
+                )
+
                 Column(
-                    modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState()),
+                    modifier = Modifier.fillMaxWidth().padding(28.dp).verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     NeumorphismHeader(title = "About Campus Buddy", titleFontSize = 22f)
                     Spacer(Modifier.height(16.dp))
                     Text(
                         "A smart bus attendance and tracking system for colleges \u2014 GPS-based live tracking, QR attendance, student absence planning, real-time stop management, and multi-role support for drivers, students, and admins.",
-                        fontSize = 14.sp, color = NeumorphTextSecondary, textAlign = TextAlign.Start,
+                        fontSize = 14.sp, color = NeumorphTextSecondary, textAlign = TextAlign.Center,
                         lineHeight = 21.sp, modifier = Modifier.fillMaxWidth()
                     )
-                    Spacer(Modifier.height(12.dp))
-                    Column(Modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(6.dp)) {
+                    Spacer(Modifier.height(16.dp))
+                    Column(Modifier.wrapContentWidth(), verticalArrangement = Arrangement.spacedBy(8.dp), horizontalAlignment = Alignment.Start) {
                         listOf(
                             "Smart bus tracking with GPS",
                             "QR-based attendance system",
@@ -609,16 +736,16 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
                         ).forEach { feature ->
                             Row(verticalAlignment = Alignment.CenterVertically) {
                                 Box(
-                                    Modifier.size(6.dp)
+                                    Modifier.size(8.dp)
                                         .background(NeumorphSurface, CircleShape)
-                                        .neumorphic(cornerRadius = 3.dp, elevation = 1.dp, blur = 2.dp, lightShadowColor = Color.White)
+                                        .neumorphic(cornerRadius = 4.dp, elevation = 2.dp, blur = 4.dp, lightShadowColor = Color.White)
                                 )
-                                Spacer(Modifier.width(10.dp))
-                                Text(feature, fontSize = 13.sp, color = NeumorphTextSecondary)
+                                Spacer(Modifier.width(12.dp))
+                                Text(feature, fontSize = 13.sp, color = NeumorphTextPrimary, fontWeight = FontWeight.Medium)
                             }
                         }
                     }
-                    Spacer(Modifier.height(24.dp))
+                    Spacer(Modifier.height(28.dp))
                     NeumorphismButton(text = "Close", onClick = { visible = false; onDismiss() }, showGlow = false)
                 }
             }
