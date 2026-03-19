@@ -288,9 +288,7 @@ object RealtimeDataManager {
                                 busId = doc.id,
                                 busNumber = doc.getLong("busNumber")?.toInt() ?: 0,
                                 capacity = doc.getLong("capacity")?.toInt() ?: 0,
-                                activeDriverId = doc.getString("activeDriverId") ?: "",
-                                activeDriverName = doc.getString("activeDriverName") ?: "",
-                                activeDriverPhone = doc.getString("activeDriverPhone") ?: ""
+                                activeDriverId = doc.getString("activeDriverId") ?: ""
                             )
                         } catch (e: Exception) {
                             Log.e(TAG, "Error parsing bus document: ${doc.id}", e)
@@ -334,9 +332,7 @@ object RealtimeDataManager {
                             busId = snapshot.id,
                             busNumber = snapshot.getLong("busNumber")?.toInt() ?: 0,
                             capacity = snapshot.getLong("capacity")?.toInt() ?: 0,
-                            activeDriverId = snapshot.getString("activeDriverId") ?: "",
-                            activeDriverName = snapshot.getString("activeDriverName") ?: "",
-                            activeDriverPhone = snapshot.getString("activeDriverPhone") ?: ""
+                            activeDriverId = snapshot.getString("activeDriverId") ?: ""
                         )
                         Log.d(TAG, "Bus updated: Bus ${bus.busNumber}")
                         trySend(bus)

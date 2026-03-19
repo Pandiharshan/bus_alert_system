@@ -43,18 +43,9 @@ import com.google.zxing.qrcode.QRCodeWriter
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
-enum class StudentStatus {
-    WAITING_TO_BOARD,
-    BOARDED
-}
-
-data class StudentMember(
-    val id: String,
-    val name: String,
-    val initials: String,
-    val status: StudentStatus,
-    val phoneNumber: String = ""
-)
+import com.campusbussbuddy.viewmodel.StudentStatus
+import com.campusbussbuddy.viewmodel.StudentMember
+import com.campusbussbuddy.viewmodel.BusOperationsViewModel
 
 @Composable
 fun BusOperationsHubScreen(
@@ -77,84 +68,41 @@ fun BusOperationsHubScreen(
         return
     }
 
-    var currentTab by rememberSaveable { mutableStateOf("HOME") }
-    var studentsList by remember { mutableStateOf<List<StudentMember>>(emptyList()) }
-    val firestore = FirebaseFirestore.getInstance()
-
-    var driverName by remember { mutableStateOf("Loading...") }
-    var shiftInfo by remember { mutableStateOf("Loading...") }
-    var routeInfo by remember { mutableStateOf("Loading route...") }
-    var driverEmail by remember { mutableStateOf("") }
-    var driverPhone by remember { mutableStateOf("") }
-
-    var isEndingTrip by remember { mutableStateOf(false) }
-
-    val scope = rememberCoroutineScope()
-
-    LaunchedEffect(Unit) {
-        val driverInfo = FirebaseManager.getCurrentDriverInfo()
-        if (driverInfo != null) {
-            driverName = driverInfo.name
-            driverEmail = driverInfo.email
-            driverPhone = driverInfo.phone
-            shiftInfo = if (driverInfo.shift.isNotEmpty()) driverInfo.shift else "Morning Shift"
-            routeInfo = if (driverInfo.routeName.isNotEmpty()) driverInfo.routeName else "Route: Main Campus"
+    val factory = object : androidx.lifecycle.ViewModelProvider.Factory {
+        @Suppress("UNCHECKED_CAST")
+        override fun <T : androidx.lifecycle.ViewModel> create(modelClass: Class<T>): T {
+            return BusOperationsViewModel(busId) as T
         }
     }
+    val viewModel: BusOperationsViewModel = androidx.lifecycle.viewmodel.compose.viewModel(factory = factory)
+    
+    val uiState by viewModel.uiState.collectAsState()
+    
+    var currentTab by rememberSaveable { mutableStateOf("HOME") }
 
-    DisposableEffect(busId) {
-        val listener = firestore.collection("students")
-            .whereEqualTo("busId", busId)
-            .addSnapshotListener { snapshot, error ->
-                if (error != null) return@addSnapshotListener
-                if (snapshot != null) {
-                    val list = snapshot.documents.map { doc ->
-                        val name = doc.getString("name") ?: "Unknown"
-                        val initials = name.split(" ").take(2).joinToString("") { it.take(1) }.uppercase()
-                        val statusStr = doc.getString("status") ?: "WAITING"
-                        val statusEnum = if (statusStr == "BOARDED") StudentStatus.BOARDED else StudentStatus.WAITING_TO_BOARD
-                        val phone = doc.getString("phone") ?: ""
-                        StudentMember(
-                            id = doc.id,
-                            name = name,
-                            initials = initials,
-                            status = statusEnum,
-                            phoneNumber = phone
-                        )
-                    }
-                    studentsList = list
-                }
-            }
-        onDispose { listener.remove() }
-    }
+    val driverName = uiState.driverInfo?.name ?: "Loading..."
+    val shiftInfo = uiState.driverInfo?.shift?.takeIf { it.isNotBlank() } ?: "Morning Shift"
+    val routeInfo = uiState.driverInfo?.routeName?.takeIf { it.isNotBlank() } ?: "Route: Main Campus"
+    val driverEmail = uiState.driverInfo?.email ?: ""
+    val driverPhone = uiState.driverInfo?.phone ?: ""
 
-    val totalMembers = studentsList.size
-    val presentToday = studentsList.count { it.status == StudentStatus.BOARDED }
+    val studentsList = uiState.students
+    
+    val activeMembers = studentsList.filter { !it.isAbsent }
+    val totalMembers = activeMembers.size
+    val presentToday = activeMembers.count { it.status == StudentStatus.BOARDED }
 
     val endTripAction: () -> Unit = {
-        scope.launch {
-            if (isEndingTrip) return@launch
-            isEndingTrip = true
-            try {
-                // Batch write all boarded students back to WAITING_TO_BOARD
-                val boardedDocs = firestore.collection("students")
-                    .whereEqualTo("busId", busId)
-                    .whereEqualTo("status", "BOARDED")
-                    .get().await()
+        uiState.driverInfo?.uid?.let { driverId ->
+            viewModel.endTrip(driverId)
+        }
+    }
+    
+    val isEndingTrip = uiState.endTripStatus == "PROCESSING"
 
-                if (!boardedDocs.isEmpty) {
-                    val batch = firestore.batch()
-                    for (doc in boardedDocs) {
-                        batch.update(doc.reference, "status", "WAITING_TO_BOARD")
-                    }
-                    batch.commit().await()
-                }
-            } catch (e: Exception) {
-                // Ignore error in this strict demo phase
-            } finally {
-                isEndingTrip = false
-                currentTab = "HOME"
-            }
+    LaunchedEffect(uiState.endTripStatus) {
+        if (uiState.endTripStatus == "SUCCESS") {
+            currentTab = "HOME"
         }
     }
 
@@ -248,6 +196,7 @@ fun BusOperationsHubScreen(
                     "MEMBERS" -> {
                         MembersTabContent(
                             students = studentsList,
+                            todayAbsences = studentsList.filter { it.isAbsent }.map { it.id },
                             totalStudents = totalMembers,
                             onBackClick = { currentTab = "HOME" }
                         )
@@ -461,7 +410,8 @@ private fun TripAttendancePortalCard(busId: String) {
                 NeumorphismButton(
                     text = "Generate QR",
                     onClick = {
-                        qrBitmap = generateQRCode(content = "busId:$busId")
+                        val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
+                        qrBitmap = generateQRCode(content = "busId:$busId|date:$todayStr")
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -556,6 +506,7 @@ private fun generateQRCode(content: String): Bitmap? {
 @Composable
 private fun MembersTabContent(
     students: List<StudentMember>,
+    todayAbsences: List<String>,
     totalStudents: Int,
     onBackClick: () -> Unit
 ) {
@@ -592,14 +543,14 @@ private fun MembersTabContent(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = "Members to Board",
+                text = "Members",
                 fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = NeumorphTextPrimary
             )
 
             NeumorphismPill(
-                label = "$totalStudents TOTAL",
+                label = "$totalStudents EXPECTED",
                 onClick = {}
             )
         }
@@ -611,10 +562,20 @@ private fun MembersTabContent(
             contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 120.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            val waiting = students.filter { it.status == StudentStatus.WAITING_TO_BOARD }
-            val boarded = students.filter { it.status == StudentStatus.BOARDED }
+            val waiting = students.filter { it.status == StudentStatus.WAITING_TO_BOARD && !todayAbsences.contains(it.id) }
+            val boarded = students.filter { it.status == StudentStatus.BOARDED && !todayAbsences.contains(it.id) }
+            val absencesList = students.filter { todayAbsences.contains(it.id) }
 
             if (waiting.isNotEmpty()) {
+                item {
+                    Text(
+                        text = "Present (Waiting)",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFF4CAF50),
+                        modifier = Modifier.padding(vertical = 4.dp)
+                    )
+                }
                 items(waiting) { student ->
                     BusStopStudentCard(student = student, onCallClick = {})
                 }
@@ -631,9 +592,24 @@ private fun MembersTabContent(
                         modifier = Modifier.padding(vertical = 8.dp)
                     )
                 }
-
                 items(boarded) { student ->
                     BusStopStudentCard(student = student, onCallClick = {})
+                }
+            }
+            
+            if (absencesList.isNotEmpty()) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
+                    Text(
+                        text = "Absent Today",
+                        fontSize = 14.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFE53935),
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+                items(absencesList) { student ->
+                    BusStopStudentCard(student = student, isAbsentView = true, onCallClick = {})
                 }
             }
         }
@@ -643,6 +619,7 @@ private fun MembersTabContent(
 @Composable
 private fun BusStopStudentCard(
     student: StudentMember,
+    isAbsentView: Boolean = false,
     onCallClick: () -> Unit
 ) {
     NeumorphismCard(
@@ -681,13 +658,20 @@ private fun BusStopStudentCard(
 
                 Spacer(modifier = Modifier.height(4.dp))
 
-                val statusText = when (student.status) {
-                    StudentStatus.WAITING_TO_BOARD -> "WAITING TO BOARD"
-                    StudentStatus.BOARDED -> "BOARDED"
-                }
-                val statusColor = when (student.status) {
-                    StudentStatus.WAITING_TO_BOARD -> Color(0xFFFF9800)
-                    StudentStatus.BOARDED -> Color(0xFF4CAF50)
+                val statusText: String
+                val statusColor: Color
+                if (isAbsentView) {
+                    statusText = "ABSENT"
+                    statusColor = Color(0xFFE53935)
+                } else {
+                    statusText = when (student.status) {
+                        StudentStatus.WAITING_TO_BOARD -> "EXPECTED"
+                        StudentStatus.BOARDED -> "BOARDED"
+                    }
+                    statusColor = when (student.status) {
+                        StudentStatus.WAITING_TO_BOARD -> Color(0xFF4CAF50)
+                        StudentStatus.BOARDED -> NeumorphTextSecondary
+                    }
                 }
 
                 Box(

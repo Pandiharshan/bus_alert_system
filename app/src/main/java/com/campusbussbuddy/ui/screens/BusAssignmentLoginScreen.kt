@@ -196,6 +196,17 @@ fun BusAssignmentLoginScreen(
                                 
                                 when (val result = FirebaseManager.authenticateBus(busNumberInt, busPassword)) {
                                     is BusAuthResult.Success -> {
+                                        // Store history with the bus number the user actually logged into
+                                        val driverId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                                        if (driverId.isNotEmpty()) {
+                                            val logData = hashMapOf(
+                                                "driverId" to driverId,
+                                                "busId" to busNumberInt.toString(),
+                                                "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
+                                            )
+                                            FirebaseManager.firestore.collection("driver_logs").add(logData)
+                                        }
+                                        
                                         isLoading = false
                                         onLoginSuccess(busNumber, result.busInfo.busId)
                                     }

@@ -5,6 +5,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.campusbussbuddy.firebase.FirebaseManager
+import com.google.firebase.auth.FirebaseAuth
 import com.campusbussbuddy.ui.screens.UnifiedLoginScreen
 import com.campusbussbuddy.ui.screens.DriverHomeScreen
 import com.campusbussbuddy.ui.screens.BusAssignmentLoginScreen
@@ -17,6 +18,8 @@ import com.campusbussbuddy.ui.screens.AddBusScreen
 import com.campusbussbuddy.ui.screens.DriverDatabaseScreen
 import com.campusbussbuddy.ui.screens.BusDatabaseScreen
 import com.campusbussbuddy.ui.screens.StudentDatabaseScreen
+import com.campusbussbuddy.ui.screens.StudentAbsentCalendarScreen
+import com.campusbussbuddy.ui.screens.AdminAbsenceMonitoringScreen
 
 @Composable
 fun RootNavHost() {
@@ -104,7 +107,9 @@ fun RootNavHost() {
         // TripSupervisorScreen is deprecated and merged into BusOperationsHubScreen.
         
         composable(Destinations.STUDENT_PORTAL_HOME) {
+            val studentUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
             StudentPortalHomeScreen(
+                studentUid = studentUid,
                 onLogoutClick = {
                     // Sign out from Firebase
                     FirebaseManager.signOut()
@@ -112,6 +117,19 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
+                },
+                onAbsentCalendarClick = {
+                    navController.navigate(Destinations.STUDENT_ABSENT_CALENDAR)
+                }
+            )
+        }
+        
+        composable(Destinations.STUDENT_ABSENT_CALENDAR) {
+            val studentUid = FirebaseAuth.getInstance().currentUser?.uid ?: ""
+            StudentAbsentCalendarScreen(
+                studentUid = studentUid,
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }
@@ -128,6 +146,9 @@ fun RootNavHost() {
                 onManageStudentsClick = {
                     navController.navigate(Destinations.MANAGE_STUDENTS)
                 },
+                onAbsenceMonitoringClick = {
+                    navController.navigate(Destinations.ADMIN_ABSENCES)
+                },
                 onLogoutClick = {
                     // Sign out from Firebase
                     FirebaseManager.signOut()
@@ -142,6 +163,14 @@ fun RootNavHost() {
                     navController.navigate(Destinations.LOGIN_SELECTION) {
                         popUpTo(0) { inclusive = true }
                     }
+                }
+            )
+        }
+        
+        composable(Destinations.ADMIN_ABSENCES) {
+            AdminAbsenceMonitoringScreen(
+                onBackClick = {
+                    navController.popBackStack()
                 }
             )
         }

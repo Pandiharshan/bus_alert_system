@@ -30,7 +30,9 @@ import coil.compose.AsyncImage
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.DriverData
 import com.campusbussbuddy.firebase.DriverResult
+import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.FirebaseManager
+import kotlinx.coroutines.tasks.await
 import com.campusbussbuddy.ui.theme.*
 import com.campusbussbuddy.ui.neumorphism.cards.NeumorphismCard
 import com.campusbussbuddy.ui.neumorphism.inputs.NeumorphismTextField
@@ -54,11 +56,32 @@ fun AddDriverScreen(
     var photoUri by remember { mutableStateOf<Uri?>(null) }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
+    
+    // Bus Dropdown State
+    var buses by remember { mutableStateOf<List<BusInfo>>(emptyList()) }
+    var selectedBus by remember { mutableStateOf<BusInfo?>(null) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    
     var errorMessage by remember { mutableStateOf<String?>(null) }
     var successMessage by remember { mutableStateOf<String?>(null) }
     
     val scope = rememberCoroutineScope()
     val scrollState = rememberScrollState()
+
+    LaunchedEffect(Unit) {
+        val snapshot = FirebaseManager.firestore.collection("buses").get().await()
+        buses = snapshot.documents.mapNotNull { doc ->
+            try {
+                BusInfo(
+                    busId     = doc.id,
+                    // busNumber is stored as int64 — use getLong() only, never getString()
+                    busNumber = doc.getLong("busNumber")?.toInt() ?: 0,
+                    capacity  = 0,
+                    activeDriverId = ""
+                )
+            } catch (e: Exception) { null }
+        }.sortedBy { it.busNumber }
+    }
     
     val photoPickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent()
@@ -202,17 +225,47 @@ fun AddDriverScreen(
                             keyboardType = KeyboardType.Phone
                         )
                         
-                        // Assigned Bus ID Field
-                        FormField(
-                            value = assignedBusId,
-                            onValueChange = { 
-                                assignedBusId = it
-                                errorMessage = null
-                            },
-                            placeholder = "Bus ID (e.g., B-101)",
-                            icon = R.drawable.ic_directions_bus_vector,
-                            enabled = !isLoading
-                        )
+                        // Assigned Bus ID Dropdown
+                        @OptIn(ExperimentalMaterial3Api::class)
+                        ExposedDropdownMenuBox(
+                            expanded = isDropdownExpanded,
+                            onExpandedChange = { if (!isLoading) isDropdownExpanded = !isDropdownExpanded }
+                        ) {
+                            Box(modifier = Modifier.menuAnchor()) {
+                                NeumorphismTextField(
+                                    value = selectedBus?.let { "Bus ${it.busNumber}" } ?: "",
+                                    onValueChange = {},
+                                    placeholder = "Assign Bus",
+                                    leadingIcon = {
+                                        androidx.compose.material3.Icon(
+                                            painter = androidx.compose.ui.res.painterResource(id = R.drawable.ic_directions_bus_vector),
+                                            contentDescription = "Bus",
+                                            tint = NeumorphTextSecondary
+                                        )
+                                    },
+                                    enabled = false
+                                )
+                                Box(modifier = Modifier.matchParentSize().clickable(enabled = !isLoading) { isDropdownExpanded = true })
+                            }
+
+                            ExposedDropdownMenu(
+                                expanded = isDropdownExpanded,
+                                onDismissRequest = { isDropdownExpanded = false },
+                                modifier = Modifier.background(NeumorphSurface)
+                            ) {
+                                buses.forEach { bus ->
+                                    DropdownMenuItem(
+                                        text = { Text("Bus ${bus.busNumber}", color = NeumorphTextPrimary) },
+                                        onClick = {
+                                            selectedBus = bus
+                                            assignedBusId = bus.busId // Store the actual Firebase Document ID 
+                                            isDropdownExpanded = false
+                                            errorMessage = null
+                                        }
+                                    )
+                                }
+                            }
+                        }
                     }
                 }
                 

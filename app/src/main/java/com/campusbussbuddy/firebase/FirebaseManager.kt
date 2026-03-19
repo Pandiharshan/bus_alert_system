@@ -14,7 +14,7 @@ import kotlinx.coroutines.tasks.await
 object FirebaseManager {
     
     private val auth: FirebaseAuth = FirebaseAuth.getInstance()
-    private val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
+    val firestore: FirebaseFirestore = FirebaseFirestore.getInstance()
     private val storage: FirebaseStorage = FirebaseStorage.getInstance()
     
     /**
@@ -308,21 +308,38 @@ object FirebaseManager {
      */
     suspend fun getBusInfo(busId: String): BusInfo? {
         return try {
-            val busDoc = firestore.collection("buses").document(busId).get().await()
+            var busDoc = firestore.collection("buses").document(busId).get().await()
             
+            // If the literal document ID doesn't exist, try resolving it as a busNumber.
+            // Admin AddStudent flow assigns buses by human-readable busNumber (e.g. "101") 
+            // instead of auto-generated push keys for document IDs.
+            if (!busDoc.exists()) {
+                val numericBusId = busId.toIntOrNull()
+                if (numericBusId != null) {
+                    val query = firestore.collection("buses")
+                        .whereEqualTo("busNumber", numericBusId)
+                        .limit(1)
+                        .get()
+                        .await()
+                    if (!query.isEmpty) {
+                        busDoc = query.documents[0]
+                    }
+                }
+            }
+
             if (busDoc.exists()) {
                 BusInfo(
-                    busId = busId,
+                    busId = busDoc.id, // always map back to the true document ID
                     busNumber = busDoc.getLong("busNumber")?.toInt() ?: 0,
                     capacity = busDoc.getLong("capacity")?.toInt() ?: 0,
-                    activeDriverId = busDoc.getString("activeDriverId") ?: "",
-                    activeDriverName = busDoc.getString("activeDriverName") ?: "",
-                    activeDriverPhone = busDoc.getString("activeDriverPhone") ?: ""
+                    activeDriverId = busDoc.getString("activeDriverId") ?: ""
                 )
             } else {
+                Log.d("FirebaseManager", "getBusInfo: Bus $busId not found by ID or busNumber")
                 null
             }
         } catch (e: Exception) {
+            Log.e("FirebaseManager", "getBusInfo failed", e)
             null
         }
     }
@@ -356,9 +373,7 @@ object FirebaseManager {
             
             // Step 3: Lock bus with current driver
             val busUpdate = hashMapOf<String, Any>(
-                "activeDriverId" to driverInfo.uid,
-                "activeDriverName" to driverInfo.name,
-                "activeDriverPhone" to driverInfo.phone
+                "activeDriverId" to driverInfo.uid
             )
             
             firestore.collection("buses").document(busId).update(busUpdate).await()
@@ -382,9 +397,7 @@ object FirebaseManager {
         return try {
             // Clear bus active driver info
             val busUpdate = hashMapOf<String, Any>(
-                "activeDriverId" to "",
-                "activeDriverName" to "",
-                "activeDriverPhone" to ""
+                "activeDriverId" to ""
             )
             
             firestore.collection("buses").document(busId).update(busUpdate).await()
@@ -463,15 +476,6 @@ object FirebaseManager {
             val driverDoc = firestore.collection("drivers").document(uid).get().await()
             val assignedBusId = driverDoc.getString("assignedBusId") ?: ""
             val isActive = driverDoc.getBoolean("isActive") ?: false
-            
-            if (isActive && assignedBusId.isNotEmpty()) {
-                val busUpdate = hashMapOf<String, Any>(
-                    "activeDriverName" to name.trim(),
-                    "activeDriverPhone" to phone.trim()
-                )
-                firestore.collection("buses").document(assignedBusId).update(busUpdate).await()
-                Log.d("FirebaseManager", "Also updated active bus driver info")
-            }
             
             Log.d("FirebaseManager", "Driver profile updated successfully")
             DriverResult.Success("Profile updated successfully", uid)
@@ -696,8 +700,6 @@ object FirebaseManager {
                 "capacity" to capacity,
                 "password" to password,
                 "activeDriverId" to "",
-                "activeDriverName" to "",
-                "activeDriverPhone" to "",
                 "createdAt" to System.currentTimeMillis()
             )
             
@@ -734,6 +736,21 @@ object FirebaseManager {
             
             // Delete bus document
             firestore.collection("buses").document(busId).delete().await()
+            
+            // Clean up orphaned students
+            val orphanedStudents = firestore.collection("students")
+                .whereEqualTo("busId", busId)
+                .get()
+                .await()
+                
+            if (!orphanedStudents.isEmpty) {
+                val batch = firestore.batch()
+                for (doc in orphanedStudents.documents) {
+                    batch.update(doc.reference, mapOf("busId" to ""))
+                }
+                batch.commit().await()
+                Log.d("FirebaseManager", "Cleaned up ${orphanedStudents.size()} orphaned students")
+            }
             
             Log.d("FirebaseManager", "Bus deleted: $busId")
             
@@ -780,9 +797,7 @@ object FirebaseManager {
                 busId = busDoc.id,
                 busNumber = busDoc.getLong("busNumber")?.toInt() ?: busNumber,
                 capacity = busDoc.getLong("capacity")?.toInt() ?: 0,
-                activeDriverId = busDoc.getString("activeDriverId") ?: "",
-                activeDriverName = busDoc.getString("activeDriverName") ?: "",
-                activeDriverPhone = busDoc.getString("activeDriverPhone") ?: ""
+                activeDriverId = busDoc.getString("activeDriverId") ?: ""
             )
             
             Log.d("FirebaseManager", "Bus authentication successful: $busNumber")
@@ -958,7 +973,7 @@ object FirebaseManager {
     suspend fun getAllBuses(): List<BusInfo> {
         return try {
             Log.d("FirebaseManager", "Fetching all buses from Firestore...")
-            val busesSnapshot = firestore.collection("buses").get().await()
+            val busesSnapshot = firestore.collection("buses").limit(50).get().await()
             
             val buses = busesSnapshot.documents.mapNotNull { doc ->
                 try {
@@ -966,9 +981,7 @@ object FirebaseManager {
                         busId = doc.id,
                         busNumber = doc.getLong("busNumber")?.toInt() ?: 0,
                         capacity = doc.getLong("capacity")?.toInt() ?: 0,
-                        activeDriverId = doc.getString("activeDriverId") ?: "",
-                        activeDriverName = doc.getString("activeDriverName") ?: "",
-                        activeDriverPhone = doc.getString("activeDriverPhone") ?: ""
+                        activeDriverId = doc.getString("activeDriverId") ?: ""
                     )
                 } catch (e: Exception) {
                     Log.e("FirebaseManager", "Error parsing bus document: ${doc.id}", e)
@@ -990,7 +1003,7 @@ object FirebaseManager {
      */
     suspend fun getAllStudents(): List<StudentInfo> {
         return try {
-            val studentsSnapshot = firestore.collection("students").get().await()
+            val studentsSnapshot = firestore.collection("students").limit(50).get().await()
             
             studentsSnapshot.documents.mapNotNull { doc ->
                 try {
@@ -1106,7 +1119,144 @@ object FirebaseManager {
                 StudentResult.Error("Password reset failed: ${emailError.message}")
             }
         } catch (e: Exception) {
-            StudentResult.Error("Password reset failed: ${e.message}")
+            Log.e("FirebaseManager", "Password reset failed", e)
+            StudentResult.Error(getErrorMessage(e))
+        }
+    }
+    
+    // ==================== ABSENCE MANAGEMENT ====================
+    
+    /**
+     * Mark an absence for a student
+     */
+    suspend fun markAbsence(
+        studentId: String,
+        studentName: String,
+        busId: String,
+        stopName: String,
+        dates: List<String>
+    ): AbsenceResult {
+        return try {
+            val batch = firestore.batch()
+            
+            for (date in dates) {
+                // Determine a unique ID to prevent duplicates for the same student on the same date
+                val docId = "${studentId}_${date}"
+                val docRef = firestore.collection("absences").document(docId)
+                
+                val absenceData = hashMapOf(
+                    "studentId" to studentId,
+                    "studentName" to studentName,
+                    "busId" to busId,
+                    "stopName" to stopName,
+                    "date" to date,
+                    "status" to "absent",
+                    "createdAt" to System.currentTimeMillis()
+                )
+                batch.set(docRef, absenceData)
+            }
+            
+            batch.commit().await()
+            AbsenceResult.Success("Absences saved successfully")
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Mark absence failed", e)
+            AbsenceResult.Error("Failed to save absences: ${e.message}")
+        }
+    }
+    
+    /**
+     * Revoke an absence for a specific date
+     */
+    suspend fun revokeAbsence(studentId: String, date: String): AbsenceResult {
+        return try {
+            val docId = "${studentId}_${date}"
+            firestore.collection("absences").document(docId).delete().await()
+            AbsenceResult.Success("Absence revoked")
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Revoke absence failed", e)
+            AbsenceResult.Error("Failed to revoke: ${e.message}")
+        }
+    }
+    
+    /**
+     * Get all future or current absences for a specific student
+     */
+    suspend fun getStudentAbsences(studentId: String): List<AbsenceData> {
+        return try {
+            val snapshot = firestore.collection("absences")
+                .whereEqualTo("studentId", studentId)
+                .get().await()
+                
+            snapshot.documents.mapNotNull { doc ->
+                AbsenceData(
+                    id = doc.id,
+                    studentId = doc.getString("studentId") ?: "",
+                    studentName = doc.getString("studentName") ?: "",
+                    busId = doc.getString("busId") ?: "",
+                    stopName = doc.getString("stopName") ?: "",
+                    date = doc.getString("date") ?: "",
+                    status = doc.getString("status") ?: "",
+                    createdAt = doc.getLong("createdAt") ?: 0L
+                )
+            }.sortedBy { it.date }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Failed to fetch student absences", e)
+            emptyList()
+        }
+    }
+    
+    /**
+     * Get all absences for a specific bus on a specific date (e.g. TODAY)
+     */
+    suspend fun getBusAbsencesForDate(busId: String, dateString: String): List<AbsenceData> {
+        return try {
+            val snapshot = firestore.collection("absences")
+                .whereEqualTo("busId", busId)
+                .whereEqualTo("date", dateString)
+                .get().await()
+                
+            snapshot.documents.mapNotNull { doc ->
+                AbsenceData(
+                    id = doc.id,
+                    studentId = doc.getString("studentId") ?: "",
+                    studentName = doc.getString("studentName") ?: "",
+                    busId = doc.getString("busId") ?: "",
+                    stopName = doc.getString("stopName") ?: "",
+                    date = doc.getString("date") ?: "",
+                    status = doc.getString("status") ?: "",
+                    createdAt = doc.getLong("createdAt") ?: 0L
+                )
+            }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Failed to get bus absences", e)
+            emptyList()
+        }
+    }
+    
+    /**
+     * Get all recorded absences for a specific bus (Admin View)
+     */
+    suspend fun getAllAbsencesByBus(busId: String): List<AbsenceData> {
+        return try {
+            val snapshot = firestore.collection("absences")
+                .whereEqualTo("busId", busId)
+                .get().await()
+                
+            snapshot.documents.mapNotNull { doc ->
+                AbsenceData(
+                    id = doc.id,
+                    studentId = doc.getString("studentId") ?: "",
+                    studentName = doc.getString("studentName") ?: "",
+                    busId = doc.getString("busId") ?: "",
+                    stopName = doc.getString("stopName") ?: "",
+                    date = doc.getString("date") ?: "",
+                    status = doc.getString("status") ?: "",
+                    createdAt = doc.getLong("createdAt") ?: 0L
+                )
+            }.sortedByDescending { it.date }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Failed to get all bus absences", e)
+            emptyList()
         }
     }
 }
@@ -1163,9 +1313,7 @@ data class BusInfo(
     val busId: String,
     val busNumber: Int,
     val capacity: Int,
-    val activeDriverId: String,
-    val activeDriverName: String,
-    val activeDriverPhone: String
+    val activeDriverId: String
 )
 
 /**
@@ -1246,4 +1394,25 @@ sealed class StudentResult {
 sealed class StudentAuthResult {
     data class Success(val studentInfo: StudentInfo, val busInfo: BusInfo?) : StudentAuthResult()
     data class Error(val message: String) : StudentAuthResult()
+}
+
+// ==================== ABSENCE MODELS ====================
+
+/**
+ * Data model for a given day's absence
+ */
+data class AbsenceData(
+    val id: String = "",
+    val studentId: String = "",
+    val studentName: String = "",
+    val busId: String = "",
+    val stopName: String = "",
+    val date: String = "",      // format: yyyy-MM-dd
+    val status: String = "absent",
+    val createdAt: Long = 0L
+)
+
+sealed class AbsenceResult {
+    data class Success(val message: String) : AbsenceResult()
+    data class Error(val message: String) : AbsenceResult()
 }

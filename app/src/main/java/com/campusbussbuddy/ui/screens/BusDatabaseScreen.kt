@@ -86,120 +86,121 @@ fun BusDatabaseScreen(
     }
     
     NeumorphismScreenContainer {
-        Column(
-            modifier = Modifier.fillMaxSize()
-        ) {
-            Spacer(modifier = Modifier.height(48.dp))
-
-            // Embedded TopBar utilizing AppLabelPill
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 24.dp),
-                contentAlignment = Alignment.Center
+        Box(modifier = Modifier.fillMaxSize()) {
+            Column(
+                modifier = Modifier.fillMaxSize()
             ) {
-                NeumorphismIconButton(
-                    iconRes = R.drawable.ic_chevron_left,
-                    onClick = onBackClick,
-                    size = 44.dp,
-                    iconSize = 24.dp,
-                    modifier = Modifier.align(Alignment.CenterStart)
-                )
-                
-                AppLabelPill(
-                    icon = R.drawable.ic_directions_bus_vector,
-                    title = "Bus Database"
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(32.dp))
-            
-            // Search Bar
-            Box(modifier = Modifier.padding(horizontal = 24.dp)) {
-                NeumorphismTextField(
-                    value = searchQuery,
-                    onValueChange = { searchQuery = it },
-                    placeholder = "Search by bus number...",
-                    leadingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                            contentDescription = "Search",
-                            tint = NeumorphTextSecondary,
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                )
-            }
-            
-            Spacer(modifier = Modifier.height(24.dp))
-            
-            if (isLoading) {
-                // Loading State
+                Spacer(modifier = Modifier.height(48.dp))
+
+                // Embedded TopBar utilizing AppLabelPill
                 Box(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 24.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    CircularProgressIndicator(
-                        color = NeumorphAccentPrimary
+                    NeumorphismIconButton(
+                        iconRes = R.drawable.ic_chevron_left,
+                        onClick = onBackClick,
+                        size = 44.dp,
+                        iconSize = 24.dp,
+                        modifier = Modifier.align(Alignment.CenterStart)
+                    )
+                    
+                    AppLabelPill(
+                        icon = R.drawable.ic_directions_bus_vector,
+                        title = "Bus Database"
                     )
                 }
-            } else if (filteredBuses.isEmpty()) {
-                // Empty State
-                EmptyState(
-                    icon = R.drawable.ic_directions_bus_vector,
-                    title = if (searchQuery.isEmpty()) "No Buses Found" else "No Results",
-                    subtitle = if (searchQuery.isEmpty()) 
-                        "Add buses to get started" 
-                    else 
-                        "No buses match your search"
-                )
-            } else {
-                // Bus List
-                LazyColumn(
-                    modifier = Modifier.fillMaxSize(),
-                    contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 120.dp),
-                    verticalArrangement = Arrangement.spacedBy(20.dp)
-                ) {
-                    items(filteredBuses) { bus ->
-                        BusCard(
-                            bus = bus,
-                            onEditClick = {
-                                selectedBus = bus
-                                showEditDialog = true
-                            },
-                            onDeleteClick = {
-                                busToDelete = bus
-                                showDeleteDialog = true
-                            }
+                
+                Spacer(modifier = Modifier.height(32.dp))
+                
+                // Search Bar
+                Box(modifier = Modifier.padding(horizontal = 24.dp)) {
+                    NeumorphismTextField(
+                        value = searchQuery,
+                        onValueChange = { searchQuery = it },
+                        placeholder = "Search by bus number...",
+                        leadingIcon = {
+                            Icon(
+                                painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                contentDescription = "Search",
+                                tint = NeumorphTextSecondary,
+                                modifier = Modifier.size(20.dp)
+                            )
+                        }
+                    )
+                }
+                
+                Spacer(modifier = Modifier.height(24.dp))
+                
+                if (isLoading) {
+                    // Loading State
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator(
+                            color = NeumorphAccentPrimary
                         )
+                    }
+                } else if (filteredBuses.isEmpty()) {
+                    // Empty State
+                    EmptyState(
+                        icon = R.drawable.ic_directions_bus_vector,
+                        title = if (searchQuery.isEmpty()) "No Buses Found" else "No Results",
+                        subtitle = if (searchQuery.isEmpty()) 
+                            "Add buses to get started" 
+                        else 
+                            "No buses match your search"
+                    )
+                } else {
+                    // Bus List
+                    LazyColumn(
+                        modifier = Modifier.fillMaxSize(),
+                        contentPadding = PaddingValues(start = 24.dp, end = 24.dp, bottom = 120.dp),
+                        verticalArrangement = Arrangement.spacedBy(20.dp)
+                    ) {
+                        items(filteredBuses) { bus ->
+                            BusCard(
+                                bus = bus,
+                                onEditClick = {
+                                    selectedBus = bus
+                                    showEditDialog = true
+                                },
+                                onDeleteClick = {
+                                    busToDelete = bus
+                                    showDeleteDialog = true
+                                }
+                            )
+                        }
                     }
                 }
             }
-        }
-            
-        // Floating Add Button
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .padding(24.dp)
-                .size(64.dp)
-                .neumorphic(cornerRadius = 32.dp, elevation = 8.dp, blur = 16.dp)
-                .background(NeumorphSurface, CircleShape)
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null,
-                    onClick = onAddBusClick
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                painter = painterResource(id = R.drawable.ic_add),
-                contentDescription = "Add",
-                tint = NeumorphAccentPrimary,
-                modifier = Modifier.size(28.dp)
-            )
-        }
-            
+
+            // Floating Add Button (inside NeumorphismScreenContainer Box)
+            Box(
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(24.dp)
+                    .size(64.dp)
+                    .neumorphic(cornerRadius = 32.dp, elevation = 8.dp, blur = 16.dp)
+                    .background(NeumorphSurface, CircleShape)
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null,
+                        onClick = onAddBusClick
+                    ),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_add),
+                    contentDescription = "Add",
+                    tint = NeumorphAccentPrimary,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+
             // Edit Dialog
             if (showEditDialog && selectedBus != null) {
                 EditBusDialog(
@@ -216,7 +217,7 @@ fun BusDatabaseScreen(
                     }
                 )
             }
-            
+
             // Delete Confirmation Dialog
             if (showDeleteDialog && busToDelete != null) {
                 DeleteConfirmationDialog(
@@ -233,6 +234,7 @@ fun BusDatabaseScreen(
                     }
                 )
             }
+        }
     }
 }
 
@@ -289,15 +291,6 @@ private fun BusCard(
                     color = NeumorphTextSecondary
                 )
                 
-                if (bus.activeDriverName.isNotEmpty()) {
-                    Spacer(modifier = Modifier.height(4.dp))
-                    Text(
-                        text = "Driver: ${bus.activeDriverName}",
-                        fontSize = 14.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = NeumorphTextSecondary
-                    )
-                }
             }
             
             // Action Buttons

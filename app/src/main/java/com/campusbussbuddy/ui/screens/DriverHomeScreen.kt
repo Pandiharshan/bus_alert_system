@@ -167,31 +167,7 @@ fun DriverHomeScreen(
                                         HomeTabContent(
                                             uiState = uiState,
                                             isLoggingIn = isLoggingIn,
-                                            onBusLoginClick = {
-                                                val driverId = uiState.driverInfo?.uid
-                                                val busId = uiState.busInfo?.busId ?: uiState.driverInfo?.assignedBusId
-                                                if (driverId != null && busId != null) {
-                                                    isLoggingIn = true
-                                                    val logData = hashMapOf(
-                                                        "driverId" to driverId,
-                                                        "busId" to busId,
-                                                        "timestamp" to FieldValue.serverTimestamp()
-                                                    )
-                                                    firestore.collection("driver_logs").add(logData)
-                                                        .addOnSuccessListener {
-                                                            isLoggingIn = false
-                                                            Toast.makeText(context, "Bus Login Recorded successfully", Toast.LENGTH_SHORT).show()
-                                                            onBusLoginClick()
-                                                        }
-                                                        .addOnFailureListener {
-                                                            isLoggingIn = false
-                                                            Toast.makeText(context, "Failed to log in", Toast.LENGTH_SHORT).show()
-                                                            onBusLoginClick()
-                                                        }
-                                                } else {
-                                                    onBusLoginClick()
-                                                }
-                                            }
+                                            onBusLoginClick = onBusLoginClick
                                         )
                                     }
                                     "HISTORY" -> HistoryTabContent(historyLogs, historyLoading)

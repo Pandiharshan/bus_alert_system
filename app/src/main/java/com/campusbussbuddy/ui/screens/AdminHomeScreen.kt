@@ -34,6 +34,7 @@ fun AdminHomeScreen(
     onManageDriversClick: () -> Unit = {},
     onManageBusesClick: () -> Unit = {},
     onManageStudentsClick: () -> Unit = {},
+    onAbsenceMonitoringClick: () -> Unit = {},
     onLogoutClick: () -> Unit = {},
     onBackClick: () -> Unit = {}
 ) {
@@ -153,7 +154,8 @@ fun AdminHomeScreen(
                         ManagementSection(
                             onManageDriversClick  = onManageDriversClick,
                             onManageBusesClick    = onManageBusesClick,
-                            onManageStudentsClick = onManageStudentsClick
+                            onManageStudentsClick = onManageStudentsClick,
+                            onAbsenceMonitoringClick = onAbsenceMonitoringClick
                         )
 
                         Spacer(modifier = Modifier.height(32.dp))
@@ -436,7 +438,8 @@ private fun ExpandedDetailsSection(
 private fun ManagementSection(
     onManageDriversClick: () -> Unit,
     onManageBusesClick: () -> Unit,
-    onManageStudentsClick: () -> Unit
+    onManageStudentsClick: () -> Unit,
+    onAbsenceMonitoringClick: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -458,6 +461,11 @@ private fun ManagementSection(
             icon    = R.drawable.ic_student,
             title   = "Student Management",
             onClick = onManageStudentsClick
+        )
+        ManagementCard(
+            icon    = R.drawable.ic_calendar_today,
+            title   = "Absence Monitoring",
+            onClick = onAbsenceMonitoringClick
         )
     }
 }

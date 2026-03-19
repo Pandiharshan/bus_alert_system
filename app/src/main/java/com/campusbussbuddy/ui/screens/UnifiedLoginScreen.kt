@@ -479,7 +479,7 @@ private fun PrivacyPolicyDialog(onDismiss: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f * alpha))
+                .background(NeumorphBgPrimary.copy(alpha = 0.85f * alpha))
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
@@ -547,7 +547,7 @@ private fun SupportDialog(onDismiss: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f * alpha))
+                .background(NeumorphBgPrimary.copy(alpha = 0.85f * alpha))
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
@@ -680,7 +680,7 @@ private fun AppInfoDialog(onDismiss: () -> Unit) {
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .background(Color.Black.copy(alpha = 0.45f * alpha))
+                .background(NeumorphBgPrimary.copy(alpha = 0.85f * alpha))
                 .clickable(remember { MutableInteractionSource() }, null) { visible = false; onDismiss() },
             contentAlignment = Alignment.Center
         ) {
