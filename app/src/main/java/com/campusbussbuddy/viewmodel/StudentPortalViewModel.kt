@@ -44,6 +44,13 @@ class StudentPortalViewModel : ViewModel() {
         _uiState.value = _uiState.value.copy(showProfile = isVisible)
     }
 
+    private var busListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+    override fun onCleared() {
+        super.onCleared()
+        busListener?.remove()
+    }
+
     fun fetchPortalData() {
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, errorMessage = null)
@@ -58,32 +65,7 @@ class StudentPortalViewModel : ViewModel() {
                     return@launch
                 }
 
-                var bus: BusInfo? = null
-                var driver: DriverInfo? = null
-
-                // Step 2: Fetch assigned bus
-                if (student.busId.isNotEmpty()) {
-                    bus = FirebaseManager.getBusInfo(student.busId)
-
-                    // Step 3: Fetch active driver explicitly by their ID (solving the stale string bug)
-                    if (bus != null && bus.activeDriverId.isNotEmpty()) {
-                        val doc = FirebaseManager.firestore.collection("drivers").document(bus.activeDriverId).get().await()
-                        if (doc.exists()) {
-                            driver = DriverInfo(
-                                uid = doc.id,
-                                name = doc.getString("name") ?: "Driver",
-                                username = doc.getString("username") ?: "",
-                                email = doc.getString("email") ?: "",
-                                phone = doc.getString("phone") ?: "",
-                                photoUrl = doc.getString("photoUrl") ?: "",
-                                assignedBusId = doc.getString("assignedBusId") ?: "",
-                                isActive = doc.getBoolean("isActive") ?: false
-                            )
-                        }
-                    }
-                }
-
-                // Step 4: Fetch absences
+                // Step 2: Fetch absences
                 val absences = FirebaseManager.getStudentAbsences(student.uid)
                 val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 val upcomingCount = absences.count { it.date >= todayStr }
@@ -91,10 +73,58 @@ class StudentPortalViewModel : ViewModel() {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
                     studentInfo = student,
-                    busInfo = bus,
-                    activeDriver = driver,
                     upcomingAbsenceCount = upcomingCount
                 )
+
+                // Step 3: Listen to assigned bus in real-time
+                if (student.busId.isNotEmpty()) {
+                    busListener?.remove()
+                    busListener = FirebaseManager.firestore.collection("buses").document(student.busId)
+                        .addSnapshotListener { snapshot, error ->
+                            if (error != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
+                            
+                            val busNumber = snapshot.getLong("busNumber")?.toInt() ?: 0
+                            val capacity = snapshot.getLong("capacity")?.toInt() ?: 0
+                            val activeDriverId = snapshot.getString("activeDriverId") ?: ""
+                            
+                            val liveBus = BusInfo(
+                                busId = snapshot.id,
+                                busNumber = busNumber,
+                                capacity = capacity,
+                                activeDriverId = activeDriverId
+                            )
+                            
+                            if (activeDriverId.isNotEmpty()) {
+                                FirebaseManager.firestore.collection("drivers").document(activeDriverId)
+                                    .get()
+                                    .addOnSuccessListener { doc ->
+                                        if (doc.exists()) {
+                                            val liveDriver = DriverInfo(
+                                                uid = doc.id,
+                                                name = doc.getString("name") ?: "Driver",
+                                                username = doc.getString("username") ?: "",
+                                                email = doc.getString("email") ?: "",
+                                                phone = doc.getString("phone") ?: "",
+                                                photoUrl = doc.getString("photoUrl") ?: "",
+                                                assignedBusId = doc.getString("assignedBusId") ?: "",
+                                                isActive = doc.getBoolean("isActive") ?: false,
+                                                shift = doc.getString("shift") ?: "",
+                                                routeName = doc.getString("routeName") ?: ""
+                                            )
+                                            _uiState.value = _uiState.value.copy(
+                                                busInfo = liveBus,
+                                                activeDriver = liveDriver
+                                            )
+                                        }
+                                    }
+                            } else {
+                                _uiState.value = _uiState.value.copy(
+                                    busInfo = liveBus,
+                                    activeDriver = null
+                                )
+                            }
+                        }
+                }
 
             } catch (e: Exception) {
                 Log.e("StudentPortalViewModel", "Error fetching data", e)

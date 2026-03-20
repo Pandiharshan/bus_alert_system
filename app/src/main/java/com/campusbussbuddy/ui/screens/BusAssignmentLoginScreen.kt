@@ -32,6 +32,7 @@ import com.campusbussbuddy.ui.neumorphism.layout.AppLabelPill
 import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismScreenContainer
 import com.campusbussbuddy.ui.theme.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 @Composable
 fun BusAssignmentLoginScreen(
@@ -205,6 +206,24 @@ fun BusAssignmentLoginScreen(
                                                 "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                                             )
                                             FirebaseManager.firestore.collection("driver_logs").add(logData)
+                                            
+                                            // Lock the bus for this driver
+                                            val driverDoc = FirebaseManager.firestore.collection("drivers").document(driverId).get().await()
+                                            if (driverDoc.exists()) {
+                                                val driver = com.campusbussbuddy.firebase.DriverInfo(
+                                                    uid = driverId,
+                                                    name = driverDoc.getString("name") ?: "Driver",
+                                                    username = driverDoc.getString("username") ?: "",
+                                                    email = driverDoc.getString("email") ?: "",
+                                                    phone = driverDoc.getString("phone") ?: "",
+                                                    photoUrl = driverDoc.getString("photoUrl") ?: "",
+                                                    assignedBusId = result.busInfo.busId,
+                                                    isActive = true,
+                                                    shift = driverDoc.getString("shift") ?: "",
+                                                    routeName = driverDoc.getString("routeName") ?: ""
+                                                )
+                                                FirebaseManager.activateDriverAndLockBus(driver)
+                                            }
                                         }
                                         
                                         isLoading = false

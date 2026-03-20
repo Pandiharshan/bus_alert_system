@@ -882,6 +882,14 @@ fun QRScannerView(
                 }, executor)
                 previewView
             },
+            onRelease = { view ->
+                try {
+                    val cameraProviderFuture = ProcessCameraProvider.getInstance(view.context)
+                    cameraProviderFuture.get().unbindAll()
+                } catch (e: Exception) {
+                    Log.e("QRScannerView", "Failed to unbind camera", e)
+                }
+            },
             modifier = Modifier.fillMaxSize()
         )
 
