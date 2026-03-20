@@ -44,6 +44,7 @@ fun StudentDatabaseScreen(
 ) {
     var students by remember { mutableStateOf<List<StudentInfo>>(emptyList()) }
     var filteredStudents by remember { mutableStateOf<List<StudentInfo>>(emptyList()) }
+    var busMap by remember { mutableStateOf<Map<String, Int>>(emptyMap()) } // busId -> busNumber
     var searchQuery by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var showEditDialog by remember { mutableStateOf(false) }
@@ -54,9 +55,11 @@ fun StudentDatabaseScreen(
 
     val scope = rememberCoroutineScope()
 
-    // Load students on screen launch
+    // Load students AND buses on screen launch so we can show bus numbers
     LaunchedEffect(Unit) {
         scope.launch {
+            val allBuses = FirebaseManager.getAllBuses()
+            busMap = allBuses.associate { it.busId to it.busNumber }
             students = FirebaseManager.getAllStudents()
             filteredStudents = students
             isLoading = false
@@ -147,14 +150,9 @@ fun StudentDatabaseScreen(
                     items(filteredStudents) { student ->
                         StudentCard(
                             student = student,
-                            onEditClick = {
-                                selectedStudent = student
-                                showEditDialog = true
-                            },
-                            onDeleteClick = {
-                                selectedStudent = student
-                                showDeleteDialog = true
-                            }
+                            busLabel = busMap[student.busId]?.let { "Bus $it" } ?: if (student.busId.isBlank()) "Not Assigned" else "Bus ${student.busId.take(6)}...",
+                            onEditClick = { selectedStudent = student; showEditDialog = true },
+                            onDeleteClick = { selectedStudent = student; showDeleteDialog = true }
                         )
                     }
                 }
@@ -309,6 +307,7 @@ private fun StudentEmptyState(
 @Composable
 private fun StudentCard(
     student: StudentInfo,
+    busLabel: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -358,7 +357,7 @@ private fun StudentCard(
                 Spacer(modifier = Modifier.height(2.dp))
 
                 Text(
-                    text = "Bus: ${student.busId}",
+                    text = "Bus: $busLabel",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Medium,
                     color = NeumorphTextSecondary

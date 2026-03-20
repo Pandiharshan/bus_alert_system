@@ -59,6 +59,7 @@ fun DriverDatabaseScreen(
 ) {
     var drivers by remember { mutableStateOf<List<DriverInfo>>(emptyList()) }
     var filteredDrivers by remember { mutableStateOf<List<DriverInfo>>(emptyList()) }
+    var busMap by remember { mutableStateOf<Map<String, Int>>(emptyMap()) } // busId -> busNumber
     var searchQuery by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(true) }
     var showEditDialog by remember { mutableStateOf(false) }
@@ -69,9 +70,11 @@ fun DriverDatabaseScreen(
     
     val scope = rememberCoroutineScope()
     
-    // Load drivers on screen launch
+    // Load drivers AND buses on screen launch
     LaunchedEffect(Unit) {
         scope.launch {
+            val allBuses = FirebaseManager.getAllBuses()
+            busMap = allBuses.associate { it.busId to it.busNumber }
             drivers = FirebaseManager.getAllDrivers()
             filteredDrivers = drivers
             isLoading = false
@@ -165,6 +168,7 @@ fun DriverDatabaseScreen(
                         items(filteredDrivers) { driver ->
                             DriverCard(
                                 driver = driver,
+                                busLabel = busMap[driver.assignedBusId]?.let { "Bus $it" } ?: if (driver.assignedBusId.isBlank()) "Not Assigned" else "Bus ${driver.assignedBusId.take(6)}...",
                                 onEditClick = {
                                     selectedDriver = driver
                                     showEditDialog = true
@@ -332,6 +336,7 @@ private fun EmptyState(
 @Composable
 private fun DriverCard(
     driver: DriverInfo,
+    busLabel: String,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit
 ) {
@@ -438,7 +443,7 @@ private fun DriverCard(
                 
                 // Bus ID
                 Text(
-                    text = "Bus ID: ${if (driver.assignedBusId.isNotEmpty()) driver.assignedBusId else "Not assigned"}",
+                    text = "Bus: $busLabel",
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold,
                     color = NeumorphTextPrimary

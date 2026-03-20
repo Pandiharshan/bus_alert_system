@@ -40,6 +40,9 @@ import com.campusbussbuddy.ui.neumorphism.layout.NeumorphismPill
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.zxing.BarcodeFormat
 import com.google.zxing.qrcode.QRCodeWriter
+import android.content.Intent
+import android.net.Uri
+import androidx.compose.ui.platform.LocalContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.tasks.await
 
@@ -89,8 +92,8 @@ fun BusOperationsHubScreen(
     val studentsList = uiState.students
     
     val activeMembers = studentsList.filter { !it.isAbsent }
-    val totalMembers = activeMembers.size
-    val presentToday = activeMembers.count { it.status == StudentStatus.BOARDED }
+    val totalMembers = studentsList.size
+    val presentToday = studentsList.count { !it.isAbsent && it.status == StudentStatus.BOARDED }
 
     val endTripAction: () -> Unit = {
         uiState.driverInfo?.uid?.let { driverId ->
@@ -140,7 +143,7 @@ fun BusOperationsHubScreen(
 
                                 AppLabelPill(
                                     icon = R.drawable.ic_directions_bus_vector,
-                                    title = "Bus Operations"
+                                    title = if (uiState.isTripStarted) "Trip Supervision" else "Bus Operations"
                                 )
                             }
 
@@ -171,26 +174,85 @@ fun BusOperationsHubScreen(
 
                                 NeumorphismStatCard(
                                     count = totalMembers.toString(),
-                                    label = "Total Members",
+                                    label = "Total Assigned",
                                     iconRes = R.drawable.ic_group,
                                     modifier = Modifier.weight(1f)
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(24.dp))
-
-                            TripAttendancePortalCard(busId = busId)
-
                             Spacer(modifier = Modifier.height(32.dp))
 
-                            NeumorphismButton(
-                                text = "End Trip",
-                                onClick = endTripAction,
-                                isLoading = isEndingTrip,
-                                modifier = Modifier.fillMaxWidth()
-                            )
+                            if (!uiState.isTripStarted) {
+                                // Bus Home Page: Show explicit "Start Trip" circular button
+                                Box(
+                                    modifier = Modifier
+                                        .size(160.dp)
+                                        .neumorphicInset(cornerRadius = 80.dp, blur = 12.dp, elevation = 8.dp)
+                                        .background(NeumorphBgPrimary, CircleShape)
+                                        .clickable { viewModel.startTrip() },
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                                        Icon(
+                                            painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                            contentDescription = "Start Trip",
+                                            tint = NeumorphAccentPrimary,
+                                            modifier = Modifier.size(48.dp)
+                                        )
+                                        Spacer(modifier = Modifier.height(8.dp))
+                                        Text(
+                                            text = "START TRIP",
+                                            fontSize = 16.sp,
+                                            fontWeight = FontWeight.Bold,
+                                            color = NeumorphTextPrimary,
+                                            letterSpacing = 1.sp
+                                        )
+                                    }
+                                }
 
-                            Spacer(modifier = Modifier.height(120.dp))
+                                Spacer(modifier = Modifier.height(120.dp))
+
+                            } else {
+                                // Trip Supervision Screen
+                                LiveMapPlaceholderCard()
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                TripAttendancePortalCard(busId = busId, currentTripId = uiState.currentTripId)
+
+                                Spacer(modifier = Modifier.height(24.dp))
+
+                                // Filter Members List Inline
+                                Text(
+                                    text = "Present & Boarded Members",
+                                    fontSize = 18.sp,
+                                    fontWeight = FontWeight.Bold,
+                                    color = NeumorphTextPrimary,
+                                    modifier = Modifier.align(Alignment.Start)
+                                )
+                                Spacer(modifier = Modifier.height(16.dp))
+                                
+                                val activeStudents = studentsList.filter { !it.isAbsent }
+                                if (activeStudents.isEmpty()) {
+                                    Text("No active students for this trip.", color = NeumorphTextSecondary)
+                                } else {
+                                    activeStudents.forEach { student ->
+                                        BusStopStudentCard(student = student, onCallClick = {})
+                                        Spacer(modifier = Modifier.height(12.dp))
+                                    }
+                                }
+
+                                Spacer(modifier = Modifier.height(32.dp))
+
+                                NeumorphismButton(
+                                    text = "Complete Trip",
+                                    onClick = endTripAction,
+                                    isLoading = isEndingTrip,
+                                    modifier = Modifier.fillMaxWidth()
+                                )
+
+                                Spacer(modifier = Modifier.height(120.dp))
+                            }
                         }
                     }
                     "MEMBERS" -> {
@@ -327,9 +389,25 @@ fun BusOperationsHubScreen(
 
                             Spacer(modifier = Modifier.height(24.dp))
 
+                            val scope = rememberCoroutineScope()
                             NeumorphismButton(
                                 text = "Logout",
-                                onClick = onLogoutClick,
+                                onClick = {
+                                    scope.launch {
+                                        // P1 Fix: Always clear driver lock before logout
+                                        val driverId = uiState.driverInfo?.uid ?: ""
+                                        if (driverId.isNotEmpty()) {
+                                            if (uiState.isTripStarted) {
+                                                // Trip is active — do a full End Trip first to reset students + bus
+                                                viewModel.endTrip(driverId)
+                                            } else {
+                                                // Trip not started — just remove activeDriverId silently
+                                                FirebaseManager.deactivateDriverAndUnlockBus(driverId, busId)
+                                            }
+                                        }
+                                        onLogoutClick()
+                                    }
+                                },
                                 modifier = Modifier.fillMaxWidth()
                             )
 
@@ -352,7 +430,7 @@ fun BusOperationsHubScreen(
 // ─── INTERNAL COMPOSABLES ───────────────────────────────────────────────────
 
 @Composable
-private fun TripAttendancePortalCard(busId: String) {
+private fun TripAttendancePortalCard(busId: String, currentTripId: String) {
     var qrBitmap by remember { mutableStateOf<Bitmap?>(null) }
 
     NeumorphismCard(
@@ -411,7 +489,8 @@ private fun TripAttendancePortalCard(busId: String) {
                     text = "Generate QR",
                     onClick = {
                         val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                        qrBitmap = generateQRCode(content = "busId:$busId|date:$todayStr")
+                        // Fix 3 & 16: Embed dynamic tripId to cryptographically defeat screenshot reuse
+                        qrBitmap = generateQRCode(content = "busId:$busId|tripId:$currentTripId|date:$todayStr")
                     },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -620,8 +699,13 @@ private fun MembersTabContent(
 private fun BusStopStudentCard(
     student: StudentMember,
     isAbsentView: Boolean = false,
-    onCallClick: () -> Unit
+    onCallClick: () -> Unit = {}
 ) {
+    val context = LocalContext.current
+    val resolvedCallClick: () -> Unit = if (student.phoneNumber.isNotBlank()) {
+        // P3 Fix: open system dialer with student phone number
+        { context.startActivity(Intent(Intent.ACTION_DIAL, Uri.parse("tel:${student.phoneNumber}"))) }
+    } else onCallClick
     NeumorphismCard(
         modifier = Modifier.fillMaxWidth(),
         cornerRadius = 20.dp,
@@ -691,7 +775,7 @@ private fun BusStopStudentCard(
 
             NeumorphismIconButton(
                 iconRes = R.drawable.ic_call,
-                onClick = onCallClick,
+                onClick = resolvedCallClick,
                 size = 40.dp,
                 iconSize = 20.dp,
                 unselectedTint = NeumorphTextPrimary
@@ -794,6 +878,45 @@ private fun HubNavItem(
             color = if (isSelected) NeumorphAccentPrimary else NeumorphTextSecondary,
             letterSpacing = 0.5.sp
         )
+    }
+}
+
+@Composable
+private fun LiveMapPlaceholderCard() {
+    NeumorphismCard(
+        modifier = Modifier.fillMaxWidth().height(200.dp),
+        cornerRadius = 24.dp,
+        contentPadding = PaddingValues(16.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Box(
+                modifier = Modifier
+                    .size(64.dp)
+                    .background(Color(0xFFE3F2FD), CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    painter = painterResource(id = R.drawable.ic_pin_drop),
+                    contentDescription = "Map Placeholder",
+                    tint = Color(0xFF1976D2),
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                text = "Live Map Tracking",
+                fontSize = 18.sp,
+                fontWeight = FontWeight.Bold,
+                color = NeumorphTextPrimary
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "Map integration will populate here.",
+                fontSize = 14.sp,
+                color = NeumorphTextSecondary
+            )
+        }
     }
 }
 

@@ -46,6 +46,7 @@ fun AddStudentScreen(
     var password by remember { mutableStateOf("") }
     var busId by remember { mutableStateOf("") }
     var stop by remember { mutableStateOf("") }
+    var phone by remember { mutableStateOf("") }
     var isPasswordVisible by remember { mutableStateOf(false) }
     var isLoading by remember { mutableStateOf(false) }
     
@@ -217,6 +218,19 @@ fun AddStudentScreen(
                             }
                         }
                         
+                        // Phone Number
+                        FormField(
+                            value = phone,
+                            onValueChange = { 
+                                phone = it
+                                errorMessage = null
+                            },
+                            placeholder = "Parent/Student Phone",
+                            icon = R.drawable.ic_call,
+                            enabled = !isLoading,
+                            keyboardType = KeyboardType.Phone
+                        )
+
                         // Bus Stop
                         FormField(
                             value = stop,
@@ -262,7 +276,7 @@ fun AddStudentScreen(
                     onClick = {
                         if (isLoading) return@NeumorphismButton
                         if (name.isBlank() || username.isBlank() || password.isBlank() || 
-                            busId.isBlank() || stop.isBlank()) {
+                            busId.isBlank() || stop.isBlank() || phone.isBlank()) {
                             errorMessage = "Please fill in all fields"
                         } else {
                             scope.launch {
@@ -274,7 +288,8 @@ fun AddStudentScreen(
                                     name = name.trim(),
                                     username = username.trim(),
                                     busId = busId.trim(),
-                                    stop = stop.trim()
+                                    stop = stop.trim(),
+                                    phone = phone.trim()
                                 )
                                 
                                 when (val result = FirebaseManager.createStudentAccount(

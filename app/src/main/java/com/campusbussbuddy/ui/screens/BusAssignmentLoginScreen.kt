@@ -197,8 +197,27 @@ fun BusAssignmentLoginScreen(
                                 
                                 when (val result = FirebaseManager.authenticateBus(busNumberInt, busPassword)) {
                                     is BusAuthResult.Success -> {
-                                        // Store history with the bus number the user actually logged into
                                         val driverId = com.google.firebase.auth.FirebaseAuth.getInstance().currentUser?.uid ?: ""
+                                        
+                                        // Only block if ANOTHER driver is currently active on this bus
+                                        val activeDriverId = result.busInfo.activeDriverId
+                                        if (activeDriverId.isNotEmpty() && activeDriverId != driverId) {
+                                            // Ghost driver timeout: if lock is older than 12 hours, allow override
+                                            val currentBusDoc = FirebaseManager.firestore.collection("buses").document(result.busInfo.busId).get().await()
+                                            val tripStartedAt = currentBusDoc.getTimestamp("tripStartedAt")?.toDate()?.time ?: 0L
+                                            val now = System.currentTimeMillis()
+                                            val isStale = tripStartedAt > 0 && (now - tripStartedAt) > 12 * 60 * 60 * 1000L
+
+                                            if (!isStale) {
+                                                isLoading = false
+                                                errorMessage = "Bus $busNumber is currently active with another driver. Please wait."
+                                                return@launch
+                                            } else {
+                                                android.util.Log.w("BusLogin", "Ghost lock over 12hrs old bypassed on Bus $busNumber.")
+                                            }
+                                        }
+
+                                        // Log the bus access attempt
                                         if (driverId.isNotEmpty()) {
                                             val logData = hashMapOf(
                                                 "driverId" to driverId,
@@ -206,24 +225,6 @@ fun BusAssignmentLoginScreen(
                                                 "timestamp" to com.google.firebase.firestore.FieldValue.serverTimestamp()
                                             )
                                             FirebaseManager.firestore.collection("driver_logs").add(logData)
-                                            
-                                            // Lock the bus for this driver
-                                            val driverDoc = FirebaseManager.firestore.collection("drivers").document(driverId).get().await()
-                                            if (driverDoc.exists()) {
-                                                val driver = com.campusbussbuddy.firebase.DriverInfo(
-                                                    uid = driverId,
-                                                    name = driverDoc.getString("name") ?: "Driver",
-                                                    username = driverDoc.getString("username") ?: "",
-                                                    email = driverDoc.getString("email") ?: "",
-                                                    phone = driverDoc.getString("phone") ?: "",
-                                                    photoUrl = driverDoc.getString("photoUrl") ?: "",
-                                                    assignedBusId = result.busInfo.busId,
-                                                    isActive = true,
-                                                    shift = driverDoc.getString("shift") ?: "",
-                                                    routeName = driverDoc.getString("routeName") ?: ""
-                                                )
-                                                FirebaseManager.activateDriverAndLockBus(driver)
-                                            }
                                         }
                                         
                                         isLoading = false

@@ -149,6 +149,44 @@ object FirebaseManager {
      * @param photoUri Optional photo URI for driver profile
      * @return Result with success/error message
      */
+    /**
+     * Helper: Creates a new Firebase Auth user OR cleans up an orphaned one (deleted from Firestore
+     * but still exists in Auth) by signing in + deleting + recreating.
+     * Returns the UID on success, null on failure (after populating [errorOut]).
+     */
+    private suspend fun resolveAuthUid(
+        email: String,
+        password: String,
+        username: String,
+        role: String,
+        errorOut: (String) -> Unit
+    ): String? {
+        return try {
+            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
+            authResult.user?.uid
+        } catch (authEx: Exception) {
+            val isAlreadyInUse =
+                authEx.message?.contains("email address is already in use", ignoreCase = true) == true ||
+                authEx.message?.contains("email-already-in-use", ignoreCase = true) == true
+            if (!isAlreadyInUse) { errorOut(getErrorMessage(authEx)); return null }
+            Log.w("FirebaseManager", "Orphaned Auth account found for $email — cleaning up")
+            try {
+                val oldAuth = auth.signInWithEmailAndPassword(email, password).await()
+                oldAuth.user?.delete()?.await()
+                Log.d("FirebaseManager", "Orphaned Auth deleted, recreating $email")
+                val retryResult = auth.createUserWithEmailAndPassword(email, password).await()
+                retryResult.user?.uid
+            } catch (signInEx: Exception) {
+                Log.e("FirebaseManager", "Cannot clean up orphaned Auth — wrong password", signInEx)
+                errorOut(
+                    "A $role with username '$username' already existed. " +
+                    "Use a different username, or the same password as before."
+                )
+                null
+            }
+        }
+    }
+
     suspend fun createDriverAccount(
         driverData: DriverData,
         password: String,
@@ -157,35 +195,29 @@ object FirebaseManager {
         return try {
             Log.d("FirebaseManager", "Creating driver account for: ${driverData.username}")
             
-            // Validate input data
             if (driverData.username.isBlank() || driverData.name.isBlank()) {
                 return DriverResult.Error("Username and name are required")
             }
-            
             if (password.length < 6) {
                 return DriverResult.Error("Password must be at least 6 characters")
             }
             
-            // Convert username to email format for Firebase Auth
             val email = "${driverData.username.trim()}@gmail.com"
-            
             Log.d("FirebaseManager", "Creating Firebase Auth account with email: $email")
             
-            // Step 1: Create Firebase Auth account
-            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-            val driverUid = authResult.user?.uid ?: return DriverResult.Error("Failed to create account")
+            var errorMsg: String? = null
+            val driverUid = resolveAuthUid(email, password, driverData.username.trim(), "driver") { errorMsg = it }
+                ?: return DriverResult.Error(errorMsg ?: "Failed to create account")
             
-            Log.d("FirebaseManager", "Firebase Auth account created, UID: $driverUid")
+            Log.d("FirebaseManager", "Firebase Auth account ready, UID: $driverUid")
             
-            // Step 2: Upload photo to Firebase Storage if provided
+            // Upload photo if provided
             var photoUrl: String? = null
             if (photoUri != null) {
-                Log.d("FirebaseManager", "Uploading driver photo...")
                 photoUrl = uploadDriverPhoto(driverUid, photoUri)
-                Log.d("FirebaseManager", "Photo upload result: $photoUrl")
             }
             
-            // Step 3: Create driver document in Firestore using UID as document ID
+            // Create/overwrite driver document in Firestore
             val driverDocument = hashMapOf(
                 "name" to driverData.name.trim(),
                 "username" to driverData.username.trim(),
@@ -198,11 +230,7 @@ object FirebaseManager {
             )
             
             firestore.collection("drivers").document(driverUid).set(driverDocument).await()
-            
             Log.d("FirebaseManager", "Driver document created in Firestore")
-            
-            // Step 4: Sign out the newly created driver account (admin should remain signed in)
-            // Note: This is handled by re-authenticating admin after driver creation
             
             DriverResult.Success("Driver account created successfully", driverUid)
         } catch (e: Exception) {
@@ -528,9 +556,19 @@ object FirebaseManager {
             val assignedBusId = driverDoc.getString("assignedBusId") ?: ""
             val isActive = driverDoc.getBoolean("isActive") ?: false
             
-            // Step 2: If driver is active, deactivate and unlock bus first
-            if (isActive && assignedBusId.isNotEmpty()) {
-                deactivateDriverAndUnlockBus(driverUid, assignedBusId)
+            // Fix 5.3: Bulletproof bus unlock — query any bus locked by this driver and unlock it
+            val lockedBuses = firestore.collection("buses")
+                .whereEqualTo("activeDriverId", driverUid)
+                .get()
+                .await()
+            for (bDoc in lockedBuses.documents) {
+                firestore.collection("buses").document(bDoc.id)
+                    .update(mapOf(
+                        "activeDriverId" to "",
+                        "tripActive" to false,
+                        "currentTripId" to "",
+                        "tripStartedAt" to null
+                    )).await()
             }
             
             // Step 3: Delete photo from Firebase Storage if exists
@@ -602,25 +640,41 @@ object FirebaseManager {
     }
     
     /**
-     * Update driver information (Admin function)
-     * @param driverInfo Updated driver information
-     * @param newPassword Optional new password for the driver
-     * @return Result with success/error message
+     * Update driver information (Admin function).
+     * Fix 5: If assignedBusId changes, clear old bus lock to prevent ghost-driver lock.
      */
     suspend fun updateDriverInfo(driverInfo: DriverInfo, newPassword: String? = null): DriverResult {
         return try {
+            // Fix 5: Detect bus reassignment and clear old bus lock
+            val existingDriverDoc = firestore.collection("drivers").document(driverInfo.uid).get().await()
+            val oldBusId = existingDriverDoc.getString("assignedBusId") ?: ""
+            val isCurrentlyActive = existingDriverDoc.getBoolean("isActive") ?: false
+
+            // If bus ID is changing and driver is NOT mid-trip, clear old bus's activeDriverId
+            if (oldBusId.isNotEmpty() && oldBusId != driverInfo.assignedBusId && !isCurrentlyActive) {
+                val oldBusSnapshot = firestore.collection("buses").document(oldBusId).get().await()
+                val busActiveDriver = oldBusSnapshot.getString("activeDriverId") ?: ""
+                if (busActiveDriver == driverInfo.uid) {
+                    // Safe to clear — this driver owns the lock on the old bus
+                    firestore.collection("buses").document(oldBusId)
+                        .update(mapOf("activeDriverId" to "", "tripActive" to false, "tripStartedAt" to null))
+                        .await()
+                    Log.d("FirebaseManager", "Cleared ghost lock on old bus $oldBusId after driver reassignment")
+                }
+            }
+
             val updateData = hashMapOf<String, Any>(
                 "name" to driverInfo.name,
                 "username" to driverInfo.username,
                 "phone" to driverInfo.phone,
                 "assignedBusId" to driverInfo.assignedBusId
             )
-            
+
             firestore.collection("drivers")
                 .document(driverInfo.uid)
                 .update(updateData)
                 .await()
-            
+
             // If password change is requested, update it
             if (!newPassword.isNullOrBlank() && newPassword.length >= 6) {
                 val passwordResult = resetDriverPassword(driverInfo.email, newPassword)
@@ -628,7 +682,7 @@ object FirebaseManager {
                     return DriverResult.Error("Driver info updated but password change failed: ${passwordResult.message}")
                 }
             }
-            
+
             DriverResult.Success("Driver information updated successfully", driverInfo.uid)
         } catch (e: Exception) {
             DriverResult.Error("Failed to update driver: ${e.message}")
@@ -695,10 +749,11 @@ object FirebaseManager {
      */
     suspend fun createBus(busNumber: Int, capacity: Int, password: String): BusResult {
         return try {
+            val hashedPassword = hashPassword(password)
             val busData = hashMapOf(
                 "busNumber" to busNumber,
                 "capacity" to capacity,
-                "password" to password,
+                "password" to hashedPassword,
                 "activeDriverId" to "",
                 "createdAt" to System.currentTimeMillis()
             )
@@ -762,6 +817,20 @@ object FirebaseManager {
     }
     
     /**
+     * SHA-256 password hasher for bus authentication
+     */
+    private fun hashPassword(password: String): String {
+        return try {
+            val digest = java.security.MessageDigest.getInstance("SHA-256")
+            val hashBytes = digest.digest(password.toByteArray(Charsets.UTF_8))
+            hashBytes.joinToString("") { "%02x".format(it) }
+        } catch (e: Exception) {
+            Log.e("FirebaseManager", "Hash calculation failed", e)
+            password // Fallback to raw string if digest fails for some reason
+        }
+    }
+
+    /**
      * Authenticate bus with bus number and password
      * @param busNumber Bus number to authenticate
      * @param password Bus password
@@ -785,11 +854,24 @@ object FirebaseManager {
             // Get the first matching bus
             val busDoc = busesSnapshot.documents.first()
             val storedPassword = busDoc.getString("password") ?: ""
+            val inputHash = hashPassword(password)
             
-            // Verify password
-            if (storedPassword != password) {
+            // Verify password mapping: Support both hashed and legacy plaintext for migration
+            val isMatch = (storedPassword == inputHash) || (storedPassword == password)
+            
+            if (!isMatch) {
                 Log.d("FirebaseManager", "Invalid password for bus: $busNumber")
                 return BusAuthResult.Error("Invalid password. Please try again.")
+            }
+            
+            // Auto-migrate plaintext passwords to SHA-256 on successful login
+            if (storedPassword == password && storedPassword != inputHash) {
+                try {
+                    busDoc.reference.update("password", inputHash).await()
+                    Log.d("FirebaseManager", "Migrated bus password to SHA-256 format")
+                } catch (e: Exception) {
+                    Log.w("FirebaseManager", "Failed to migrate password", e)
+                }
             }
             
             // Password is correct, create BusInfo object
@@ -850,27 +932,26 @@ object FirebaseManager {
         return try {
             Log.d("FirebaseManager", "Creating student account for username: ${studentData.username}")
             
-            // Convert username to email format for Firebase Auth
             val email = "${studentData.username.trim()}@gmail.com"
             
-            // Step 1: Create Firebase Auth account
-            val authResult = auth.createUserWithEmailAndPassword(email, password).await()
-            val studentUid = authResult.user?.uid ?: return StudentResult.Error("Failed to create account")
+            var errorMsg: String? = null
+            val studentUid = resolveAuthUid(email, password, studentData.username.trim(), "student") { errorMsg = it }
+                ?: return StudentResult.Error(errorMsg ?: "Failed to create account")
             
-            Log.d("FirebaseManager", "Student Auth UID created: $studentUid")
+            Log.d("FirebaseManager", "Student Auth UID ready: $studentUid")
             
-            // Step 2: Create student document in Firestore using UID as document ID
+            // Create/overwrite student document in Firestore
             val studentDocument = hashMapOf(
                 "name" to studentData.name,
                 "username" to studentData.username,
                 "email" to email,
+                "phone" to studentData.phone,
                 "busId" to studentData.busId,
                 "stop" to studentData.stop,
                 "createdAt" to System.currentTimeMillis()
             )
             
             firestore.collection("students").document(studentUid).set(studentDocument).await()
-            
             Log.d("FirebaseManager", "Student document created in Firestore")
             
             StudentResult.Success("Student account created successfully", studentUid)
@@ -916,7 +997,8 @@ object FirebaseManager {
                 username = username.trim(),
                 email = email,
                 busId = studentDoc.getString("busId") ?: "",
-                stop = studentDoc.getString("stop") ?: ""
+                stop = studentDoc.getString("stop") ?: "",
+                phone = studentDoc.getString("phone") ?: ""
             )
             
             Log.d("FirebaseManager", "Student info loaded: ${studentInfo.name}")
@@ -954,7 +1036,8 @@ object FirebaseManager {
                     username = studentDoc.getString("username") ?: "",
                     email = studentDoc.getString("email") ?: "",
                     busId = studentDoc.getString("busId") ?: "",
-                    stop = studentDoc.getString("stop") ?: ""
+                    stop = studentDoc.getString("stop") ?: "",
+                    phone = studentDoc.getString("phone") ?: ""
                 )
             } else {
                 Log.w("FirebaseManager", "Student document not found for UID: ${currentUser.uid}")
@@ -1013,7 +1096,8 @@ object FirebaseManager {
                         username = doc.getString("username") ?: "",
                         email = doc.getString("email") ?: "",
                         busId = doc.getString("busId") ?: "",
-                        stop = doc.getString("stop") ?: ""
+                        stop = doc.getString("stop") ?: "",
+                        phone = doc.getString("phone") ?: ""
                     )
                 } catch (e: Exception) {
                     null
@@ -1040,7 +1124,22 @@ object FirebaseManager {
                 return StudentResult.Error("Student not found")
             }
             
-            // Step 2: Delete Firestore document
+            // P3 Fix: Delete all absence records for this student before deleting the student doc
+            val absenceSnapshot = firestore.collection("absences")
+                .whereEqualTo("studentId", studentUid)
+                .get()
+                .await()
+            
+            if (!absenceSnapshot.isEmpty) {
+                absenceSnapshot.documents.chunked(499).forEach { chunk ->
+                    val absenceBatch = firestore.batch()
+                    chunk.forEach { absenceBatch.delete(it.reference) }
+                    absenceBatch.commit().await()
+                }
+                Log.d("FirebaseManager", "Deleted ${absenceSnapshot.size()} absence records for $studentUid")
+            }
+            
+            // Step 2: Delete Firestore student document
             firestore.collection("students").document(studentUid).delete().await()
             
             Log.d("FirebaseManager", "Student document deleted: $studentUid")
@@ -1070,7 +1169,8 @@ object FirebaseManager {
                 "name" to studentInfo.name,
                 "username" to studentInfo.username,
                 "busId" to studentInfo.busId,
-                "stop" to studentInfo.stop
+                "stop" to studentInfo.stop,
+                "phone" to studentInfo.phone
             )
             
             firestore.collection("students")
@@ -1365,7 +1465,8 @@ data class StudentData(
     val name: String,
     val username: String,
     val busId: String,
-    val stop: String
+    val stop: String,
+    val phone: String = ""
 )
 
 /**
@@ -1377,7 +1478,8 @@ data class StudentInfo(
     val username: String,
     val email: String,
     val busId: String,
-    val stop: String
+    val stop: String,
+    val phone: String = ""
 )
 
 /**

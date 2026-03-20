@@ -35,6 +35,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.zIndex
 import androidx.core.content.ContextCompat
+import android.net.ConnectivityManager
+import android.net.NetworkCapabilities
 import com.campusbussbuddy.R
 import com.campusbussbuddy.firebase.BusInfo
 import com.campusbussbuddy.firebase.StudentInfo
@@ -218,7 +220,13 @@ fun StudentPortalHomeScreen(
 
                     // Action Grid — ONLY cards trigger navigation
                     StudentActionGrid(
-                        onQrScanClick  = { openQrScanner() },
+                        onQrScanClick  = {
+                            if (uiState.isAbsentToday) {
+                                Toast.makeText(context, "Access Denied: You are marked absent today.", Toast.LENGTH_LONG).show()
+                            } else {
+                                viewModel.setScannerVisible(true)
+                            }
+                        },
                         onProfileClick = { viewModel.setProfileVisible(true) },
                         onAbsentClick  = onAbsentCalendarClick
                     )
@@ -246,27 +254,75 @@ fun StudentPortalHomeScreen(
                         onScan = { qrContent ->
                             viewModel.setScannerVisible(false)
                             val todayStr = java.text.SimpleDateFormat("yyyy-MM-dd", java.util.Locale.getDefault()).format(java.util.Date())
-                            if (qrContent.startsWith("busId:") && qrContent.contains("|date:$todayStr")) {
+
+                            // Fix 2+3: Check network FIRST — block fake offline success
+                            val cm = context.getSystemService(ConnectivityManager::class.java)
+                            val isOnline = cm?.activeNetwork?.let {
+                                cm.getNetworkCapabilities(it)?.hasCapability(NetworkCapabilities.NET_CAPABILITY_INTERNET)
+                            } ?: false
+
+                            if (!isOnline) {
+                                Toast.makeText(context, "No internet connection. Please connect and retry.", Toast.LENGTH_LONG).show()
+                                return@QRScannerView
+                            }
+
+                            if (qrContent.startsWith("busId:") && qrContent.contains("|date:$todayStr") && qrContent.contains("|tripId:")) {
                                 val parts = qrContent.split("|")
                                 val scannedBusId = parts.firstOrNull { it.startsWith("busId:") }?.removePrefix("busId:")
-                                
+                                val scannedTripId = parts.firstOrNull { it.startsWith("tripId:") }?.removePrefix("tripId:")
                                 val uid = FirebaseAuth.getInstance().currentUser?.uid
-                                if (uid != null && scannedBusId != null) {
-                                    FirebaseFirestore.getInstance()
-                                        .collection("students").document(uid)
-                                        .update(mapOf("status" to "BOARDED", "busId" to scannedBusId))
-                                        .addOnSuccessListener {
-                                            Toast.makeText(context, "Boarded Successfully", Toast.LENGTH_SHORT).show()
+                                val studentBusId = studentInfo?.busId ?: ""
+
+                                if (uid != null && scannedBusId != null && scannedTripId != null) {
+                                    if (scannedBusId != studentBusId) {
+                                        Toast.makeText(context, "Invalid QR: This QR code belongs to a different bus.", Toast.LENGTH_LONG).show()
+                                    } else {
+                                        // Fix 2+3+16: Use Firestore runTransaction for atomic check-then-write
+                                        // This prevents: (a) race condition if two devices scan simultaneously
+                                        //                (b) offline fake-success (transaction requires server round-trip)
+                                        //                (c) screenshot reuse (validates dynamic tripId directly against server)
+                                        val studentRef = FirebaseFirestore.getInstance().collection("students").document(uid)
+                                        val busRef = FirebaseFirestore.getInstance().collection("buses").document(scannedBusId)
+
+                                        FirebaseFirestore.getInstance().runTransaction { transaction ->
+                                            // Server-read inside transaction — cannot use cache
+                                            val busSnapshot = transaction.get(busRef)
+                                            val liveTripId = busSnapshot.getString("currentTripId") ?: ""
+                                            if (liveTripId.isEmpty() || liveTripId != scannedTripId) {
+                                                throw Exception("INVALID_TRIP")
+                                            }
+
+                                            val studentSnapshot = transaction.get(studentRef)
+                                            val currentStatus = studentSnapshot.getString("status") ?: ""
+                                            if (currentStatus == "BOARDED") {
+                                                throw Exception("ALREADY_BOARDED")
+                                            }
+                                            
+                                            // Atomic write — only update status, never overwrite busId
+                                            transaction.update(studentRef, "status", "BOARDED")
+                                        }.addOnSuccessListener {
+                                            Toast.makeText(context, "Boarded Successfully ✓", Toast.LENGTH_SHORT).show()
                                             hasScannedSession = true
+                                        }.addOnFailureListener { ex ->
+                                            when (ex.message) {
+                                                "ALREADY_BOARDED" -> {
+                                                    Toast.makeText(context, "Already boarded for this trip.", Toast.LENGTH_LONG).show()
+                                                    hasScannedSession = true
+                                                }
+                                                "INVALID_TRIP" -> {
+                                                    Toast.makeText(context, "Expired QR: Please scan the live QR code.", Toast.LENGTH_LONG).show()
+                                                }
+                                                else -> {
+                                                    Toast.makeText(context, "Boarding failed. Please try again.", Toast.LENGTH_SHORT).show()
+                                                }
+                                            }
                                         }
-                                        .addOnFailureListener {
-                                            Toast.makeText(context, "Failed to update attendance.", Toast.LENGTH_SHORT).show()
-                                        }
+                                    }
                                 } else {
-                                    Toast.makeText(context, "Error: User not logged in", Toast.LENGTH_SHORT).show()
+                                    Toast.makeText(context, "Error: Invalid QR or User not logged in", Toast.LENGTH_SHORT).show()
                                 }
                             } else {
-                                Toast.makeText(context, "Invalid QR Code", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(context, "Invalid or Expired QR Code", Toast.LENGTH_SHORT).show()
                             }
                         },
                         onClose = { viewModel.setScannerVisible(false) }

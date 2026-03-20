@@ -24,6 +24,7 @@ data class StudentPortalUiState(
     val upcomingAbsenceCount: Int = 0,
     val showScanner: Boolean = false,
     val showProfile: Boolean = false,
+    val isAbsentToday: Boolean = false,
     val errorMessage: String? = null
 )
 
@@ -45,6 +46,10 @@ class StudentPortalViewModel : ViewModel() {
     }
 
     private var busListener: com.google.firebase.firestore.ListenerRegistration? = null
+
+    // Fix 6: Cache the last known activeDriverId to avoid re-fetching driver
+    // doc on every bus document update when the driver hasn't changed
+    private var cachedActiveDriverId: String = ""
 
     override fun onCleared() {
         super.onCleared()
@@ -69,19 +74,52 @@ class StudentPortalViewModel : ViewModel() {
                 val absences = FirebaseManager.getStudentAbsences(student.uid)
                 val todayStr = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).format(Date())
                 val upcomingCount = absences.count { it.date >= todayStr }
+                val absentToday = absences.any { it.date == todayStr }
 
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
+                // We do NOT set isLoading = false yet! We wait until we get the bus.
+                var currentState = _uiState.value.copy(
                     studentInfo = student,
-                    upcomingAbsenceCount = upcomingCount
+                    upcomingAbsenceCount = upcomingCount,
+                    isAbsentToday = absentToday
                 )
 
-                // Step 3: Listen to assigned bus in real-time
+                // Step 3: Immediately fetch bus info so portal shows bus number right away
+                if (student.busId.isNotEmpty()) {
+                    try {
+                        val busDoc = FirebaseManager.firestore.collection("buses").document(student.busId).get().await()
+                        if (busDoc.exists()) {
+                            val immediateBus = BusInfo(
+                                busId = busDoc.id,
+                                busNumber = busDoc.getLong("busNumber")?.toInt() ?: 0,
+                                capacity = busDoc.getLong("capacity")?.toInt() ?: 0,
+                                activeDriverId = busDoc.getString("activeDriverId") ?: ""
+                            )
+                            currentState = currentState.copy(busInfo = immediateBus)
+                            Log.d("StudentPortalViewModel", "Immediately loaded bus: ${immediateBus.busNumber}")
+                        } else {
+                            Log.w("StudentPortalViewModel", "Bus document ${student.busId} does not exist in Firestore")
+                        }
+                    } catch (e: Exception) {
+                        Log.e("StudentPortalViewModel", "Failed to immediate-load bus info", e)
+                    }
+                }
+                
+                // Now we have everything we need to show the UI without flickering
+                _uiState.value = currentState.copy(isLoading = false)
+
+                // Step 4: Listen to assigned bus in real-time
                 if (student.busId.isNotEmpty()) {
                     busListener?.remove()
                     busListener = FirebaseManager.firestore.collection("buses").document(student.busId)
                         .addSnapshotListener { snapshot, error ->
-                            if (error != null || snapshot == null || !snapshot.exists()) return@addSnapshotListener
+                            if (error != null) {
+                                Log.e("StudentPortalViewModel", "Bus snapshot error", error)
+                                return@addSnapshotListener
+                            }
+                            if (snapshot == null || !snapshot.exists()) {
+                                Log.w("StudentPortalViewModel", "Bus snapshot null/non-existent for ${student.busId}")
+                                return@addSnapshotListener
+                            }
                             
                             val busNumber = snapshot.getLong("busNumber")?.toInt() ?: 0
                             val capacity = snapshot.getLong("capacity")?.toInt() ?: 0
@@ -93,37 +131,46 @@ class StudentPortalViewModel : ViewModel() {
                                 capacity = capacity,
                                 activeDriverId = activeDriverId
                             )
-                            
+
                             if (activeDriverId.isNotEmpty()) {
-                                FirebaseManager.firestore.collection("drivers").document(activeDriverId)
-                                    .get()
-                                    .addOnSuccessListener { doc ->
-                                        if (doc.exists()) {
-                                            val liveDriver = DriverInfo(
-                                                uid = doc.id,
-                                                name = doc.getString("name") ?: "Driver",
-                                                username = doc.getString("username") ?: "",
-                                                email = doc.getString("email") ?: "",
-                                                phone = doc.getString("phone") ?: "",
-                                                photoUrl = doc.getString("photoUrl") ?: "",
-                                                assignedBusId = doc.getString("assignedBusId") ?: "",
-                                                isActive = doc.getBoolean("isActive") ?: false,
-                                                shift = doc.getString("shift") ?: "",
-                                                routeName = doc.getString("routeName") ?: ""
-                                            )
-                                            _uiState.value = _uiState.value.copy(
-                                                busInfo = liveBus,
-                                                activeDriver = liveDriver
-                                            )
+                                if (activeDriverId != cachedActiveDriverId) {
+                                    cachedActiveDriverId = activeDriverId
+                                    FirebaseManager.firestore.collection("drivers").document(activeDriverId)
+                                        .get()
+                                        .addOnSuccessListener { doc ->
+                                            if (doc.exists()) {
+                                                val liveDriver = DriverInfo(
+                                                    uid = doc.id,
+                                                    name = doc.getString("name") ?: "Driver",
+                                                    username = doc.getString("username") ?: "",
+                                                    email = doc.getString("email") ?: "",
+                                                    phone = doc.getString("phone") ?: "",
+                                                    photoUrl = doc.getString("photoUrl") ?: "",
+                                                    assignedBusId = doc.getString("assignedBusId") ?: "",
+                                                    isActive = doc.getBoolean("isActive") ?: false,
+                                                    shift = doc.getString("shift") ?: "",
+                                                    routeName = doc.getString("routeName") ?: ""
+                                                )
+                                                _uiState.value = _uiState.value.copy(
+                                                    busInfo = liveBus,
+                                                    activeDriver = liveDriver
+                                                )
+                                            }
                                         }
-                                    }
+                                } else {
+                                    _uiState.value = _uiState.value.copy(busInfo = liveBus)
+                                }
                             } else {
+                                cachedActiveDriverId = ""
                                 _uiState.value = _uiState.value.copy(
                                     busInfo = liveBus,
                                     activeDriver = null
                                 )
                             }
                         }
+                } else {
+                    // No bus ID, so just stop loading
+                    _uiState.value = currentState.copy(isLoading = false)
                 }
 
             } catch (e: Exception) {

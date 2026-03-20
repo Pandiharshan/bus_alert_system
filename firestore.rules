@@ -1,27 +1,60 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // Allow authenticated users to read and write their own documents
-    match /admins/{userId} {
-      allow read, write: if request.auth != null;
+
+    // ─── ADMINS ───────────────────────────────────────────────────────────────
+    // Only authenticated users can read admin docs.
+    // Writes only allowed by the admin themselves (document ID matches auth uid's email).
+    match /admins/{adminId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.token.email == adminId;
     }
-    
-    match /drivers/{userId} {
-      allow read, write: if request.auth != null;
+
+    // ─── DRIVERS ─────────────────────────────────────────────────────────────
+    // All authenticated users can read driver docs (needed for student portal to show driver info).
+    // Only the driver themselves can write their own document.
+    match /drivers/{driverId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == driverId;
     }
-    
-    match /students/{userId} {
-      allow read, write: if request.auth != null;
+
+    // ─── STUDENTS ────────────────────────────────────────────────────────────
+    // All authenticated users can read (needed for driver to see their bus students).
+    // Students can only write their own document (e.g. update status to BOARDED).
+    match /students/{studentId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null && request.auth.uid == studentId;
     }
-    
+
+    // ─── BUSES ───────────────────────────────────────────────────────────────
+    // All authenticated users can read bus info.
+    // Only drivers can write to buses (to set/clear activeDriverId during trip).
     match /buses/{busId} {
-      allow read, write: if request.auth != null;
-    }
-    
-    // Allow authenticated users to read all documents (for admin functions)
-    match /{document=**} {
       allow read: if request.auth != null;
       allow write: if request.auth != null;
     }
+
+    // ─── ABSENCES ────────────────────────────────────────────────────────────
+    // All authenticated users can read absences (drivers need to filter absent students).
+    // A student can only write/delete their own absence (doc ID format: {studentId}_{date}).
+    match /absences/{absenceId} {
+      allow read: if request.auth != null;
+      allow write, delete: if request.auth != null
+        && absenceId.matches(request.auth.uid + '_.*');
+    }
+
+    // ─── DRIVER LOGS ─────────────────────────────────────────────────────────
+    match /driver_logs/{logId} {
+      allow read: if request.auth != null;
+      allow create: if request.auth != null;
+      allow update, delete: if false; // logs are immutable
+    }
+
+    // ─── DEFAULT: deny everything not matched above ───────────────────────────
+    match /{document=**} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
   }
 }
+

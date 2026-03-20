@@ -10,8 +10,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Icon
-import androidx.compose.material3.Text
+import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,6 +27,8 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.campusbussbuddy.R
+import com.campusbussbuddy.firebase.BusInfo
+import com.campusbussbuddy.firebase.FirebaseManager
 import com.campusbussbuddy.firebase.StudentInfo
 import com.campusbussbuddy.ui.theme.NeumorphAccentPrimary
 import com.campusbussbuddy.ui.theme.NeumorphSurface
@@ -48,9 +49,24 @@ fun EditStudentDialog(
     var username by remember { mutableStateOf(student.username) }
     var busId by remember { mutableStateOf(student.busId) }
     var stop by remember { mutableStateOf(student.stop) }
+    var phone by remember { mutableStateOf(student.phone) }
+    
+    var buses by remember { mutableStateOf<List<BusInfo>>(emptyList()) }
+    var isDropdownExpanded by remember { mutableStateOf(false) }
+    var selectedBus by remember { mutableStateOf<BusInfo?>(null) }
     
     var visible by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) { visible = true }
+    LaunchedEffect(Unit) { 
+        visible = true 
+        try {
+            buses = FirebaseManager.getAllBuses()
+            // Pre-select the student's current bus if found
+            selectedBus = buses.find { it.busId == student.busId }
+        } catch (e: Exception) {
+            // handle silently
+        }
+    }
+    
     val alpha by animateFloatAsState(if (visible) 1f else 0f, tween(300), label = "a")
     val scale by animateFloatAsState(if (visible) 1f else 0.88f, tween(300), label = "s")
     
@@ -143,14 +159,59 @@ fun EditStudentDialog(
 
                     Spacer(modifier = Modifier.height(16.dp))
 
+                    // Bus ID Dropdown
+                    @OptIn(ExperimentalMaterial3Api::class)
+                    ExposedDropdownMenuBox(
+                        expanded = isDropdownExpanded,
+                        onExpandedChange = { isDropdownExpanded = !isDropdownExpanded }
+                    ) {
+                        Box(modifier = Modifier.menuAnchor()) {
+                            NeumorphismTextField(
+                                value = selectedBus?.let { "Bus ${it.busNumber}" } ?: busId, // Fallback to raw busId if not found in list
+                                onValueChange = {},
+                                placeholder = "Select Bus",
+                                leadingIcon = {
+                                    Icon(
+                                        painter = painterResource(id = R.drawable.ic_directions_bus_vector),
+                                        contentDescription = "Bus",
+                                        tint = NeumorphTextSecondary,
+                                        modifier = Modifier.size(20.dp)
+                                    )
+                                },
+                                enabled = false
+                            )
+                            Box(modifier = Modifier.matchParentSize().clickable { isDropdownExpanded = true })
+                        }
+
+                        ExposedDropdownMenu(
+                            expanded = isDropdownExpanded,
+                            onDismissRequest = { isDropdownExpanded = false },
+                            modifier = Modifier.background(NeumorphSurface)
+                        ) {
+                            buses.forEach { bus ->
+                                DropdownMenuItem(
+                                    text = { Text("Bus ${bus.busNumber}", color = NeumorphTextPrimary) },
+                                    onClick = {
+                                        selectedBus = bus
+                                        busId = bus.busId
+                                        isDropdownExpanded = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
                     NeumorphismTextField(
-                        value = busId,
-                        onValueChange = { busId = it },
-                        placeholder = "Bus ID (e.g., B-101)",
+                        value = phone,
+                        onValueChange = { phone = it },
+                        placeholder = "Parent/Student Phone",
+                        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
                         leadingIcon = {
                             Icon(
-                                painter = painterResource(id = R.drawable.ic_directions_bus_vector),
-                                contentDescription = "Bus ID",
+                                painter = painterResource(id = R.drawable.ic_call),
+                                contentDescription = "Phone",
                                 tint = NeumorphTextSecondary,
                                 modifier = Modifier.size(20.dp)
                             )
@@ -212,7 +273,8 @@ fun EditStudentDialog(
                                     name = name.trim(),
                                     username = username.trim(),
                                     busId = busId.trim(),
-                                    stop = stop.trim()
+                                    stop = stop.trim(),
+                                    phone = phone.trim()
                                 )
                                 onSave(updatedStudent, null)
                             },
