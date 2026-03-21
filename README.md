@@ -22,13 +22,13 @@ All without requiring any custom backend server.
 
 | 🔐 Login Page | 👨‍💼 Admin Home | 🎓 Student Home |
 |--------------|----------------|----------------|
-| <img src="screenshots/admin_login.jpg" width="260" /> | <img src="screenshots/admin-home.jpg" width="260" /> | <img src="screenshots/student-home.jpg" width="260" /> |
+| <img src="Screenshots/admin_login.jpg" width="260" /> | <img src="Screenshots/admin-home.jpg" width="260" /> | <img src="Screenshots/student-home.jpg" width="260" /> |
 
 ---
 
 | 🚗 Driver Home | 🚌 Bus Management |
 |---------------|------------------|
-| <img src="screenshots/driver-home.jpg" width="260" /> | <img src="screenshots/bus-page.jpg" width="260" /> |
+| <img src="Screenshots/driver-home.jpg" width="260" /> | <img src="Screenshots/bus-page.jpg" width="260" /> |
 
 ---
 
