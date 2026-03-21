@@ -20,9 +20,15 @@ All without requiring any custom backend server.
 ---
 ## 📸 Screenshots
 
-| Admin Login | Role Selection Screen |
-|-------------|-----------------------|
-| <img src="Screenshots/admin_login.png" width="260" /> | <img src="Screenshots/selection_screen.png" width="260" /> |
+| 🔐 Login Page | 👨‍💼 Admin Home | 🎓 Student Home |
+|--------------|----------------|----------------|
+| <img src="screenshots/admin_login.jpg" width="260" /> | <img src="screenshots/admin-home.jpg" width="260" /> | <img src="screenshots/student-home.jpg" width="260" /> |
+
+---
+
+| 🚗 Driver Home | 🚌 Bus Management |
+|---------------|------------------|
+| <img src="screenshots/driver-home.jpg" width="260" /> | <img src="screenshots/bus-page.jpg" width="260" /> |
 
 ---
 
